@@ -1,7 +1,8 @@
 import re
 from datetime import datetime
-from flask import Flask
+from flask import Flask, render_template, request, redirect, session
 app = Flask(__name__)
+from gradio_client import Client
 
 @app.route("/")
 def home():
@@ -26,8 +27,11 @@ def hello_there(name):
     return content
 
 
-@app.route('/todo', methods=['POST'])
+@app.route('/todo', methods=["POST"])
 def get_todos():
-    
-     print('hello bro')
-     return ''
+     #client = Client("https://facebook-seamless-m4t.hf.space/")
+     
+     
+     print(request.method)
+     print(request.form.get('audio'))
+     return {"res":"result"}

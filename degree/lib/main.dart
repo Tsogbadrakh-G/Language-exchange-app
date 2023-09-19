@@ -3,19 +3,17 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:degree/Data.dart';
+import 'package:degree/custom_source.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'dart:async';
-import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:audioplayers/audioplayers.dart';
-// import 'package:record/record.dart';
-// import 'package:flutter_sound/flutter_sound.dart';
+import 'package:just_audio/just_audio.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYDB2cdCZpmEwb8/sX15idn5V0fc/1BlrrrY2DL98YieT9AoFhhRTM9MkE5MkSwtDM5NkY8skoyRDC1NTI0ujJCOjlBQj14PsqQ2BjAwSx1tZGBkgEMTnYShJLS6JT85IzMtLzWFgAABuJh+p";
+    "007eJxTYJiiW2/jenCSa7t/glTVssu39rjzb3fq2cH08Fp3YKWNmL8CQ4qpmWmSiUmSpYWhmUmysWWSUZKhhampkaVRkpFRSorRDiXO1IZARgbVM7msjAwQCOLzMJSkFpfEJ2ck5uWl5jAwAAC46iA9";
 const channel = "test_channel";
 
 void main() => runApp(const MaterialApp(home: MyApp()));
@@ -32,7 +30,7 @@ class _MyAppState extends State<MyApp> {
   bool _localUserJoined = false;
   late RtcEngine _engine;
   int mute = 0;
-  //final audioPlayer = AudioPlayer();
+  final audioPlayer = AudioPlayer();
   //final audioRecord = Record();
   bool isRecording = false;
   //String? audioPath = '../../ai_speech_translator/audio/input.wav';
@@ -132,7 +130,6 @@ class _MyAppState extends State<MyApp> {
   //   }
   // }
 
-  AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
@@ -184,27 +181,19 @@ class _MyAppState extends State<MyApp> {
                   Uint8List hha = await File(record).readAsBytes();
 
                   File req = await File(record);
-                  Data.sendAudio(req);
 
-                  print('hha ${hha.length}');
+                  var val = await Data.sendAudio(record);
+
+                  log('res: ${val}');
+
+                  // print('hha ${hha.length}');
                   // print('hha $hha');
+                  await audioPlayer.setAudioSource(CustomSource(hha));
 
-                  assetsAudioPlayer.open(Audio.file(record),
-                      showNotification: true);
+                  await audioPlayer.load();
 
-                  assetsAudioPlayer.play();
+                  audioPlayer.play();
 
-                  // final player = AudioPlayer();
-                  // player.play(UrlSource(record));
-
-                  // playRecording(hha);
-                  // File(record);
-                  // Source urlSource =BytesSource(audioPath!);
-                  // await stopRecording();
-                  // log('stopped recording');
-                  // if (!isRecording && audioPath != null) {
-                  //   await playRecording();
-                  // }
                   setState(() {});
                 } else {
                   Directory tempDir = await getTemporaryDirectory();
@@ -254,7 +243,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    assetsAudioPlayer.dispose();
     super.dispose();
   }
 }
