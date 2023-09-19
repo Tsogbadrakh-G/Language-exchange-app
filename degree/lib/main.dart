@@ -47,10 +47,12 @@ class _MyAppState extends State<MyApp> {
 
     //create the engine
     _engine = createAgoraRtcEngine();
-    await _engine.initialize(const RtcEngineContext(
-      appId: appId,
-      channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
-    ));
+    await _engine.initialize(
+      const RtcEngineContext(
+          appId: appId,
+          channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+          logConfig: LogConfig(level: LogLevel.logLevelError)),
+    );
 
     _engine.registerEventHandler(
       RtcEngineEventHandler(
@@ -175,19 +177,17 @@ class _MyAppState extends State<MyApp> {
                 if (mute % 2 == 0) {
                   await _engine.stopAudioRecording();
                   Directory tempDir = await getTemporaryDirectory();
-                  String record = '${tempDir.absolute.path}/record.aac';
+                  String record = '${tempDir.absolute.path}/record.wav';
 
                   log('recorded file: $record');
-                  Uint8List hha = await File(record).readAsBytes();
+                  Uint8List hha = await File(record).readAsBytesSync();
 
-                  File req = await File(record);
+                  // File req = File(record);
 
                   var val = await Data.sendAudio(record);
 
                   log('res: ${val}');
 
-                  // print('hha ${hha.length}');
-                  // print('hha $hha');
                   await audioPlayer.setAudioSource(CustomSource(hha));
 
                   await audioPlayer.load();
@@ -197,7 +197,7 @@ class _MyAppState extends State<MyApp> {
                   setState(() {});
                 } else {
                   Directory tempDir = await getTemporaryDirectory();
-                  String record = '${tempDir.absolute.path}/record.aac';
+                  String record = '${tempDir.absolute.path}/record.wav';
                   await File(record).create(exclusive: false, recursive: false);
 
                   _engine.startAudioRecording(
