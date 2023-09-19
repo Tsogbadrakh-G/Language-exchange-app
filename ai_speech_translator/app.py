@@ -44,11 +44,16 @@ def get_todos():
             save_path = os.path.join(os.getcwd(), 'uploads', audio_file.filename)
             audio_file.save(save_path)
             result = translate(save_path)
+
+            # to Mongol start block
             targeted_languga_text=convertTuple(result)   
             print(synthesize(targeted_languga_text))
+            #to Mongol end block
 
             print(result[0])
             path= result[0]
+
+          #  below is speech to speech start
 
             # with wave.open(path, 'r') as wf:
             #     # Read audio data
@@ -63,8 +68,10 @@ def get_todos():
             #     new_wf.setframerate(wf.getframerate())
             #     new_wf.writeframes(audio_data)
             #     print('Audio data written to the new file:', translated_path)
+            
 
-            # audio_file.save(os.path.join('path/to/save', audio_file.filename))
+           # audio_file.save(os.path.join('path/to/save', audio_file.filename))
+           # end s2s
             return jsonify({'message': 'Audio file uploaded successfully'}), 200
         else:
             return jsonify({'error': 'No audio file provided'}), 400
@@ -115,7 +122,7 @@ def synthesize(text):
     r = requests.post(
         url, data=text.encode('utf-8'), headers=headers)
 
-    with open("audio/output.wav", 'wb') as out:
+    with open("translated/output.wav", 'wb') as out:
         out.write(r.content)
 
 
