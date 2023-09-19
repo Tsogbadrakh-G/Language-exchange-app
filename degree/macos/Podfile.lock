@@ -33,14 +33,21 @@ PODS:
   - AgoraRtcEngine_macOS/VideoCodecEnc (4.2.2)
   - AgoraRtcEngine_macOS/VirtualBackground (4.2.2)
   - AgoraRtcEngine_macOS/VQA (4.2.2)
+  - audioplayers (0.0.1):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - iris_method_channel (0.0.1):
+    - FlutterMacOS
+  - path_provider_foundation (0.0.1):
+    - Flutter
     - FlutterMacOS
 
 DEPENDENCIES:
   - agora_rtc_engine (from `Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos`)
+  - audioplayers (from `Flutter/ephemeral/.symlinks/plugins/audioplayers/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - iris_method_channel (from `Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos`)
+  - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -50,17 +57,23 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   agora_rtc_engine:
     :path: Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos
+  audioplayers:
+    :path: Flutter/ephemeral/.symlinks/plugins/audioplayers/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   iris_method_channel:
     :path: Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos
+  path_provider_foundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
 
 SPEC CHECKSUMS:
   agora_rtc_engine: 66c57685283ebadc4b70d49b234fd0443f837589
   AgoraIrisRTC_macOS: c4cb1fea791a76ce172801c8b006aa69eb036b07
   AgoraRtcEngine_macOS: 5e4d1430490bf36597e47cdbe6e5284b24e66504
+  audioplayers: 8b48e22684b6e0d9df143b2d1bbd61dca9dab6b4
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   iris_method_channel: fba932d668df5b2a085f19bcd0b1f23d667a83cd
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
 
