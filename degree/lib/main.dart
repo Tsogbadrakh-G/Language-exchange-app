@@ -13,7 +13,7 @@ import 'package:just_audio/just_audio.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYJiiW2/jenCSa7t/glTVssu39rjzb3fq2cH08Fp3YKWNmL8CQ4qpmWmSiUmSpYWhmUmysWWSUZKhhampkaVRkpFRSorRDiXO1IZARgbVM7msjAwQCOLzMJSkFpfEJ2ck5uWl5jAwAAC46iA9";
+    "007eJxTYFC5N8nVytUzmE/Gd5/7LJGGY+JCJhWzE6e6zgyb33tkU48CQ4qpmWmSiUmSpYWhmUmysWWSUZKhhampkaVRkpFRSooRVyhXakMgI8Nn5mZmRgYIBPF5GEpSi0vikzMS8/JScxgYAB3uHpQ=";
 const channel = "test_channel";
 
 void main() => runApp(const MaterialApp(home: MyApp()));
@@ -31,9 +31,8 @@ class _MyAppState extends State<MyApp> {
   late RtcEngine _engine;
   int mute = 0;
   final audioPlayer = AudioPlayer();
-  //final audioRecord = Record();
+
   bool isRecording = false;
-  //String? audioPath = '../../ai_speech_translator/audio/input.wav';
 
   @override
   void initState() {
@@ -93,44 +92,6 @@ class _MyAppState extends State<MyApp> {
       options: const ChannelMediaOptions(),
     );
   }
-
-  // Future<void> startRecording() async {
-
-  //   try {
-  //     if (await audioRecord.hasPermission()) {
-  //       await audioRecord.start();
-  //       setState(() {
-  //         isRecording = true;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     log('Error start Recording : $e');
-  //   }
-  // }
-
-  // Future<void> stopRecording() async {
-  //   print('hello is $isRecording');
-  //   try {
-  //     String? path = await audioRecord.stop();
-  //     log('output : $path');
-  //     isRecording = false;
-  //   } catch (e) {
-  //     print('Error stopping recording: $e');
-  //   }
-
-  // }
-
-  // Future<void> playRecording(Uint8List hha) async {
-  //   try {
-  //     Source urlSource = BytesSource(hha);
-  //     // Source urlSource = UrlSource(audioPath!);
-
-  //     await audioPlayer.play(urlSource);
-  //     log('playing path $audioPath');
-  //   } catch (e) {
-  //     log('Error Play Recording : $e');
-  //   }
-  // }
 
   // Create UI with local view and remote view
   @override
@@ -193,8 +154,7 @@ class _MyAppState extends State<MyApp> {
                   await audioPlayer.load();
 
                   audioPlayer.play();
-
-                  setState(() {});
+                  if (this.mounted) setState(() {});
                 } else {
                   Directory tempDir = await getTemporaryDirectory();
                   String record = '${tempDir.absolute.path}/record.wav';

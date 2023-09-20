@@ -3,8 +3,8 @@ import 'package:dio/dio.dart';
 
 class Data {
   static Future<String> sendAudio(String path) async {
-    final url = 'http://192.168.1.122:5000/todo';
-    //Map<String, File> request = {"file": req};
+    //final url = 'http://51.20.44.63:5000/todo';
+    final url = 'http://192.168.1.133:5000/todo';
     final dio = Dio();
 
     FormData formData = FormData.fromMap({
@@ -19,7 +19,6 @@ class Data {
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
     log('response: ${response}');
-    log('after res');
 
     if (response.statusCode == 200) {
       // Map<String, dynamic> responsePayload = json.decode(response.data);
