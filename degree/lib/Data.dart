@@ -3,8 +3,8 @@ import 'package:dio/dio.dart';
 
 class Data {
   static Future<String> sendAudio(String path) async {
-    //final url = 'http://51.20.44.63:5000/todo';
-    final url = 'http://192.168.1.133:5000/todo';
+    final url = 'http://51.20.44.63:5000/todo';
+    //final url = 'http://192.168.1.133:5000/todo';
     final dio = Dio();
 
     FormData formData = FormData.fromMap({
