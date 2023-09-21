@@ -13,7 +13,7 @@ import 'package:just_audio/just_audio.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYFC5N8nVytUzmE/Gd5/7LJGGY+JCJhWzE6e6zgyb33tkU48CQ4qpmWmSiUmSpYWhmUmysWWSUZKhhampkaVRkpFRSooRVyhXakMgI8Nn5mZmRgYIBPF5GEpSi0vikzMS8/JScxgYAB3uHpQ=";
+    "007eJxTYKh78uDZ9Odrb3F1sp9WkmZI8puZYNTyKCJo7tZWbyaRdesVGFJMzUyTTEySLC0MzUySjS2TjJIMLUxNjSyNkoyMUlKM/L9ypzYEMjKU5ixmZWSAQBCfh6EktbgkPjkjMS8vNYeBAQAzGCGq";
 const channel = "test_channel";
 
 void main() => runApp(const MaterialApp(home: MyApp()));
@@ -154,7 +154,7 @@ class _MyAppState extends State<MyApp> {
                   await audioPlayer.load();
 
                   audioPlayer.play();
-                  if (this.mounted) setState(() {});
+                  // if (this.mounted) setState(() {});
                 } else {
                   Directory tempDir = await getTemporaryDirectory();
                   String record = '${tempDir.absolute.path}/record.wav';
