@@ -13,8 +13,47 @@ import 'package:just_audio/just_audio.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYKh78uDZ9Odrb3F1sp9WkmZI8puZYNTyKCJo7tZWbyaRdesVGFJMzUyTTEySLC0MzUySjS2TjJIMLUxNjSyNkoyMUlKM/L9ypzYEMjKU5ixmZWSAQBCfh6EktbgkPjkjMS8vNYeBAQAzGCGq";
+    "007eJxTYHi4I/LIvzVbr7HLhWvJzhS3Tpn7r+3zbonX57pFAkPipNwVGFJMzUyTTEySLC0MzUySjS2TjJIMLUxNjSyNkoyMUlKMLBJ5UxsCGRnefGdiZmSAQBCfh6EktbgkPjkjMS8vNYeBAQBBPSGx";
 const channel = "test_channel";
+
+List<String> out_lans = [
+  'Bengali',
+  'Catalan',
+  'Czech',
+  'Danish',
+  'Dutch',
+  'English',
+  'Estonian',
+  'Finnish',
+  'French',
+  'German',
+  'Hindi',
+  'Indonesian',
+  'Italian',
+  'Japanese',
+  'Korean',
+  'Maltese',
+  'Mandarin Chinese',
+  'Modern Standard Arabic',
+  'Northern Uzbek',
+  'Polish',
+  'Portuguese',
+  'Romanian',
+  'Russian',
+  'Slovak',
+  'Spanish',
+  'Swahili',
+  'Swedish',
+  'Tagalog',
+  'Telugu',
+  'Thai',
+  'Turkish',
+  'Ukrainian',
+  'Urdu',
+  'Vietnamese',
+  'Welsh',
+  'Western Persian'
+];
 
 class Video_call_screen extends StatefulWidget {
   const Video_call_screen({Key? key}) : super(key: key);
@@ -143,7 +182,11 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                   setState(() {});
 
-                  var val = await Data.sendAudio(record);
+                  // var val = await Data.sendAudio(record, "English",
+                  //     "Halh Mongolian", "S2TT (Speech to Text translation)");
+                  var val = await Data.sendAudio(record, "English", "Russian",
+                      "S2ST (Speech to Speech translation)");
+
                   final audioPlayer = AudioPlayer();
                   await audioPlayer.setAudioSource(CustomSource(val));
 

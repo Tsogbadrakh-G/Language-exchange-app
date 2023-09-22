@@ -2,13 +2,20 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 
 class Data {
-  static Future<dynamic> sendAudio(String path) async {
+  List<String> inputLanguages = [];
+
+  List<String> outputLanguages = [];
+  static Future<dynamic> sendAudio(
+      String path, String from, String to, String tranlsation) async {
     final url = 'http://51.20.44.63:5000/todo';
-    //final url = 'http://192.168.1.133:5000/todo';
+    //final url = 'http://192.168.1.74:5000/todo';
     final dio = Dio();
 
     FormData formData = FormData.fromMap({
       'audio': await MultipartFile.fromFile(path, filename: 'record.wav'),
+      'input': from,
+      'output': to,
+      'translation': tranlsation,
     });
 
     log('pre res ');
