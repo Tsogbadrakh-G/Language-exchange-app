@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "855274406737",
+    "project_id": "language-exchange-app-cf264",
+    "storage_bucket": "language-exchange-app-cf264.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855274406737:android:c15d347812d5e4dcfec970",
+        "android_client_info": {
+          "package_name": "com.example.degree"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl2FGH04tYy36AJ25T0x_J4eSZc3RvNTc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

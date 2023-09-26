@@ -1,7 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:degree/Data.dart';
 import 'package:degree/custom_source.dart';
 import 'package:path_provider/path_provider.dart';
@@ -184,7 +182,7 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                   // var val = await Data.sendAudio(record, "English",
                   //     "Halh Mongolian", "S2TT (Speech to Text translation)");
-                  var val = await Data.sendAudio(record, "English", "Russian",
+                  var val = await Data.sendAudio(record, "English", "German",
                       "S2ST (Speech to Speech translation)");
 
                   final audioPlayer = AudioPlayer();
