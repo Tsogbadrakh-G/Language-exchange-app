@@ -807,6 +807,7 @@ PODS:
   - nanopb/encode (2.30909.0)
   - native_screenshot (0.0.1):
     - Flutter
+  - OpenSSL-Universal (1.1.2200)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -828,6 +829,7 @@ DEPENDENCIES:
   - iris_method_channel (from `.symlinks/plugins/iris_method_channel/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - native_screenshot (from `.symlinks/plugins/native_screenshot/ios`)
+  - OpenSSL-Universal
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -850,6 +852,7 @@ SPEC REPOS:
     - GTMSessionFetcher
     - leveldb-library
     - nanopb
+    - OpenSSL-Universal
     - PromisesObjC
     - RecaptchaInterop
 
@@ -905,12 +908,13 @@ SPEC CHECKSUMS:
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   native_screenshot: 70900984bca8d5f42acf68611b8214b32a9f0deb
+  OpenSSL-Universal: 6e1ae0555546e604dbc632a2b9a24a9c46c41ef6
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
 
-PODFILE CHECKSUM: a0595e6056ad0246a354e05a07b41f32f9aadca1
+PODFILE CHECKSUM: 63f8421263e31eefc4cc0127a99b469a3d1cfecd
 
 COCOAPODS: 1.12.1

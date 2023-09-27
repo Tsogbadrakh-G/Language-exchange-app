@@ -31,14 +31,16 @@ class _SignInState extends State<SignIn> {
       email = email.trim().toLowerCase();
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      log('2');
+
       QuerySnapshot querySnapshot =
           await DatabaseMethods().getUserbyemail(email);
 
       name = "${querySnapshot.docs[0]["Name"]}";
+
       username = "${querySnapshot.docs[0]["username"]}";
       pic = "${querySnapshot.docs[0]["Photo"]}";
       id = querySnapshot.docs[0].id;
+      //log('name $name, usrname: $username, pic: $pic, id: $id');
 
       await SharedPreferenceHelper().saveUserDisplayName(name);
       await SharedPreferenceHelper().saveUserName(username);
@@ -204,6 +206,7 @@ class _SignInState extends State<SignIn> {
                                     setState(() {
                                       email = usermailcontroller.text;
                                       password = userpasswordcontroller.text;
+                                      //log('email: $email, pass: $password');
                                     });
                                   }
                                   userLogin();
