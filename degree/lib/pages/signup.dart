@@ -32,6 +32,7 @@ class _SignUpState extends State<SignUp> {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: email.toLowerCase(), password: password);
+
         String Id = randomAlphaNumeric(10);
         String user = mailcontroller.text.replaceAll("@gmail.com", "");
         String updateusername =

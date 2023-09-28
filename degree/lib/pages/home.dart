@@ -210,7 +210,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add), //child widget inside this button
         onPressed: () {
-          Get.to(Video_call_screen());
+          Get.to(Video_call_screen(channel));
           //task to execute when this button is pressed
         },
       ),
@@ -227,13 +227,12 @@ class _HomeState extends State<Home> {
           "users": [myUserName, data["username"]],
         };
         await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatPage(
-                    name: data["Name"],
-                    profileurl: data["Photo"],
-                    username: data["username"])));
+        Get.to(ChatPage(
+          name: data["Name"],
+          profileurl: data["Photo"],
+          username: data["username"],
+          channel: chatRoomId,
+        ));
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -325,13 +324,13 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatPage(
-                    name: name,
-                    profileurl: profilePicUrl,
-                    username: username)));
+        log('to ${widget.chatRoomId}');
+        Get.to(ChatPage(
+          name: name,
+          profileurl: profilePicUrl,
+          username: username,
+          channel: widget.chatRoomId,
+        ));
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 10.0),

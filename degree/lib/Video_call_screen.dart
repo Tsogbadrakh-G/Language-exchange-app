@@ -54,7 +54,8 @@ List<String> out_lans = [
 ];
 
 class Video_call_screen extends StatefulWidget {
-  const Video_call_screen({Key? key}) : super(key: key);
+  final String channel = '';
+  const Video_call_screen(String channel, {Key? key}) : super(key: key);
 
   @override
   State<Video_call_screen> createState() => _Video_call_screen();

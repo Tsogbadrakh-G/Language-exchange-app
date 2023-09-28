@@ -1,20 +1,22 @@
 import 'dart:developer';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/Data.dart';
 import 'package:degree/Video_call_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'home.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
 import 'package:random_string/random_string.dart';
 
 class ChatPage extends StatefulWidget {
-  String name, profileurl, username;
+  String name, profileurl, username, channel;
   ChatPage(
-      {required this.name, required this.profileurl, required this.username});
+      {required this.name,
+      required this.profileurl,
+      required this.username,
+      required this.channel});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -153,49 +155,22 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    log('channel:${widget.channel}');
     return Scaffold(
+      appBar: buildAppBar(),
       backgroundColor: Color(0xFF553370),
       body: Container(
-        padding: EdgeInsets.only(top: 60.0),
+        // padding: EdgeInsets.only(top: 60.0),
         child: Stack(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 50.0),
+              // margin: EdgeInsets.only(top: 50.0),
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 1.12,
+              height: double.infinity,
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30))),
-              child: chatMessage(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => Home()));
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios_new_outlined,
-                      color: Color(0Xffc199cd),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 90.0,
-                  ),
-                  Text(
-                    widget.name,
-                    style: TextStyle(
-                        color: Color(0Xffc199cd),
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ],
+                color: Colors.white,
               ),
+              child: chatMessage(),
             ),
             Container(
               margin: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
@@ -221,6 +196,111 @@ class _ChatPageState extends State<ChatPage> {
                             child: Icon(Icons.send_rounded))),
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget buildAppBar() {
+    return AppBar(
+      elevation: 0.5,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 70,
+      backgroundColor: Colors.white,
+      flexibleSpace: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 70,
+              child: Row(
+                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: Get.back,
+                    icon: Image.asset('assets/images/ic_chevron_left.png',
+                        height: 20, width: 20, color: Colors.black),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      // border: Border.all(color: (user?.online ?? false) ? LimeColors.primaryColor : const Color(0xffd8d8d8), width: size > 40 ? 3 : 1.5),
+                    ),
+                    width: 50,
+                    height: 50,
+                    child: ClipOval(
+                        child: CachedNetworkImage(
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      imageUrl: myProfilePic!,
+                      // placeholder: (context, url) => _textAvatar(text: LimeChatHelper.getChannelName(channel!)),
+                      // errorWidget: (context, url, e) => _textAvatar(
+                      //   text: LimeChatHelper.getChannelName(channel!),
+                      // ),
+                    )),
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    direction: Axis.vertical,
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      Text(
+                        widget.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        // style: ,
+                      ),
+                      Text(
+                        widget.username,
+                        //  LimeChatHelper.getChannelUserNumber(channel),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        //   style: ,
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  Visibility(
+                    visible: true,
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      width: 24,
+                      child: RawMaterialButton(
+                        onPressed: () {
+                          //_startCallScreen(1);
+                          Get.to(Video_call_screen(widget.channel));
+                        },
+                        shape: const CircleBorder(),
+                        child: Image.asset("assets/images/ic_chat_video.png",
+                            color: Get.theme.colorScheme.secondary,
+                            width: 20,
+                            height: 20),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    width: 24,
+                    child: RawMaterialButton(
+                      onPressed: () {
+                        //Get.to(StreamChannel(channel: widget.channel, child: const ChannelInfoScreen()));
+                      },
+                      shape: const CircleBorder(),
+                      child: Image.asset("assets/images/ic_chat_more.png",
+                          color: Get.theme.colorScheme.secondary,
+                          width: 20,
+                          height: 20),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
