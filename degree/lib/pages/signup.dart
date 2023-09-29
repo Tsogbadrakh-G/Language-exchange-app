@@ -62,8 +62,8 @@ class _SignUpState extends State<SignUp> {
           "Registered Successfully",
           style: TextStyle(fontSize: 20.0),
         )));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
+
+        Get.to(Home());
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

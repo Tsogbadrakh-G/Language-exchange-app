@@ -2,17 +2,19 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:degree/Data.dart';
 import 'package:degree/custom_source.dart';
+import 'package:degree/service/database.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'dart:async';
 import 'package:just_audio/just_audio.dart';
+import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
     "007eJxTYHi4I/LIvzVbr7HLhWvJzhS3Tpn7r+3zbonX57pFAkPipNwVGFJMzUyTTEySLC0MzUySjS2TjJIMLUxNjSyNkoyMUlKMLBJ5UxsCGRnefGdiZmSAQBCfh6EktbgkPjkjMS8vNYeBAQBBPSGx";
-const channel = "test_channel";
+//const channel = "test_channel";
 
 List<String> out_lans = [
   'Bengali',
@@ -54,8 +56,8 @@ List<String> out_lans = [
 ];
 
 class Video_call_screen extends StatefulWidget {
-  final String channel = '';
-  const Video_call_screen(String channel, {Key? key}) : super(key: key);
+  final String channel;
+  const Video_call_screen(this.channel, {Key? key}) : super(key: key);
 
   @override
   State<Video_call_screen> createState() => _Video_call_screen();
@@ -123,7 +125,7 @@ class _Video_call_screen extends State<Video_call_screen> {
 
     await _engine.joinChannel(
       token: token,
-      channelId: channel,
+      channelId: widget.channel,
       uid: 0,
       options: const ChannelMediaOptions(),
     );
@@ -185,13 +187,14 @@ class _Video_call_screen extends State<Video_call_screen> {
                   //     "Halh Mongolian", "S2TT (Speech to Text translation)");
                   var val = await Data.sendAudio(record, "English", "German",
                       "S2ST (Speech to Speech translation)");
+                  await sendAudioLink(val);
 
-                  final audioPlayer = AudioPlayer();
-                  await audioPlayer.setAudioSource(CustomSource(val));
+                  // final audioPlayer = AudioPlayer();
+                  // await audioPlayer.setAudioSource(CustomSource(val));
 
-                  await audioPlayer.load();
+                  // await audioPlayer.load();
 
-                  audioPlayer.play();
+                  // audioPlayer.play();
                 } else {
                   Directory tempDir = await getTemporaryDirectory();
                   String record = '${tempDir.absolute.path}/record.wav';
@@ -220,15 +223,27 @@ class _Video_call_screen extends State<Video_call_screen> {
     );
   }
 
+  sendAudioLink(String val) async {
+    // String translation_text =
+    //     await Data.sendText(message, "English", "Japanese");
+
+    Map<String, dynamic> messageInfoMap = {
+      "type": "audio",
+      "url": val,
+    };
+    String messageId = randomAlphaNumeric(10);
+
+    DatabaseMethods().addMessage(widget.channel, messageId, messageInfoMap);
+  }
+
   // Display remote user's video
   Widget _remoteVideo() {
     if (_remoteUid != null) {
       return AgoraVideoView(
         controller: VideoViewController.remote(
-          rtcEngine: _engine,
-          canvas: VideoCanvas(uid: _remoteUid),
-          connection: const RtcConnection(channelId: channel),
-        ),
+            rtcEngine: _engine,
+            canvas: VideoCanvas(uid: _remoteUid),
+            connection: RtcConnection(channelId: widget.channel)),
       );
     } else {
       return const Text(

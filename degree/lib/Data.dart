@@ -30,13 +30,8 @@ class Data {
     // dio.download(response.data[''], savePath)
 
     if (response.statusCode == 200) {
-      final res = await dio.get(response.data['message'],
-          options: Options(responseType: ResponseType.bytes));
-      print('download: ${res.data}');
-      // Map<String, dynamic> responsePayload = json.decode(response.data);
-      //log(responsePayload["res"]);
-
-      return res.data;
+      //translated audio file URL on the server
+      return response.data['message'];
     } else {
       log('unsuccessfull req');
       return 'error';

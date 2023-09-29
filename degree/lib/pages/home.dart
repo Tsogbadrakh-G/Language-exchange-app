@@ -110,107 +110,150 @@ class _HomeState extends State<Home> {
     }
   }
 
+  final PageController pageController = PageController(initialPage: 0);
+  late int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF553370),
-      body: Container(
-          child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.only(
-              left: 20.0, right: 20.0, top: 50.0, bottom: 20.0),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 5.0,
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: kBottomNavigationBarHeight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              search
-                  ? Expanded(
-                      child: TextField(
-                      onChanged: (value) {
-                        initiateSearch(value.toUpperCase());
-                      },
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Search User',
-                          hintStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w500)),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w500),
-                    ))
-                  : Text(
-                      "ChatUp",
-                      style: TextStyle(
-                          color: Color(0Xffc199cd),
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-              GestureDetector(
-                onTap: () {
-                  search = true;
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
                   setState(() {});
                 },
-                child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                        color: Color(0xFF3a2144),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: search
-                        ? GestureDetector(
-                            onTap: () {
-                              search = false;
-                              queryResultSet = [];
-                              tempSearchStore = [];
-
-                              setState(() {});
-                            },
-                            child: Icon(
-                              Icons.close,
-                              color: Color(0Xffc199cd),
-                            ),
-                          )
-                        : Icon(
-                            Icons.search,
-                            color: Color(0Xffc199cd),
-                          )),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  setState(() {});
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.account_circle_outlined),
+                onPressed: () {
+                  setState(() {});
+                },
               )
             ],
           ),
         ),
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-            width: MediaQuery.of(context).size.width,
-            height: search
-                ? MediaQuery.of(context).size.height / 1.19
-                : MediaQuery.of(context).size.height / 1.15,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20))),
-            child: Column(
+      ),
+      backgroundColor: Color(0xFF7f30fe),
+      body: PageView(controller: pageController, children: [
+        Container(
+            child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 20.0, right: 20.0, top: 50.0, bottom: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 search
-                    ? ListView(
-                        padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                        primary: false,
-                        shrinkWrap: true,
-                        children: tempSearchStore.map((element) {
-                          return buildResultCard(element);
-                        }).toList())
-                    : ChatRoomList(),
+                    ? Expanded(
+                        child: TextField(
+                        onChanged: (value) {
+                          initiateSearch(value.toUpperCase());
+                        },
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Search User',
+                            hintStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500)),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w500),
+                      ))
+                    : Text(
+                        "ChatUp",
+                        style: TextStyle(
+                            color: Color(0Xffc199cd),
+                            fontSize: 22.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                GestureDetector(
+                  onTap: () {
+                    search = true;
+                    setState(() {});
+                  },
+                  child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                          color: Color(0xFF3a2144),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: search
+                          ? GestureDetector(
+                              onTap: () {
+                                search = false;
+                                queryResultSet = [];
+                                tempSearchStore = [];
+
+                                setState(() {});
+                              },
+                              child: Icon(
+                                Icons.close,
+                                color: Color(0Xffc199cd),
+                              ),
+                            )
+                          : Icon(
+                              Icons.search,
+                              color: Color(0Xffc199cd),
+                            )),
+                )
               ],
             ),
           ),
-        )
-      ])),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+              width: MediaQuery.of(context).size.width,
+              height: search
+                  ? MediaQuery.of(context).size.height / 1.19
+                  : MediaQuery.of(context).size.height / 1.15,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20))),
+              child: Column(
+                children: [
+                  search
+                      ? ListView(
+                          padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                          primary: false,
+                          shrinkWrap: true,
+                          children: tempSearchStore.map((element) {
+                            return buildResultCard(element);
+                          }).toList())
+                      : ChatRoomList(),
+                ],
+              ),
+            ),
+          )
+        ])),
+        Center(
+          child: Text('1'),
+        ),
+        Center(
+          child: Text('2'),
+        ),
+      ]),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add), //child widget inside this button
         onPressed: () {
-          Get.to(Video_call_screen(channel));
+          Get.to(Video_call_screen('channel'));
           //task to execute when this button is pressed
         },
       ),

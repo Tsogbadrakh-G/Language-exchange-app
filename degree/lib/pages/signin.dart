@@ -47,9 +47,6 @@ class _SignInState extends State<SignIn> {
       await SharedPreferenceHelper().saveUserId(id);
       await SharedPreferenceHelper().saveUserPic(pic);
 
-      // Navigator.pushReplacement(
-      //     context, MaterialPageRoute(builder: (context) => Home()));
-
       Get.to(Home());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -81,13 +78,14 @@ class _SignInState extends State<SignIn> {
               height: MediaQuery.of(context).size.height / 3.5,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Color(0xFF7f30fe), Color(0xFF6380fb)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.vertical(
-                      bottom: Radius.elliptical(
-                          MediaQuery.of(context).size.width, 105.0))),
+                gradient: LinearGradient(
+                    colors: [Color(0xFF7f30fe), Color(0xFF6380fb)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight),
+                borderRadius: BorderRadius.vertical(
+                    bottom: Radius.elliptical(
+                        MediaQuery.of(context).size.width, 105.0)),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 50.0),

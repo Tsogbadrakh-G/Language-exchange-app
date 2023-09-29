@@ -3,16 +3,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/Data.dart';
 import 'package:degree/Video_call_screen.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
 import 'package:random_string/random_string.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:degree/custom_source.dart';
 
 class ChatPage extends StatefulWidget {
-  String name, profileurl, username, channel;
-  ChatPage(
+  final String name, profileurl, username, channel;
+  const ChatPage(
       {required this.name,
       required this.profileurl,
       required this.username,
@@ -26,6 +30,7 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messagecontroller = new TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
+  final dio = Dio();
 
   getthesharedpref() async {
     myUserName = await SharedPreferenceHelper().getUserName();
@@ -41,6 +46,31 @@ class _ChatPageState extends State<ChatPage> {
     await getthesharedpref();
     await getAndSetMessages();
     setState(() {});
+    StreamBuilder(
+        stream: messageStream,
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            int len = snapshot.data.docs.length;
+            for (int index = 0; index < len; index++) {
+              DocumentSnapshot docs = snapshot.data.docs[index];
+              if (docs["type"] == "audio") downloadAudio(docs["url"]);
+            }
+          }
+          return Offstage();
+        });
+  }
+
+  downloadAudio(String url) async {
+    log('audio');
+    final res =
+        await dio.get(url, options: Options(responseType: ResponseType.bytes));
+    print('download: ${res.data}');
+    final audioPlayer = AudioPlayer();
+    await audioPlayer.setAudioSource(CustomSource(res.data));
+
+    await audioPlayer.load();
+
+    audioPlayer.play();
   }
 
   @override
@@ -99,10 +129,16 @@ class _ChatPageState extends State<ChatPage> {
                   itemCount: snapshot.data.docs.length,
                   reverse: true,
                   itemBuilder: (context, index) {
-                    log('chat screen is building');
                     DocumentSnapshot ds = snapshot.data.docs[index];
-                    return chatMessageTile(
-                        ds["message"], myUserName == ds["sendBy"]);
+
+                    if (ds["type"] == "text") {
+                      log('chat: ${ds["message"]}');
+                      return chatMessageTile(
+                          ds["message"], myUserName == ds["sendBy"]);
+                    } else {
+                      log('audio');
+                      return Offstage();
+                    }
                   })
               : Center(
                   child: CircularProgressIndicator(),
@@ -115,13 +151,15 @@ class _ChatPageState extends State<ChatPage> {
       String message = messagecontroller.text;
       messagecontroller.text = "";
 
-      String translation_text =
-          await Data.sendText(message, "English", "Japanese");
-      message = message + "\n $translation_text";
+      // String translation_text =
+      //     await Data.sendText(message, "English", "Japanese");
+      message = message + "";
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
       Map<String, dynamic> messageInfoMap = {
+        "type": "text",
+        "url": "",
         "message": message,
         "sendBy": myUserName,
         "ts": formattedDate,
@@ -232,17 +270,19 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     width: 50,
                     height: 50,
-                    child: ClipOval(
-                        child: CachedNetworkImage(
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      imageUrl: myProfilePic!,
-                      // placeholder: (context, url) => _textAvatar(text: LimeChatHelper.getChannelName(channel!)),
-                      // errorWidget: (context, url, e) => _textAvatar(
-                      //   text: LimeChatHelper.getChannelName(channel!),
-                      // ),
-                    )),
+                    child: myProfilePic != null
+                        ? ClipOval(
+                            child: CachedNetworkImage(
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            imageUrl: myProfilePic!,
+                            // placeholder: (context, url) => _textAvatar(text: LimeChatHelper.getChannelName(channel!)),
+                            // errorWidget: (context, url, e) => _textAvatar(
+                            //   text: LimeChatHelper.getChannelName(channel!),
+                            // ),
+                          ))
+                        : Offstage(),
                   ),
                   SizedBox(
                     width: 15,
