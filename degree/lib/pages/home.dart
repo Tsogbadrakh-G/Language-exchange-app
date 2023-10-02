@@ -250,13 +250,13 @@ class _HomeState extends State<Home> {
           child: Text('2'),
         ),
       ]),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add), //child widget inside this button
-        onPressed: () {
-          Get.to(Video_call_screen('channel'));
-          //task to execute when this button is pressed
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: Icon(Icons.add), //child widget inside this button
+      //   onPressed: () {
+      //     Get.to(Video_call_screen('channel'));
+      //     //task to execute when this button is pressed
+      //   },
+      // ),
     );
   }
 
@@ -378,7 +378,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
       child: Container(
         margin: EdgeInsets.only(bottom: 10.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             profilePicUrl == ""
                 ? CircularProgressIndicator()

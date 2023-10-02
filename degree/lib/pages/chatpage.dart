@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/Data.dart';
 import 'package:degree/Video_call_screen.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +30,6 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messagecontroller = new TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
-  final dio = Dio();
 
   getthesharedpref() async {
     myUserName = await SharedPreferenceHelper().getUserName();
@@ -45,34 +44,11 @@ class _ChatPageState extends State<ChatPage> {
   ontheload() async {
     await getthesharedpref();
     await getAndSetMessages();
+
     setState(() {});
-    StreamBuilder(
-        stream: messageStream,
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            int len = snapshot.data.docs.length;
-            for (int index = 0; index < len; index++) {
-              DocumentSnapshot docs = snapshot.data.docs[index];
-              if (docs["type"] == "audio") downloadAudio(docs["url"]);
-            }
-          }
-          return Offstage();
-        });
   }
 
 //
-  downloadAudio(String url) async {
-    log('audio');
-    final res =
-        await dio.get(url, options: Options(responseType: ResponseType.bytes));
-    print('download: ${res.data}');
-    final audioPlayer = AudioPlayer();
-    await audioPlayer.setAudioSource(CustomSource(res.data));
-
-    await audioPlayer.load();
-
-    audioPlayer.play();
-  }
 
   @override
   void initState() {
@@ -137,7 +113,7 @@ class _ChatPageState extends State<ChatPage> {
                       return chatMessageTile(
                           ds["message"], myUserName == ds["sendBy"]);
                     } else {
-                      log('audio');
+                      log('audio render');
                       return Offstage();
                     }
                   })
@@ -152,15 +128,14 @@ class _ChatPageState extends State<ChatPage> {
       String message = messagecontroller.text;
       messagecontroller.text = "";
 
-      // String translation_text =
-      //     await Data.sendText(message, "English", "Japanese");
-      message = message + "";
+      String translation_text =
+          await Data.sendText(message, "English", "Halh Mongolian");
+      message = message + "\n ${translation_text}";
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
       Map<String, dynamic> messageInfoMap = {
         "type": "text",
-        "url": "",
         "message": message,
         "sendBy": myUserName,
         "ts": formattedDate,
@@ -317,7 +292,8 @@ class _ChatPageState extends State<ChatPage> {
                       child: RawMaterialButton(
                         onPressed: () {
                           //_startCallScreen(1);
-                          Get.to(Video_call_screen(widget.channel));
+                          Get.to(Video_call_screen(
+                              widget.channel, myUserName!, widget.username));
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_video.png",

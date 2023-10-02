@@ -50,7 +50,7 @@ class Data {
       'output': to,
     });
 
-    log('pre res for text ');
+    log('pre response for text ');
 
     final response = await dio.post(
       url,

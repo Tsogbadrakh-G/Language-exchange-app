@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/Data.dart';
 import 'package:degree/custom_source.dart';
 import 'package:degree/service/database.dart';
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYHi4I/LIvzVbr7HLhWvJzhS3Tpn7r+3zbonX57pFAkPipNwVGFJMzUyTTEySLC0MzUySjS2TjJIMLUxNjSyNkoyMUlKMLBJ5UxsCGRnefGdiZmSAQBCfh6EktbgkPjkjMS8vNYeBAQBBPSGx";
+    "007eJxTYJAVZ5t2fefaPy8nlM3M9j1pFHjsSJzm/+wzT9dmT94rz9alwJBiamaaZGKSZGlhaGaSbGyZZJRkaGFqamRplGRklJJiJKgildoQyMig8iGbmZEBAkF8FoaS1OISBgYAbhIe7A==";
 //const channel = "test_channel";
 
 List<String> out_lans = [
@@ -56,8 +58,10 @@ List<String> out_lans = [
 ];
 
 class Video_call_screen extends StatefulWidget {
-  final String channel;
-  const Video_call_screen(this.channel, {Key? key}) : super(key: key);
+  final String channel, myUserName, username;
+  const Video_call_screen(this.channel, this.myUserName, this.username,
+      {Key? key})
+      : super(key: key);
 
   @override
   State<Video_call_screen> createState() => _Video_call_screen();
@@ -69,13 +73,70 @@ class _Video_call_screen extends State<Video_call_screen> {
   late RtcEngine _engine;
   int mute = 0;
   final audioPlayer = AudioPlayer();
-
+  final dio = Dio();
   bool isRecording = false;
+  bool exited = false;
 
   @override
   void initState() {
     super.initState();
     initAgora();
+    listenForNewMessages();
+  }
+
+  void listenForNewMessages() {
+    final CollectionReference messagesCollection = FirebaseFirestore.instance
+        .collection('chatrooms/${widget.channel}/chats');
+
+    messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
+      snapshot.docChanges.forEach((change) {
+        if (change.type == DocumentChangeType.added) {
+          // This message is newly added
+
+          final messageData = change.doc.data() as Map<String, dynamic>;
+
+          //  print('New Message: $messageData, $myUserName');
+
+          log(' new message: ${messageData}, widget username: ${widget.username}');
+          if (exited) {
+            updateChatReadState(messageData["id"]);
+          } else if (messageData["type"] == "audio" &&
+              messageData["sendBy"] == widget.username &&
+              messageData["read"] == 0) {
+            downloadAndPlayAudio(messageData["url"], messageData["id"]);
+          }
+
+          // Process and display the new message as needed
+        }
+      });
+    });
+  }
+
+  downloadAndPlayAudio(String url, chatId) async {
+    log('audio play');
+    final res =
+        await dio.get(url, options: Options(responseType: ResponseType.bytes));
+    print('download: ${res.data}');
+    final audioPlayer = AudioPlayer();
+    await audioPlayer.setAudioSource(CustomSource(res.data));
+    await audioPlayer.load();
+    audioPlayer.play();
+    updateChatReadState(chatId);
+  }
+
+  updateChatReadState(String chatId) async {
+    try {
+      final chatPairRef = FirebaseFirestore.instance
+          .collection('chatrooms')
+          .doc(widget.channel)
+          .collection('chats')
+          .doc(chatId);
+      await chatPairRef.update({
+        'read': 1,
+      });
+    } catch (e) {
+      print('Error updating chat pair: $e');
+    }
   }
 
   Future<void> initAgora() async {
@@ -183,10 +244,10 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                   setState(() {});
 
-                  // var val = await Data.sendAudio(record, "English",
-                  //     "Halh Mongolian", "S2TT (Speech to Text translation)");
-                  var val = await Data.sendAudio(record, "English", "German",
-                      "S2ST (Speech to Speech translation)");
+                  var val = await Data.sendAudio(record, "English",
+                      "Halh Mongolian", "S2TT (Speech to Text translation)");
+                  // var val = await Data.sendAudio(record, "English", "German",
+                  //     "S2ST (Speech to Speech translation)");
                   await sendAudioLink(val);
 
                   // final audioPlayer = AudioPlayer();
@@ -224,14 +285,15 @@ class _Video_call_screen extends State<Video_call_screen> {
   }
 
   sendAudioLink(String val) async {
-    // String translation_text =
-    //     await Data.sendText(message, "English", "Japanese");
+    String messageId = randomAlphaNumeric(10);
 
     Map<String, dynamic> messageInfoMap = {
+      "id": messageId,
       "type": "audio",
       "url": val,
+      "sendBy": widget.myUserName,
+      "read": 0
     };
-    String messageId = randomAlphaNumeric(10);
 
     DatabaseMethods().addMessage(widget.channel, messageId, messageInfoMap);
   }
@@ -256,5 +318,6 @@ class _Video_call_screen extends State<Video_call_screen> {
   @override
   void dispose() {
     super.dispose();
+    exited = true;
   }
 }
