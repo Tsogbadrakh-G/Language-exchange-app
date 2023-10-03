@@ -117,10 +117,16 @@ class _Video_call_screen extends State<Video_call_screen> {
     final res =
         await dio.get(url, options: Options(responseType: ResponseType.bytes));
     print('download: ${res.data}');
+
     final audioPlayer = AudioPlayer();
+    log('1');
     await audioPlayer.setAudioSource(CustomSource(res.data));
+    log('2');
+
     await audioPlayer.load();
-    audioPlayer.play();
+    log('3');
+    await audioPlayer.play();
+    log('4');
     updateChatReadState(chatId);
   }
 
@@ -244,8 +250,13 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                   setState(() {});
 
-                  var val = await Data.sendAudio(record, "English",
-                      "Halh Mongolian", "S2TT (Speech to Text translation)");
+                  var val = await Data.sendAudio(
+                      record,
+                      "English",
+                      "Halh Mongolian",
+                      "S2TT (Speech to Text translation)",
+                      widget.channel,
+                      widget.myUserName);
                   // var val = await Data.sendAudio(record, "English", "German",
                   //     "S2ST (Speech to Speech translation)");
                   await sendAudioLink(val);
