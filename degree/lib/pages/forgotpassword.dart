@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'signup.dart';
+import 'package:degree/pages/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -187,7 +187,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SignUp()));
+                                  builder: (context) => Register()));
                         },
                         child: Text(
                           " Sign Up Now!",

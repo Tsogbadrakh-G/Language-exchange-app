@@ -1,12 +1,11 @@
 import 'package:degree/pages/home.dart';
 import 'package:degree/pages/login.dart';
-import 'package:degree/pages/signin.dart';
+import 'package:degree/pages/register.dart';
+
 import 'package:degree/service/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'pages/signup.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +41,7 @@ class MyApp extends StatelessWidget {
       //       if (snapshot.hasData) {
       //         return Home();
       //       } else {
-      //         return SignUp();
+      //         return Register();
       //       }
       //     }),
       home: LogIn(),

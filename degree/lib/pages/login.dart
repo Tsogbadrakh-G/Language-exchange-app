@@ -1,3 +1,4 @@
+import 'package:degree/pages/register.dart';
 import 'package:flutter/material.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
@@ -7,7 +8,6 @@ import 'package:get/get.dart';
 import 'home.dart';
 import 'dart:developer';
 import 'package:degree/pages/forgotpassword.dart';
-import 'signup.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -83,7 +83,7 @@ class _LogInState extends State<LogIn> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 30,
+                      height: 50,
                     ),
                     Container(
                         width: double.infinity,
@@ -322,7 +322,7 @@ class _LogInState extends State<LogIn> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Get.to(SignUp());
+                      Get.to(Register());
                     },
                     child: Text(
                       " Register Now ",

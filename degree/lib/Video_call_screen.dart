@@ -15,7 +15,7 @@ import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 const token =
-    "007eJxTYJAVZ5t2fefaPy8nlM3M9j1pFHjsSJzm/+wzT9dmT94rz9alwJBiamaaZGKSZGlhaGaSbGyZZJRkaGFqamRplGRklJJiJKgildoQyMig8iGbmZEBAkF8FoaS1OISBgYAbhIe7A==";
+    "007eJxTYIhs3fZm3qrPrAzCTxauq/EWu32X9fBe/vcbHp6sPL1+lUClAkOKqZlpkolJkqWFoZlJsrFlklGSoYWpqZGlUZKRUUqK0eaj0qkNgYwMd+JSmBkZIBDEZ2EoSS0uYWAAANbZIRU=";
 //const channel = "test_channel";
 
 List<String> out_lans = [
@@ -160,6 +160,9 @@ class _Video_call_screen extends State<Video_call_screen> {
 
     _engine.registerEventHandler(
       RtcEngineEventHandler(
+        onError: (err, msg) {
+          log('$err, $msg');
+        },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           debugPrint("local user ${connection.localUid} joined");
           setState(() {
@@ -189,10 +192,12 @@ class _Video_call_screen extends State<Video_call_screen> {
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     await _engine.enableVideo();
     await _engine.startPreview();
+    await _engine.enableAudio();
+    await _engine.muteLocalAudioStream(true);
 
     await _engine.joinChannel(
       token: token,
-      channelId: widget.channel,
+      channelId: "test",
       uid: 0,
       options: const ChannelMediaOptions(),
     );
@@ -241,7 +246,9 @@ class _Video_call_screen extends State<Video_call_screen> {
                 mute++;
                 log('click $mute');
                 if (mute % 2 == 0) {
+                  await _engine.muteLocalAudioStream(true);
                   await _engine.stopAudioRecording();
+
                   Directory tempDir = await getTemporaryDirectory();
                   String record = '${tempDir.absolute.path}/record.wav';
 
@@ -268,6 +275,7 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                   // audioPlayer.play();
                 } else {
+                  await _engine.muteLocalAudioStream(false);
                   Directory tempDir = await getTemporaryDirectory();
                   String record = '${tempDir.absolute.path}/record.wav';
                   await File(record).create(exclusive: false, recursive: false);
@@ -316,7 +324,7 @@ class _Video_call_screen extends State<Video_call_screen> {
         controller: VideoViewController.remote(
             rtcEngine: _engine,
             canvas: VideoCanvas(uid: _remoteUid),
-            connection: RtcConnection(channelId: widget.channel)),
+            connection: RtcConnection(channelId: "test")),
       );
     } else {
       return const Text(
@@ -327,8 +335,11 @@ class _Video_call_screen extends State<Video_call_screen> {
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
+    await _engine.leaveChannel();
+    _engine.release();
     super.dispose();
+
     exited = true;
   }
 }

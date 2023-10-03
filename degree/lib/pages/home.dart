@@ -19,6 +19,8 @@ class _HomeState extends State<Home> {
   bool search = false;
   String? myName, myProfilePic, myUserName, myEmail;
   Stream? chatRoomsStream;
+  PageController controller = PageController();
+  int _curr = 0;
 
   getthesharedpref() async {
     myName = await SharedPreferenceHelper().getDisplayName();
@@ -110,153 +112,310 @@ class _HomeState extends State<Home> {
     }
   }
 
-  final PageController pageController = PageController(initialPage: 0);
-  late int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 5.0,
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          height: kBottomNavigationBarHeight,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  setState(() {});
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-                  setState(() {});
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.account_circle_outlined),
-                onPressed: () {
-                  setState(() {});
-                },
-              )
-            ],
-          ),
-        ),
-      ),
-      backgroundColor: Color(0xFF7f30fe),
-      body: PageView(controller: pageController, children: [
-        Container(
-            child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.only(
-                left: 20.0, right: 20.0, top: 50.0, bottom: 20.0),
-            child: Row(
+      key: _globalKey,
+      drawer: Drawer(
+        width: 275,
+        elevation: 30,
+        backgroundColor: Color(0xF3393838),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(right: Radius.circular(40))),
+        child: Container(
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.horizontal(right: Radius.circular(40)),
+              boxShadow: [
+                BoxShadow(
+                    color: Color(0x3D000000), spreadRadius: 30, blurRadius: 20)
+              ]),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                search
-                    ? Expanded(
-                        child: TextField(
-                        onChanged: (value) {
-                          initiateSearch(value.toUpperCase());
-                        },
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Search User',
-                            hintStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500)),
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w500),
-                      ))
-                    : Text(
-                        "ChatUp",
-                        style: TextStyle(
-                            color: Color(0Xffc199cd),
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                GestureDetector(
-                  onTap: () {
-                    search = true;
-                    setState(() {});
-                  },
-                  child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                          color: Color(0xFF3a2144),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: search
-                          ? GestureDetector(
-                              onTap: () {
-                                search = false;
-                                queryResultSet = [];
-                                tempSearchStore = [];
-
-                                setState(() {});
-                              },
-                              child: Icon(
-                                Icons.close,
-                                color: Color(0Xffc199cd),
-                              ),
-                            )
-                          : Icon(
-                              Icons.search,
-                              color: Color(0Xffc199cd),
-                            )),
-                )
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 56,
+                        ),
+                        Text(
+                          'Settings',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      children: [
+                        UserAvatar(filename: myProfilePic ?? ''),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Text(
+                          'Tom Brenan',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    const DrawerItem(
+                      title: 'Account',
+                      icon: Icons.key,
+                    ),
+                    const DrawerItem(title: 'Chats', icon: Icons.chat_bubble),
+                    const DrawerItem(
+                        title: 'Notifications', icon: Icons.notifications),
+                    const DrawerItem(
+                        title: 'Data and Storage', icon: Icons.storage),
+                    const DrawerItem(title: 'Help', icon: Icons.help),
+                    const Divider(
+                      height: 35,
+                      color: Colors.green,
+                    ),
+                    const DrawerItem(
+                        title: 'Invite a friend', icon: Icons.people_outline),
+                  ],
+                ),
+                const DrawerItem(title: 'Log out', icon: Icons.logout)
               ],
             ),
           ),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-              width: MediaQuery.of(context).size.width,
-              height: search
-                  ? MediaQuery.of(context).size.height / 1.19
-                  : MediaQuery.of(context).size.height / 1.15,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20))),
-              child: Column(
-                children: [
-                  search
-                      ? ListView(
-                          padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                          primary: false,
-                          shrinkWrap: true,
-                          children: tempSearchStore.map((element) {
-                            return buildResultCard(element);
-                          }).toList())
-                      : ChatRoomList(),
-                ],
-              ),
-            ),
-          )
-        ])),
-        Center(
-          child: Text('1'),
         ),
-        Center(
-          child: Text('2'),
-        ),
-      ]),
-      // floatingActionButton: FloatingActionButton(
-      //   child: Icon(Icons.add), //child widget inside this button
-      //   onPressed: () {
-      //     Get.to(Video_call_screen('channel'));
-      //     //task to execute when this button is pressed
-      //   },
-      // ),
+      ),
+      body: PageView(
+        allowImplicitScrolling: true,
+        scrollDirection: Axis.horizontal,
+        controller: controller,
+        onPageChanged: (num) {
+          setState(() {
+            _curr = num;
+            log('$num');
+          });
+        },
+        children: [
+          if (_curr == 0)
+            Container(
+                color: Colors.white,
+                child: Column(children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(
+                        color: Colors.black,
+                      )),
+                    ),
+                    padding: const EdgeInsets.only(
+                        left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _globalKey.currentState!.openDrawer();
+                          },
+                          child: Image.asset(
+                            'assets/images/img_menu.png',
+                            width: 25,
+                            height: 25,
+                          ),
+                        ),
+                        search
+                            ? Expanded(
+                                child: TextField(
+                                  textAlign: TextAlign.center,
+                                  onChanged: (value) {
+                                    log('$value');
+                                    initiateSearch(value.toUpperCase());
+                                  },
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Search User',
+                                      hintStyle: TextStyle(
+                                          color: Color(0Xff2675EC),
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.w500)),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              )
+                            : Text(
+                                "ChatUp",
+                                style: TextStyle(
+                                    color: Color(0Xff2675EC),
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                        GestureDetector(
+                          onTap: () {
+                            search = true;
+                            setState(() {});
+                          },
+                          child: Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: search
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        search = false;
+                                        queryResultSet = [];
+                                        tempSearchStore = [];
+
+                                        setState(() {});
+                                      },
+                                      child: Icon(
+                                        size: 35,
+                                        Icons.close,
+                                        color: Color(0Xff2675EC),
+                                      ),
+                                    )
+                                  : Icon(
+                                      size: 35,
+                                      Icons.search,
+                                      color: Color(0Xff2675EC),
+                                    )),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(left: 10),
+                      children: [
+                        TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Messages",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 26),
+                            )),
+                        const SizedBox(
+                          width: 35,
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              _curr = 1;
+                              setState(() {});
+                            },
+                            child: const Text(
+                              "Online",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 26),
+                            )),
+                        const SizedBox(
+                          width: 35,
+                        ),
+                        TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Groups",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 26),
+                            )),
+                        const SizedBox(
+                          width: 35,
+                        ),
+                        TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "More",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 26),
+                            )),
+                        const SizedBox(
+                          width: 35,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Expanded(
+                  //   child: Container(
+                  //     padding:
+                  //         EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+                  //     width: double.infinity,
+                  //     height: double.infinity,
+                  //     // width: MediaQuery.of(context).size.width,
+                  //     // height: search
+                  //     //     ? MediaQuery.of(context).size.height / 1.19
+                  //     //     : MediaQuery.of(context).size.height / 1.15,
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white,
+                  //       // borderRadius: BorderRadius.only(
+                  //       //     topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  //     ),
+                  //     child: Column(
+                  //       children: [
+                  //   search
+                  //              ? ListView(
+                  //                 padding:
+                  //                     EdgeInsets.only(left: 10.0, right: 10.0),
+                  //                 primary: false,
+                  //                 shrinkWrap: true,
+                  //                 children: tempSearchStore.map((element) {
+                  //                   return buildResultCard(element);
+                  //                 }).toList())
+                  //             : ChatRoomList(),
+                  //       ],
+                  //     ),
+                  //    ),
+
+                  // ),
+                  Expanded(
+                      child: Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: search
+                        ? ListView(
+                            padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                            primary: false,
+                            shrinkWrap: true,
+                            children: tempSearchStore.map((element) {
+                              return buildResultCard(element);
+                            }).toList())
+                        : ChatRoomList(),
+                  ))
+                ])),
+          if (_curr == 1)
+            Center(
+                child: Pages(
+              text: "Page Two",
+              color: Colors.red.shade100,
+            )),
+          if (_curr == 2)
+            Center(
+                child: Pages(
+              text: "Page Three",
+              color: Colors.grey,
+            )),
+          if (_curr == 3)
+            Center(
+                child: Pages(
+              text: "Page Four",
+              color: Colors.yellow.shade100,
+            ))
+        ],
+      ),
     );
   }
 
@@ -269,7 +428,9 @@ class _HomeState extends State<Home> {
         Map<String, dynamic> chatRoomInfoMap = {
           "users": [myUserName, data["username"]],
         };
+
         await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
+        setState(() {});
         Get.to(ChatPage(
           name: data["Name"],
           profileurl: data["Photo"],
@@ -365,6 +526,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
+    log('username: $username');
     return GestureDetector(
       onTap: () {
         log('to ${widget.chatRoomId}');
@@ -376,6 +538,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         ));
       },
       child: Container(
+        width: double.infinity,
         margin: EdgeInsets.only(bottom: 10.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -383,11 +546,11 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
             profilePicUrl == ""
                 ? CircularProgressIndicator()
                 : ClipRRect(
-                    borderRadius: BorderRadius.circular(60),
+                    borderRadius: BorderRadius.circular(20),
                     child: Image.network(
                       profilePicUrl,
-                      height: 60,
-                      width: 60,
+                      height: 100,
+                      width: 100,
                       fit: BoxFit.cover,
                     )),
             SizedBox(
@@ -407,12 +570,11 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                       fontWeight: FontWeight.w500),
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width / 2,
                   child: Text(
                     widget.lastMessage,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: Colors.black45,
+                        color: true ? Color(0xff848484) : Color(0xff2675EC),
                         fontSize: 15.0,
                         fontWeight: FontWeight.w500),
                   ),
@@ -420,15 +582,110 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               ],
             ),
             Spacer(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  widget.time,
+                  style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DrawerItem extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  const DrawerItem({
+    super.key,
+    required this.title,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 25),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(
+              width: 40,
+            ),
             Text(
-              widget.time,
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w500),
+              title,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class UserAvatar extends StatelessWidget {
+  final String filename;
+  UserAvatar({
+    super.key,
+    required this.filename,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (filename != '')
+      return CircleAvatar(
+        radius: 32,
+        backgroundColor: Colors.white,
+        child: CircleAvatar(
+          radius: 29,
+          backgroundImage: Image.network(filename).image,
+        ),
+      );
+    else
+      return CircleAvatar(
+        radius: 32,
+        backgroundColor: Colors.white,
+        child: CircleAvatar(
+          radius: 29,
+          backgroundImage: Image.asset('assets/images/boy1.jpg').image,
+        ),
+      );
+  }
+}
+
+class Pages extends StatelessWidget {
+  final text;
+  final color;
+  Pages({this.text, this.color});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: color,
+      child: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+              ),
+            ]),
       ),
     );
   }
