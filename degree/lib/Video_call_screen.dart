@@ -58,8 +58,9 @@ List<String> out_lans = [
 ];
 
 class Video_call_screen extends StatefulWidget {
-  final String channel, myUserName, username;
-  const Video_call_screen(this.channel, this.myUserName, this.username,
+  final String channel, myUserName, username, from, to;
+  const Video_call_screen(
+      this.channel, this.myUserName, this.username, this.from, this.to,
       {Key? key})
       : super(key: key);
 
@@ -206,6 +207,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
+    log('from ${widget.from}, to: ${widget.to}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agora Video Call'),

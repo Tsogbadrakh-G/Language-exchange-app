@@ -3,16 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/Data.dart';
 import 'package:degree/Video_call_screen.dart';
-import 'package:dio/dio.dart';
-
+//import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
 import 'package:random_string/random_string.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:degree/custom_source.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class ChatPage extends StatefulWidget {
   final String name, profileurl, username, channel;
@@ -30,6 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messagecontroller = new TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
+  int translation_status = 1;
 
   getthesharedpref() async {
     myUserName = await SharedPreferenceHelper().getUserName();
@@ -108,14 +107,9 @@ class _ChatPageState extends State<ChatPage> {
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
 
-                    if (ds["type"] == "text") {
-                      log('chat: ${ds["message"]}');
-                      return chatMessageTile(
-                          ds["message"], myUserName == ds["sendBy"]);
-                    } else {
-                      log('audio render');
-                      return Offstage();
-                    }
+                    // log('chat: ${ds["message"]}');
+                    return chatMessageTile(
+                        ds["message"], myUserName == ds["sendBy"]);
                   })
               : Center(
                   child: CircularProgressIndicator(),
@@ -128,9 +122,11 @@ class _ChatPageState extends State<ChatPage> {
       String message = messagecontroller.text;
       messagecontroller.text = "";
 
-      String translation_text =
-          await Data.sendText(message, "English", "Halh Mongolian");
-      message = message + "\n ${translation_text}";
+      String translation_text = await Data.sendText(
+          message,
+          selectedValueFrom ?? "Halh Mongolian",
+          selectedValueTo ?? "Halh Mongolian");
+      message = message + "\n${translation_text}";
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
@@ -167,25 +163,127 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  List<String> voice_in_lans = [
+    'Bengali',
+    'Catalan',
+    'Czech',
+    'Danish',
+    'Dutch',
+    'English',
+    'Estonian',
+    'Finnish',
+    'French',
+    'German',
+    'Hindi',
+    'Indonesian',
+    'Italian',
+    'Japanese',
+    'Korean',
+    'Maltese',
+    'Mandarin Chinese',
+    'Modern Standard Arabic',
+    'Northern Uzbek',
+    'Polish',
+    'Portuguese',
+    'Romanian',
+    'Russian',
+    'Slovak',
+    'Spanish',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
+    'Telugu',
+    'Thai',
+    'Turkish',
+    'Ukrainian',
+    'Urdu',
+    'Vietnamese',
+    'Welsh',
+    'Western Persian'
+  ];
+
+  final List<String> chat_in_lans = [
+    'Halh Mongolian'
+        'Item1',
+    'Item2',
+    'Item3',
+    'Item4',
+    'Item5',
+    'Item6',
+    'Item7',
+    'Item8',
+  ];
+  List<String> voice_out_lans = [
+    'Bengali',
+    'Catalan',
+    'Czech',
+    'Danish',
+    'Dutch',
+    'English',
+    'Estonian',
+    'Finnish',
+    'French',
+    'German',
+    'Hindi',
+    'Indonesian',
+    'Italian',
+    'Japanese',
+    'Korean',
+    'Maltese',
+    'Mandarin Chinese',
+    'Modern Standard Arabic',
+    'Northern Uzbek',
+    'Polish',
+    'Portuguese',
+    'Romanian',
+    'Russian',
+    'Slovak',
+    'Spanish',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
+    'Telugu',
+    'Thai',
+    'Turkish',
+    'Ukrainian',
+    'Urdu',
+    'Vietnamese',
+    'Welsh',
+    'Western Persian'
+  ];
+
+  final List<String> chat_out_lans = [
+    'Halh Mongolian'
+        'Item1',
+    'Item2',
+    'Item3',
+    'Item4',
+    'Item5',
+    'Item6',
+    'Item7',
+    'Item8',
+  ];
+
+  String? selectedValueFrom;
+  String? selectedValueTo;
   @override
   Widget build(BuildContext context) {
     log('channel:${widget.channel}');
+    log('message; $selectedValueFrom');
     return Scaffold(
       appBar: buildAppBar(),
       backgroundColor: Color(0xFF553370),
       body: Container(
-        // padding: EdgeInsets.only(top: 60.0),
         child: Stack(
           children: [
             Container(
-              // margin: EdgeInsets.only(top: 50.0),
-              width: MediaQuery.of(context).size.width,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
-              child: chatMessage(),
-            ),
+                // margin: EdgeInsets.only(top: 50.0),
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: chatMessage()),
             Container(
               margin: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               alignment: Alignment.bottomCenter,
@@ -210,6 +308,276 @@ class _ChatPageState extends State<ChatPage> {
                             child: Icon(Icons.send_rounded))),
                   ),
                 ),
+              ),
+            ),
+            Container(
+              height: 100,
+              width: double.infinity,
+              decoration:
+                  BoxDecoration(color: Color.fromARGB(255, 233, 232, 229)),
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Translate from'),
+                          SizedBox(height: 5),
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton2<String>(
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      selectedValueFrom ?? 'Halh Mongolian',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              items: translation_status % 2 == 0
+                                  ? voice_in_lans
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )))
+                                      .toList()
+                                  : chat_in_lans
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )))
+                                      .toList(),
+                              value: selectedValueFrom,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedValueFrom = value;
+                                });
+                                print('vl: ${selectedValueFrom}');
+                              },
+                              buttonStyleData: ButtonStyleData(
+                                height: 50,
+                                width: 140,
+                                padding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                    ),
+                                    //color: Color(0xffC6E2EE),
+                                    color: Colors.white),
+                                elevation: 2,
+                              ),
+                              dropdownStyleData: DropdownStyleData(
+                                maxHeight: 200,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white,
+                                ),
+                                offset: const Offset(-20, 0),
+                                scrollbarTheme: ScrollbarThemeData(
+                                  radius: const Radius.circular(40),
+                                  thickness:
+                                      MaterialStateProperty.all<double>(6),
+                                  thumbVisibility:
+                                      MaterialStateProperty.all<bool>(true),
+                                ),
+                              ),
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
+                                padding: EdgeInsets.only(left: 14, right: 14),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 25,
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              translation_status++;
+                              selectedValueFrom = null;
+                              selectedValueTo = null;
+                              setState(() {});
+                            },
+                            icon: translation_status % 2 == 0
+                                ? Icon(
+                                    Icons.keyboard_voice_outlined,
+                                    size: 35,
+                                  )
+                                : Icon(
+                                    Icons.chat_bubble_outline,
+                                    size: 30,
+                                  ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Translate to'),
+                          SizedBox(height: 5),
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton2<String>(
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      selectedValueTo ?? 'Halh Mongolian',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              items: translation_status % 2 == 0
+                                  ? voice_out_lans
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )))
+                                      .toList()
+                                  : chat_out_lans
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )))
+                                      .toList(),
+                              value: selectedValueTo,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedValueTo = value;
+                                });
+                                print('vl: ${selectedValueTo}');
+                              },
+                              buttonStyleData: ButtonStyleData(
+                                height: 50,
+                                width: 140,
+                                padding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                    ),
+                                    //color: Color(0xffC6E2EE),
+                                    color: Colors.white),
+                                elevation: 2,
+                              ),
+                              dropdownStyleData: DropdownStyleData(
+                                maxHeight: 200,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white,
+                                ),
+                                offset: const Offset(-20, 0),
+                                scrollbarTheme: ScrollbarThemeData(
+                                  radius: const Radius.circular(40),
+                                  thickness:
+                                      MaterialStateProperty.all<double>(6),
+                                  thumbVisibility:
+                                      MaterialStateProperty.all<bool>(true),
+                                ),
+                              ),
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
+                                padding: EdgeInsets.only(left: 14, right: 14),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -292,8 +660,14 @@ class _ChatPageState extends State<ChatPage> {
                       child: RawMaterialButton(
                         onPressed: () {
                           //_startCallScreen(1);
-                          Get.to(Video_call_screen(
-                              widget.channel, myUserName!, widget.username));
+                          if (translation_status % 2 == 0)
+                            Get.to(Video_call_screen(
+                                widget.channel,
+                                myUserName!,
+                                widget.username,
+                                selectedValueFrom ?? 'Halh Mongolian',
+                                selectedValueTo ?? 'Halh Mongolian'));
+                          else {}
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_video.png",
@@ -303,20 +677,70 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    width: 24,
-                    child: RawMaterialButton(
-                      onPressed: () {
-                        //Get.to(StreamChannel(channel: widget.channel, child: const ChannelInfoScreen()));
-                      },
-                      shape: const CircleBorder(),
-                      child: Image.asset("assets/images/ic_chat_more.png",
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton2(
+                      customButton: Image.asset(
+                          "assets/images/ic_chat_more.png",
                           color: Get.theme.colorScheme.secondary,
                           width: 20,
                           height: 20),
+                      items: [
+                        ...MenuItems.firstItems.map(
+                          (item) => DropdownMenuItem<MenuItem>(
+                            value: item,
+                            child: MenuItems.buildItem(item),
+                          ),
+                        ),
+                        const DropdownMenuItem<Divider>(
+                            enabled: false, child: Divider()),
+                        ...MenuItems.secondItems.map(
+                          (item) => DropdownMenuItem<MenuItem>(
+                            value: item,
+                            child: MenuItems.buildItem(item),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        MenuItems.onChanged(context, value! as MenuItem);
+                      },
+                      dropdownStyleData: DropdownStyleData(
+                        width: 160,
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.redAccent,
+                        ),
+                        offset: const Offset(0, 8),
+                      ),
+                      menuItemStyleData: MenuItemStyleData(
+                        customHeights: [
+                          ...List<double>.filled(
+                              MenuItems.firstItems.length, 48),
+                          8,
+                          ...List<double>.filled(
+                              MenuItems.secondItems.length, 48),
+                        ],
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                      ),
                     ),
                   ),
+                  SizedBox(
+                    width: 20,
+                  )
+                  // Container(
+                  //   margin: const EdgeInsets.only(right: 10),
+                  //   width: 24,
+                  //   child: RawMaterialButton(
+                  //     onPressed: () {
+
+                  //     },
+                  //     shape: const CircleBorder(),
+                  //     child: Image.asset("assets/images/ic_chat_more.png",
+                  //         color: Get.theme.colorScheme.secondary,
+                  //         width: 20,
+                  //         height: 20),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -324,5 +748,61 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
+  }
+}
+
+class MenuItem {
+  const MenuItem({
+    required this.text,
+    required this.icon,
+  });
+
+  final String text;
+  final IconData icon;
+}
+
+abstract class MenuItems {
+  static const List<MenuItem> firstItems = [home, share, settings];
+  static const List<MenuItem> secondItems = [logout];
+
+  static const home = MenuItem(text: 'Home', icon: Icons.home);
+  static const share = MenuItem(text: 'Share', icon: Icons.share);
+  static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
+  static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
+
+  static Widget buildItem(MenuItem item) {
+    return Row(
+      children: [
+        Icon(item.icon, color: Colors.white, size: 22),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            item.text,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static void onChanged(BuildContext context, MenuItem item) {
+    switch (item) {
+      case MenuItems.home:
+        //Do something
+        break;
+      case MenuItems.settings:
+        //Do something
+        break;
+      case MenuItems.share:
+        //Do something
+        break;
+      case MenuItems.logout:
+        //Do something
+        break;
+    }
   }
 }

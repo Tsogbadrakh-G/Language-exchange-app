@@ -35,16 +35,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: FutureBuilder(
-      //     future: AuthMethods().getcurrentUser(),
-      //     builder: (context, AsyncSnapshot<dynamic> snapshot) {
-      //       if (snapshot.hasData) {
-      //         return Home();
-      //       } else {
-      //         return Register();
-      //       }
-      //     }),
-      home: LogIn(),
+      home: FutureBuilder(
+          future: AuthMethods().getcurrentUser(),
+          builder: (context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasData) {
+              return Home();
+            } else {
+              return Register();
+            }
+          }),
+      //home: LogIn(),
     );
   }
 }

@@ -112,90 +112,94 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Widget DrawerBuilder() {
+    return Drawer(
+      width: 275,
+      elevation: 30,
+      backgroundColor: Color(0xF3393838),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.horizontal(right: Radius.circular(40))),
+      child: Container(
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.horizontal(right: Radius.circular(40)),
+            boxShadow: [
+              BoxShadow(
+                  color: Color(0x3D000000), spreadRadius: 30, blurRadius: 20)
+            ]),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 56,
+                      ),
+                      Text(
+                        'Settings',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    children: [
+                      UserAvatar(filename: myProfilePic ?? ''),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Text(
+                        'Tom Brenan',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 35,
+                  ),
+                  const DrawerItem(
+                    title: 'Account',
+                    icon: Icons.key,
+                  ),
+                  const DrawerItem(title: 'Chats', icon: Icons.chat_bubble),
+                  const DrawerItem(
+                      title: 'Notifications', icon: Icons.notifications),
+                  const DrawerItem(
+                      title: 'Data and Storage', icon: Icons.storage),
+                  const DrawerItem(title: 'Help', icon: Icons.help),
+                  const Divider(
+                    height: 35,
+                    color: Colors.green,
+                  ),
+                  const DrawerItem(
+                      title: 'Invite a friend', icon: Icons.people_outline),
+                ],
+              ),
+              const DrawerItem(title: 'Log out', icon: Icons.logout)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
-      drawer: Drawer(
-        width: 275,
-        elevation: 30,
-        backgroundColor: Color(0xF3393838),
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.horizontal(right: Radius.circular(40))),
-        child: Container(
-          decoration: const BoxDecoration(
-              borderRadius: BorderRadius.horizontal(right: Radius.circular(40)),
-              boxShadow: [
-                BoxShadow(
-                    color: Color(0x3D000000), spreadRadius: 30, blurRadius: 20)
-              ]),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        SizedBox(
-                          width: 56,
-                        ),
-                        Text(
-                          'Settings',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      children: [
-                        UserAvatar(filename: myProfilePic ?? ''),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Text(
-                          'Tom Brenan',
-                          style: TextStyle(color: Colors.white),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 35,
-                    ),
-                    const DrawerItem(
-                      title: 'Account',
-                      icon: Icons.key,
-                    ),
-                    const DrawerItem(title: 'Chats', icon: Icons.chat_bubble),
-                    const DrawerItem(
-                        title: 'Notifications', icon: Icons.notifications),
-                    const DrawerItem(
-                        title: 'Data and Storage', icon: Icons.storage),
-                    const DrawerItem(title: 'Help', icon: Icons.help),
-                    const Divider(
-                      height: 35,
-                      color: Colors.green,
-                    ),
-                    const DrawerItem(
-                        title: 'Invite a friend', icon: Icons.people_outline),
-                  ],
-                ),
-                const DrawerItem(title: 'Log out', icon: Icons.logout)
-              ],
-            ),
-          ),
-        ),
-      ),
+      drawer: DrawerBuilder(),
       body: PageView(
         allowImplicitScrolling: true,
         scrollDirection: Axis.horizontal,
@@ -207,216 +211,297 @@ class _HomeState extends State<Home> {
           });
         },
         children: [
-          if (_curr == 0)
-            Container(
-                color: Colors.white,
-                child: Column(children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                        color: Colors.black,
-                      )),
-                    ),
-                    padding: const EdgeInsets.only(
-                        left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _globalKey.currentState!.openDrawer();
-                          },
-                          child: Image.asset(
-                            'assets/images/img_menu.png',
-                            width: 25,
-                            height: 25,
-                          ),
-                        ),
-                        search
-                            ? Expanded(
-                                child: TextField(
-                                  textAlign: TextAlign.center,
-                                  onChanged: (value) {
-                                    log('$value');
-                                    initiateSearch(value.toUpperCase());
-                                  },
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Search User',
-                                      hintStyle: TextStyle(
-                                          color: Color(0Xff2675EC),
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.w500)),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              )
-                            : Text(
-                                "ChatUp",
-                                style: TextStyle(
-                                    color: Color(0Xff2675EC),
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                        GestureDetector(
-                          onTap: () {
-                            search = true;
-                            setState(() {});
-                          },
-                          child: Container(
-                              padding: EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: search
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        search = false;
-                                        queryResultSet = [];
-                                        tempSearchStore = [];
-
-                                        setState(() {});
-                                      },
-                                      child: Icon(
-                                        size: 35,
-                                        Icons.close,
-                                        color: Color(0Xff2675EC),
-                                      ),
-                                    )
-                                  : Icon(
-                                      size: 35,
-                                      Icons.search,
-                                      color: Color(0Xff2675EC),
-                                    )),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(left: 10),
-                      children: [
-                        TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "Messages",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 26),
-                            )),
-                        const SizedBox(
-                          width: 35,
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              _curr = 1;
-                              setState(() {});
-                            },
-                            child: const Text(
-                              "Online",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 26),
-                            )),
-                        const SizedBox(
-                          width: 35,
-                        ),
-                        TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "Groups",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 26),
-                            )),
-                        const SizedBox(
-                          width: 35,
-                        ),
-                        TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "More",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 26),
-                            )),
-                        const SizedBox(
-                          width: 35,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Expanded(
-                  //   child: Container(
-                  //     padding:
-                  //         EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-                  //     width: double.infinity,
-                  //     height: double.infinity,
-                  //     // width: MediaQuery.of(context).size.width,
-                  //     // height: search
-                  //     //     ? MediaQuery.of(context).size.height / 1.19
-                  //     //     : MediaQuery.of(context).size.height / 1.15,
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.white,
-                  //       // borderRadius: BorderRadius.only(
-                  //       //     topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                  //     ),
-                  //     child: Column(
-                  //       children: [
-                  //   search
-                  //              ? ListView(
-                  //                 padding:
-                  //                     EdgeInsets.only(left: 10.0, right: 10.0),
-                  //                 primary: false,
-                  //                 shrinkWrap: true,
-                  //                 children: tempSearchStore.map((element) {
-                  //                   return buildResultCard(element);
-                  //                 }).toList())
-                  //             : ChatRoomList(),
-                  //       ],
-                  //     ),
-                  //    ),
-
-                  // ),
-                  Expanded(
-                      child: Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: search
-                        ? ListView(
-                            padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                            primary: false,
-                            shrinkWrap: true,
-                            children: tempSearchStore.map((element) {
-                              return buildResultCard(element);
-                            }).toList())
-                        : ChatRoomList(),
-                  ))
-                ])),
-          if (_curr == 1)
-            Center(
-                child: Pages(
-              text: "Page Two",
-              color: Colors.red.shade100,
-            )),
-          if (_curr == 2)
-            Center(
-                child: Pages(
-              text: "Page Three",
-              color: Colors.grey,
-            )),
-          if (_curr == 3)
-            Center(
-                child: Pages(
-              text: "Page Four",
-              color: Colors.yellow.shade100,
-            ))
+          if (_curr == 0) PageViewItem(0),
+          if (_curr == 1) PageViewItem(1),
+          if (_curr == 2) PageViewItem(2),
+          if (_curr == 3) PageViewItem(3),
         ],
       ),
     );
+  }
+
+  Widget PageViewItem(int index) {
+    return Container(
+        color: Colors.white,
+        child: Column(children: [
+          Container(
+            decoration: BoxDecoration(
+                // border: Border(
+                //     bottom: BorderSide(
+                //   color: Colors.black,
+                // )),
+                ),
+            padding: const EdgeInsets.only(
+                left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _globalKey.currentState!.openDrawer();
+                  },
+                  child: Image.asset(
+                    'assets/images/img_menu.png',
+                    width: 25,
+                    height: 25,
+                  ),
+                ),
+                search
+                    ? Expanded(
+                        child: TextField(
+                          textAlign: TextAlign.center,
+                          onChanged: (value) {
+                            log('$value');
+                            initiateSearch(value.toUpperCase());
+                          },
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Search User',
+                              hintStyle: TextStyle(
+                                  color: Color(0Xff2675EC),
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w500)),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    : Text(
+                        "ChatUp",
+                        style: TextStyle(
+                            color: Color(0Xff2675EC),
+                            fontSize: 22.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                GestureDetector(
+                  onTap: () {
+                    search = true;
+                    setState(() {});
+                  },
+                  child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20)),
+                      child: search
+                          ? GestureDetector(
+                              onTap: () {
+                                search = false;
+                                queryResultSet = [];
+                                tempSearchStore = [];
+
+                                setState(() {});
+                              },
+                              child: Icon(
+                                size: 35,
+                                Icons.close,
+                                color: Color(0Xff2675EC),
+                              ),
+                            )
+                          : Icon(
+                              size: 35,
+                              Icons.search,
+                              color: Color(0Xff2675EC),
+                            )),
+                )
+              ],
+            ),
+          ),
+          Container(
+            // decoration: BoxDecoration(border: Border.all()),
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 10),
+              children: [
+                TextButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
+                      ),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(index == 0
+                        ? Colors.blue
+                        : Colors.white), // Background color
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 5)), // Padding
+                  ),
+                  onPressed: () {
+                    _curr = 0;
+
+                    setState(() {});
+                  },
+                  child: Text(
+                    "All",
+                    style: TextStyle(
+                      fontFamily: "Gilroy",
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: index == 0 ? Colors.white : Color(0xff131313),
+                      height: 25 / 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(
+                  width: 25,
+                ),
+                TextButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
+                      ),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(index == 1
+                        ? Colors.blue
+                        : Colors.white), // Background color
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 5)), // Padding
+                  ),
+                  onPressed: () {
+                    _curr = 1;
+
+                    setState(() {});
+                  },
+                  child: Text(
+                    "Important",
+                    style: TextStyle(
+                      fontFamily: "Gilroy",
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: index == 1 ? Colors.white : Color(0xff131313),
+                      height: 25 / 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(
+                  width: 25,
+                ),
+                TextButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
+                      ),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(index == 2
+                        ? Colors.blue
+                        : Colors.white), // Background color
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 5)), // Padding
+                  ),
+                  onPressed: () {
+                    _curr = 2;
+
+                    setState(() {});
+                  },
+                  child: Text(
+                    "Unread",
+                    style: TextStyle(
+                      fontFamily: "Gilroy",
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: index == 2 ? Colors.white : Color(0xff131313),
+                      height: 25 / 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(
+                  width: 25,
+                ),
+                TextButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
+                      ),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(index == 3
+                        ? Colors.blue
+                        : Colors.white), // Background color
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 5)), // Padding
+                  ),
+                  onPressed: () {
+                    _curr = 3;
+
+                    setState(() {});
+                  },
+                  child: Text(
+                    "Read",
+                    style: TextStyle(
+                      fontFamily: "Gilroy",
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: index == 3 ? Colors.white : Color(0xff131313),
+                      height: 25 / 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(
+                  width: 35,
+                ),
+              ],
+            ),
+          ),
+          // Expanded(
+          //   child: Container(
+          //     padding:
+          //         EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+          //     width: double.infinity,
+          //     height: double.infinity,
+          //     // width: MediaQuery.of(context).size.width,
+          //     // height: search
+          //     //     ? MediaQuery.of(context).size.height / 1.19
+          //     //     : MediaQuery.of(context).size.height / 1.15,
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       // borderRadius: BorderRadius.only(
+          //       //     topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          //     ),
+          //     child: Column(
+          //       children: [
+          //   search
+          //              ? ListView(
+          //                 padding:
+          //                     EdgeInsets.only(left: 10.0, right: 10.0),
+          //                 primary: false,
+          //                 shrinkWrap: true,
+          //                 children: tempSearchStore.map((element) {
+          //                   return buildResultCard(element);
+          //                 }).toList())
+          //             : ChatRoomList(),
+          //       ],
+          //     ),
+          //    ),
+
+          // ),
+          Expanded(
+              child: Container(
+            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+            width: double.infinity,
+            height: double.infinity,
+            child: search
+                ? ListView(
+                    padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                    primary: false,
+                    shrinkWrap: true,
+                    children: tempSearchStore.map((element) {
+                      return buildResultCard(element);
+                    }).toList())
+                : ChatRoomList(),
+          ))
+        ]));
   }
 
   Widget buildResultCard(data) {
@@ -574,7 +659,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     widget.lastMessage,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: true ? Color(0xff848484) : Color(0xff2675EC),
+                        //  color: true ? Color(0xff848484) : Color(0xff2675EC),
+                        color: Colors.black,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w500),
                   ),
