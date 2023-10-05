@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/Video_call_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'chatpage.dart';
@@ -21,6 +21,38 @@ class _HomeState extends State<Home> {
   Stream? chatRoomsStream;
   PageController controller = PageController();
   int _curr = 0;
+  StreamSubscription<Map<String, dynamic>>? lastMessageStream;
+
+  // void startListeningToLastMessage(String chatroomId) {
+  //   lastMessageStream =
+  //       listenToLastMessage(chatroomId).listen((lastMessageData) {
+  //     setState(() {});
+  //     print('Last message data updated in home: $lastMessageData');
+  //   });
+  // }
+
+  // Map<String, dynamic>? lastMessageData;
+  // Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  //   return firestore
+  //       .collection('chatrooms')
+  //       .doc(chatroomId)
+  //       .snapshots()
+  //       .map((chatroomSnapshot) {
+  //     if (chatroomSnapshot.exists) {
+  //       lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
+
+  //       print('listening in home');
+  //       //print('last listen:$lastMessageData');
+  //       // Return the last message data as a stream
+  //       return lastMessageData ?? {};
+  //     } else {
+  //       // Return an empty map if the chatroom document doesn't exist
+  //       return {};
+  //     }
+  //   });
+  // }
 
   getthesharedpref() async {
     myName = await SharedPreferenceHelper().getDisplayName();
@@ -33,10 +65,11 @@ class _HomeState extends State<Home> {
   ontheload() async {
     await getthesharedpref();
     chatRoomsStream = await DatabaseMethods().getChatRooms();
+
     setState(() {});
   }
 
-  Widget ChatRoomList() {
+  Widget ChatRoomList(int indx) {
     return StreamBuilder(
         stream: chatRoomsStream,
         builder: (context, AsyncSnapshot snapshot) {
@@ -47,12 +80,61 @@ class _HomeState extends State<Home> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
-                    print(ds.id);
-                    return ChatRoomListTile(
+                    print(
+                        'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
+                    if (indx == 0)
+                      return ChatRoomListTile(
                         chatRoomId: ds.id,
                         lastMessage: ds["lastMessage"],
                         myUsername: myUserName!,
-                        time: ds["lastMessageSendTs"]);
+                        sendBy: ds["lastMessageSendBy"],
+                        time: ds["lastMessageSendTs"],
+                        read: ds["read"],
+                        to_msg_num: ds['to_msg_$myUserName'],
+                        name: ds['sendByNameFrom'] == myName
+                            ? ds['sendByNameTo']
+                            : ds['sendByNameFrom'],
+                      );
+                    else if (indx == 1)
+                      return ChatRoomListTile(
+                        chatRoomId: ds.id,
+                        lastMessage: ds["lastMessage"],
+                        myUsername: myUserName!,
+                        sendBy: ds["lastMessageSendBy"],
+                        time: ds["lastMessageSendTs"],
+                        read: ds["read"],
+                        to_msg_num: ds['to_msg_$myUserName'],
+                        name: myName!,
+                      );
+                    else if (indx == 2) {
+                      if (!ds["read"] && ds["lastMessageSendBy"] != myUserName)
+                        return ChatRoomListTile(
+                          chatRoomId: ds.id,
+                          lastMessage: ds["lastMessage"],
+                          myUsername: myUserName!,
+                          sendBy: ds["lastMessageSendBy"],
+                          time: ds["lastMessageSendTs"],
+                          read: ds["read"],
+                          to_msg_num: ds['to_msg_$myUserName'],
+                          name: myName!,
+                        );
+                      else
+                        return Offstage();
+                    } else {
+                      if (ds["read"])
+                        return ChatRoomListTile(
+                          chatRoomId: ds.id,
+                          lastMessage: ds["lastMessage"],
+                          myUsername: myUserName!,
+                          sendBy: ds["lastMessageSendBy"],
+                          time: ds["lastMessageSendTs"],
+                          read: ds["read"],
+                          to_msg_num: ds['to_msg_$myUserName'],
+                          name: myName!,
+                        );
+                      else
+                        return Offstage();
+                    }
                   })
               : Center(
                   child: CircularProgressIndicator(),
@@ -62,8 +144,8 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    super.initState();
     ontheload();
+    super.initState();
   }
 
   getChatRoomIdbyUsername(String a, String b) {
@@ -112,7 +194,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Widget DrawerBuilder() {
+  Widget DrawerBuilder(String name) {
     return Drawer(
       width: 275,
       elevation: 30,
@@ -159,7 +241,7 @@ class _HomeState extends State<Home> {
                         width: 12,
                       ),
                       Text(
-                        'Tom Brenan',
+                        name,
                         style: TextStyle(color: Colors.white),
                       )
                     ],
@@ -197,9 +279,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    print('build home');
     return Scaffold(
       key: _globalKey,
-      drawer: DrawerBuilder(),
+      drawer: DrawerBuilder(myName!),
       body: PageView(
         allowImplicitScrolling: true,
         scrollDirection: Axis.horizontal,
@@ -499,7 +582,7 @@ class _HomeState extends State<Home> {
                     children: tempSearchStore.map((element) {
                       return buildResultCard(element);
                     }).toList())
-                : ChatRoomList(),
+                : ChatRoomList(_curr),
           ))
         ]));
   }
@@ -515,13 +598,14 @@ class _HomeState extends State<Home> {
         };
 
         await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
-        setState(() {});
-        Get.to(ChatPage(
+
+        await Get.to(ChatPage(
           name: data["Name"],
           profileurl: data["Photo"],
           username: data["username"],
           channel: chatRoomId,
         ));
+        setState(() {});
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -577,12 +661,18 @@ class _HomeState extends State<Home> {
 }
 
 class ChatRoomListTile extends StatefulWidget {
-  final String lastMessage, chatRoomId, myUsername, time;
+  final String lastMessage, chatRoomId, myUsername, time, sendBy, name;
+  final int to_msg_num;
+  final bool read;
   ChatRoomListTile(
       {required this.chatRoomId,
       required this.lastMessage,
       required this.myUsername,
-      required this.time});
+      required this.time,
+      required this.sendBy,
+      required this.name,
+      required this.read,
+      required this.to_msg_num});
 
   @override
   State<ChatRoomListTile> createState() => _ChatRoomListTileState();
@@ -594,13 +684,14 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   getthisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
-    print(username);
+    //print(username);
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
     name = "${querySnapshot.docs[0]["Name"]}";
     profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
-    setState(() {});
+    print('getting chat list item  data fetching is finished');
+    //setState(() {});
   }
 
   @override
@@ -611,79 +702,128 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
-    log('username: $username');
-    return GestureDetector(
-      onTap: () {
-        log('to ${widget.chatRoomId}');
-        Get.to(ChatPage(
-          name: name,
-          profileurl: profilePicUrl,
-          username: username,
-          channel: widget.chatRoomId,
-        ));
-      },
-      child: Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(bottom: 10.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            profilePicUrl == ""
-                ? CircularProgressIndicator()
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      profilePicUrl,
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                    )),
-            SizedBox(
-              width: 10.0,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 10.0,
-                ),
-                Text(
-                  username,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.w500),
-                ),
-                Container(
-                  child: Text(
-                    widget.lastMessage,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        //  color: true ? Color(0xff848484) : Color(0xff2675EC),
-                        color: Colors.black,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w500),
+    print('chat list item username: $username ');
+    return FutureBuilder(
+        future: getthisUserInfo(),
+        builder: (context, snapshot) {
+          return GestureDetector(
+            onTap: () async {
+              log('to ${widget.chatRoomId}');
+              await Get.to(ChatPage(
+                name: name,
+                profileurl: profilePicUrl,
+                username: username,
+                channel: widget.chatRoomId,
+              ));
+              print('hi');
+              setState(() {});
+            },
+            child: Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  profilePicUrl == ""
+                      ? CircularProgressIndicator()
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            profilePicUrl,
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          )),
+                  SizedBox(
+                    width: 10.0,
                   ),
-                ),
-              ],
+                  Container(
+                    // width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          widget.name,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        // const SizedBox(
+                        //   height: 5,
+                        // ),
+                        Container(
+                          child: Text(
+                            widget.sendBy == widget.myUsername
+                                ? "you: " + widget.lastMessage
+                                : widget.lastMessage,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              //  color: true ? Color(0xff848484) : Color(0xff2675EC),
+                              color: widget.sendBy == widget.myUsername
+                                  ? Color(0xff848484)
+                                  : widget.read
+                                      ? Color(0xff848484)
+                                      : Color(0xff2675ec),
+                              fontFamily: "Gilroy",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Spacer(),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.time,
+                        style: TextStyle(
+                            color: Colors.black45,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      if (widget.to_msg_num != 0) ...[
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                          decoration: BoxDecoration(
+                              color: Color(0xff2675EC),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30))),
+                          child: Text(
+                            '${widget.to_msg_num}',
+                            style: const TextStyle(
+                              fontFamily: "Gilroy",
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                              height: 13 / 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ] else if (widget.read &&
+                          widget.sendBy == widget.myUsername)
+                        Image.asset(
+                          'assets/images/img_viewed.png',
+                          scale: 1.9,
+                        ),
+                    ],
+                  )
+                ],
+              ),
             ),
-            Spacer(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  widget.time,
-                  style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 

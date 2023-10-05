@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +6,7 @@ import 'package:degree/Data.dart';
 import 'package:degree/Video_call_screen.dart';
 //import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../service/database.dart';
@@ -43,6 +45,7 @@ class _ChatPageState extends State<ChatPage> {
   ontheload() async {
     await getthesharedpref();
     await getAndSetMessages();
+    startListeningToLastMessage(chatRoomId!);
 
     setState(() {});
   }
@@ -117,16 +120,68 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
+  StreamSubscription<Map<String, dynamic>>? lastMessageStream;
+
+  void startListeningToLastMessage(String chatroomId) {
+    lastMessageStream =
+        listenToLastMessage(chatroomId).listen((lastMessageData) {
+      // Handle updates to the last message data here
+      if (lastMessageData['read'] == false &&
+          lastMessageData['lastMessageSendBy'] == widget.username) {
+        setLastMessage(chatroomId, lastMessageData, true);
+      }
+
+      print('Last message data updated in chat page: $lastMessageData');
+    });
+  }
+
+  void setLastMessage(
+      String chatroomId, Map<String, dynamic> lasMessageMap, bool read) {
+    Map<String, dynamic> lastMessageInfoMap = {
+      "lastMessage": lasMessageMap['lastMessage'],
+      "lastMessageSendTs": lasMessageMap['lastMessageSendTs'],
+      "time": lasMessageMap['time'],
+      "lastMessageSendBy": lasMessageMap['lastMessageSendBy'],
+      "read": read,
+      "to_msg_$myUserName": 0,
+      "to_msg_${widget.username}": lasMessageMap['to_msg_${widget.username}']
+    };
+
+    DatabaseMethods().updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
+  }
+
+  Map<String, dynamic>? lastMessageData;
+  Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    // print('listening: $chatRoomId');
+    return firestore
+        .collection('chatrooms')
+        .doc(chatroomId)
+        .snapshots()
+        .map((chatroomSnapshot) {
+      if (chatroomSnapshot.exists) {
+        lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
+        print('last listen in Chat Page:$lastMessageData');
+        // Return the last message data as a stream
+        return lastMessageData ?? {};
+      } else {
+        // Return an empty map if the chatroom document doesn't exist
+        return {};
+      }
+    });
+  }
+
   addMessage(bool sendClicked) async {
     if (messagecontroller.text != "") {
       String message = messagecontroller.text;
       messagecontroller.text = "";
-
-      String translation_text = await Data.sendText(
-          message,
-          selectedValueFrom ?? "Halh Mongolian",
-          selectedValueTo ?? "Halh Mongolian");
-      message = message + "\n${translation_text}";
+      if (selectedValueFrom != selectedValueTo) {
+        String translation_text = await Data.sendText(
+            message,
+            selectedValueFrom ?? "Halh Mongolian",
+            selectedValueTo ?? "Halh Mongolian");
+        message = message + "\n${translation_text}";
+      }
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
@@ -140,6 +195,14 @@ class _ChatPageState extends State<ChatPage> {
       };
       messageId ??= randomAlphaNumeric(10);
 
+      int to = 0;
+
+      if (lastMessageData!["lastMessage"] is String) {
+        log('$lastMessageData');
+        to = lastMessageData!['to_msg_${widget.username}'] + 1;
+      } else
+        to = 1;
+
       DatabaseMethods()
           .addMessage(chatRoomId!, messageId!, messageInfoMap)
           .then((value) {
@@ -148,6 +211,11 @@ class _ChatPageState extends State<ChatPage> {
           "lastMessageSendTs": formattedDate,
           "time": FieldValue.serverTimestamp(),
           "lastMessageSendBy": myUserName,
+          "read": false,
+          "to_msg_$myUserName": 0,
+          "to_msg_${widget.username}": to,
+          "sendByNameFrom": myName,
+          "sendByNameTo": widget.name
         };
         DatabaseMethods()
             .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
@@ -268,8 +336,6 @@ class _ChatPageState extends State<ChatPage> {
   String? selectedValueTo;
   @override
   Widget build(BuildContext context) {
-    log('channel:${widget.channel}');
-    log('message; $selectedValueFrom');
     return Scaffold(
       appBar: buildAppBar(),
       backgroundColor: Color(0xFF553370),
@@ -602,7 +668,9 @@ class _ChatPageState extends State<ChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   IconButton(
-                    onPressed: Get.back,
+                    onPressed: () {
+                      Get.back();
+                    },
                     icon: Image.asset('assets/images/ic_chevron_left.png',
                         height: 20, width: 20, color: Colors.black),
                   ),
@@ -640,14 +708,12 @@ class _ChatPageState extends State<ChatPage> {
                         widget.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        // style: ,
                       ),
                       Text(
                         widget.username,
                         //  LimeChatHelper.getChannelUserNumber(channel),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        //   style: ,
                       ),
                     ],
                   ),
@@ -659,7 +725,6 @@ class _ChatPageState extends State<ChatPage> {
                       width: 24,
                       child: RawMaterialButton(
                         onPressed: () {
-                          //_startCallScreen(1);
                           if (translation_status % 2 == 0)
                             Get.to(Video_call_screen(
                                 widget.channel,
@@ -667,7 +732,17 @@ class _ChatPageState extends State<ChatPage> {
                                 widget.username,
                                 selectedValueFrom ?? 'Halh Mongolian',
                                 selectedValueTo ?? 'Halh Mongolian'));
-                          else {}
+                          else {
+                            Fluttertoast.showToast(
+                              msg: 'Tadsc sd sd ',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor:
+                                  const Color.fromARGB(255, 126, 65, 65),
+                              textColor: Colors.black,
+                            );
+                          }
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_video.png",
@@ -748,6 +823,13 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    print('closing chatpage');
+    lastMessageStream?.cancel();
+    super.dispose();
   }
 }
 
