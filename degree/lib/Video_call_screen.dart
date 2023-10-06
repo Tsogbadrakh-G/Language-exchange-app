@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/Data.dart';
+import 'package:degree/DataAPI.dart';
 import 'package:degree/custom_source.dart';
 import 'package:degree/service/database.dart';
 import 'package:dio/dio.dart';
@@ -14,8 +14,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
-const token =
-    "007eJxTYIhs3fZm3qrPrAzCTxauq/EWu32X9fBe/vcbHp6sPL1+lUClAkOKqZlpkolJkqWFoZlJsrFlklGSoYWpqZGlUZKRUUqK0eaj0qkNgYwMd+JSmBkZIBDEZ2EoSS0uYWAAANbZIRU=";
+
 //const channel = "test_channel";
 
 List<String> out_lans = [
@@ -58,9 +57,10 @@ List<String> out_lans = [
 ];
 
 class Video_call_screen extends StatefulWidget {
-  final String channel, myUserName, username, from, to;
-  const Video_call_screen(
-      this.channel, this.myUserName, this.username, this.from, this.to,
+  final String channel, myUserName, username, from, to, channelToken;
+  final int uid;
+  const Video_call_screen(this.channel, this.myUserName, this.username,
+      this.from, this.to, this.channelToken, this.uid,
       {Key? key})
       : super(key: key);
 
@@ -120,9 +120,8 @@ class _Video_call_screen extends State<Video_call_screen> {
     print('download: ${res.data}');
 
     final audioPlayer = AudioPlayer();
-    log('1');
+
     await audioPlayer.setAudioSource(CustomSource(res.data));
-    log('2');
 
     await audioPlayer.load();
     log('3');
@@ -195,19 +194,24 @@ class _Video_call_screen extends State<Video_call_screen> {
     await _engine.startPreview();
     await _engine.enableAudio();
     await _engine.muteLocalAudioStream(true);
-
-    await _engine.joinChannel(
-      token: token,
-      channelId: "test",
-      uid: 0,
-      options: const ChannelMediaOptions(),
-    );
+    try {
+      print('token ${widget.channelToken}');
+      print('token ${widget.channel}');
+      await _engine.joinChannel(
+        token: widget.channelToken,
+        channelId: widget.channel,
+        uid: widget.uid,
+        options: const ChannelMediaOptions(),
+      );
+    } catch (e) {
+      print('exception in agora: $e');
+    }
   }
 
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    log('from ${widget.from}, to: ${widget.to}');
+    print('from ${widget.from}, to: ${widget.to}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agora Video Call'),
@@ -326,7 +330,7 @@ class _Video_call_screen extends State<Video_call_screen> {
         controller: VideoViewController.remote(
             rtcEngine: _engine,
             canvas: VideoCanvas(uid: _remoteUid),
-            connection: RtcConnection(channelId: "test")),
+            connection: RtcConnection(channelId: widget.channel)),
       );
     } else {
       return const Text(

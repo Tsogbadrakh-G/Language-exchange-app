@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/pages/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'chatpage.dart';
@@ -80,8 +82,8 @@ class _HomeState extends State<Home> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
-                    print(
-                        'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
+                    //  print(
+                    //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
                     if (indx == 0)
                       return ChatRoomListTile(
                         chatRoomId: ds.id,
@@ -104,7 +106,9 @@ class _HomeState extends State<Home> {
                         time: ds["lastMessageSendTs"],
                         read: ds["read"],
                         to_msg_num: ds['to_msg_$myUserName'],
-                        name: myName!,
+                        name: ds['sendByNameFrom'] == myName
+                            ? ds['sendByNameTo']
+                            : ds['sendByNameFrom'],
                       );
                     else if (indx == 2) {
                       if (!ds["read"] && ds["lastMessageSendBy"] != myUserName)
@@ -116,12 +120,14 @@ class _HomeState extends State<Home> {
                           time: ds["lastMessageSendTs"],
                           read: ds["read"],
                           to_msg_num: ds['to_msg_$myUserName'],
-                          name: myName!,
+                          name: ds['sendByNameFrom'] == myName
+                              ? ds['sendByNameTo']
+                              : ds['sendByNameFrom'],
                         );
                       else
                         return Offstage();
                     } else {
-                      if (ds["read"])
+                      if (ds["read"] && ds['sendByNameTo'] == myName)
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
                           lastMessage: ds["lastMessage"],
@@ -130,7 +136,9 @@ class _HomeState extends State<Home> {
                           time: ds["lastMessageSendTs"],
                           read: ds["read"],
                           to_msg_num: ds['to_msg_$myUserName'],
-                          name: myName!,
+                          name: ds['sendByNameFrom'] == myName
+                              ? ds['sendByNameTo']
+                              : ds['sendByNameFrom'],
                         );
                       else
                         return Offstage();
@@ -196,79 +204,145 @@ class _HomeState extends State<Home> {
 
   Widget DrawerBuilder(String name) {
     return Drawer(
-      width: 275,
+      width: 330,
       elevation: 30,
-      backgroundColor: Color(0xF3393838),
+      backgroundColor: Color(0xFfFFFFFF),
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(40))),
+          borderRadius: BorderRadius.horizontal(right: Radius.circular(35))),
       child: Container(
         decoration: const BoxDecoration(
-            borderRadius: BorderRadius.horizontal(right: Radius.circular(40)),
+            borderRadius: BorderRadius.horizontal(right: Radius.circular(35)),
             boxShadow: [
               BoxShadow(
-                  color: Color(0x3D000000), spreadRadius: 30, blurRadius: 20)
+                  color: Color(0xFfFFFFFF), spreadRadius: 30, blurRadius: 20)
             ]),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 56,
-                      ),
-                      Text(
-                        'Settings',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    children: [
-                      UserAvatar(filename: myProfilePic ?? ''),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        name,
-                        style: TextStyle(color: Colors.white),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 35,
-                  ),
-                  const DrawerItem(
-                    title: 'Account',
-                    icon: Icons.key,
-                  ),
-                  const DrawerItem(title: 'Chats', icon: Icons.chat_bubble),
-                  const DrawerItem(
-                      title: 'Notifications', icon: Icons.notifications),
-                  const DrawerItem(
-                      title: 'Data and Storage', icon: Icons.storage),
-                  const DrawerItem(title: 'Help', icon: Icons.help),
-                  const Divider(
-                    height: 35,
-                    color: Colors.green,
-                  ),
-                  const DrawerItem(
-                      title: 'Invite a friend', icon: Icons.people_outline),
-                ],
-              ),
-              const DrawerItem(title: 'Log out', icon: Icons.logout)
-            ],
+          padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Settings",
+                          style: const TextStyle(
+                            fontFamily: "Gilroy",
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xff2675ec),
+                            height: 27 / 22,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        // IconButton(
+                        //   onPressed: () {
+                        //     Navigator.pop(context);
+                        //   },
+                        //   icon: Icon(
+                        //     Icons.settings_accessibility_outlined,
+                        //     color: Color(0xff2675ec),
+                        //     size: 30,
+                        //   ),
+                        // ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: Color(0xff2675ec),
+                            size: 30,
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        myProfilePic == ""
+                            ? CircularProgressIndicator()
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.network(
+                                  myProfilePic!,
+                                  height: 100,
+                                  width: 100,
+                                  fit: BoxFit.cover,
+                                )),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Expanded(
+                            child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontFamily: "Gilroy",
+                            fontSize: 23,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xff2675ec),
+                            height: 30 / 23,
+                          ),
+                          textAlign: TextAlign.left,
+                        )),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    DrawerItem(
+                      title: 'Account',
+                      icon: Icons.key,
+                      myFunction: () {},
+                    ),
+                    DrawerItem(
+                      title: 'Chats',
+                      icon: Icons.chat_bubble_outline_outlined,
+                      myFunction: () {},
+                    ),
+                    DrawerItem(
+                      title: 'Notifications',
+                      icon: Icons.notifications_none_outlined,
+                      myFunction: () {},
+                    ),
+                    DrawerItem(
+                      title: 'Data and Storage',
+                      icon: Icons.storage,
+                      myFunction: () {},
+                    ),
+                    DrawerItem(
+                      title: 'Help',
+                      icon: Icons.help_outline,
+                      myFunction: () {},
+                    ),
+                    const Divider(
+                      height: 35,
+                      color: Colors.green,
+                    ),
+                    DrawerItem(
+                      title: 'Invite a friend',
+                      icon: Icons.people_outline,
+                      myFunction: () {},
+                    ),
+                  ],
+                ),
+                DrawerItem(
+                  title: 'Log out',
+                  icon: Icons.logout,
+                  myFunction: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => LogIn()),
+                        (Route<dynamic> route) => false);
+                  },
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -596,7 +670,7 @@ class _HomeState extends State<Home> {
         Map<String, dynamic> chatRoomInfoMap = {
           "users": [myUserName, data["username"]],
         };
-
+        print('created channel: $chatRoomId');
         await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
 
         await Get.to(ChatPage(
@@ -690,7 +764,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     name = "${querySnapshot.docs[0]["Name"]}";
     profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
-    print('getting chat list item  data fetching is finished');
+    // print('getting chat list item  data fetching is finished');
     //setState(() {});
   }
 
@@ -702,7 +776,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
-    print('chat list item username: $username ');
+    // print('chat list item username: $username ');
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
@@ -715,7 +789,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 username: username,
                 channel: widget.chatRoomId,
               ));
-              print('hi');
+
               setState(() {});
             },
             child: Container(
@@ -730,15 +804,14 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           borderRadius: BorderRadius.circular(20),
                           child: Image.network(
                             profilePicUrl,
-                            height: 100,
-                            width: 100,
+                            height: 70,
+                            width: 70,
                             fit: BoxFit.cover,
                           )),
                   SizedBox(
                     width: 10.0,
                   ),
-                  Container(
-                    // width: double.infinity,
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -777,7 +850,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                       ],
                     ),
                   ),
-                  Spacer(),
+                  SizedBox(
+                    width: 30,
+                  ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -811,8 +886,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      ] else if (widget.read &&
-                          widget.sendBy == widget.myUsername)
+                      ] else if (widget.read)
+                        //    widget.sendBy == widget.myUsername)
                         Image.asset(
                           'assets/images/img_viewed.png',
                           scale: 1.9,
@@ -830,31 +905,39 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 class DrawerItem extends StatelessWidget {
   final String title;
   final IconData icon;
-  const DrawerItem({
-    super.key,
-    required this.title,
-    required this.icon,
-  });
+  final void Function() myFunction;
+  DrawerItem(
+      {super.key,
+      required this.title,
+      required this.icon,
+      required this.myFunction});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: myFunction,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 25),
         child: Row(
           children: [
             Icon(
               icon,
-              color: Colors.white,
-              size: 20,
+              color: Color(0xff2675ec),
+              size: 40,
             ),
             const SizedBox(
               width: 40,
             ),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+            Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                    fontFamily: "Gilroy",
+                    fontSize: 19,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff2675ec),
+                    height: 23 / 19,
+                  ),
+                  textAlign: TextAlign.left),
             ),
           ],
         ),

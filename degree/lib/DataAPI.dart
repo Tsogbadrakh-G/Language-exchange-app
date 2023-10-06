@@ -5,6 +5,9 @@ class Data {
   List<String> inputLanguages = [];
 
   List<String> outputLanguages = [];
+  String app_id = 'd565b44b98164c39b2b1855292b22dd2';
+  String app_certificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
+
   static Future<dynamic> sendAudio(String path, String from, String to,
       String tranlsation, String chatroomId, String itsUser) async {
     final url = 'http://51.20.44.63:5000/todo';
@@ -68,6 +71,35 @@ class Data {
       //log(responsePayload["res"]);
 
       return response.data['message'];
+    } else {
+      log('unsuccessfull req');
+      return 'error';
+    }
+  }
+
+  static Future<String> generate_token(String roomid, int uid) async {
+    final url = 'http://51.20.44.63:5000/generate_agora_token/' + roomid;
+    //final url = 'http://192.168.1.98:5000/generate_agora_token/' + roomid;
+
+    final dio = Dio();
+
+    FormData formData = FormData.fromMap({
+      'uid': uid,
+    });
+
+    print('pre response for generate token $url');
+
+    final response = await dio.post(
+      url,
+      data: formData,
+      options: Options(headers: {"Content-Type": "multipart/form-data"}),
+    );
+    print('response: ${response}');
+
+    if (response.statusCode == 200) {
+      print('download: ${response.data['token']}');
+
+      return response.data['token'];
     } else {
       log('unsuccessfull req');
       return 'error';

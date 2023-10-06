@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/Data.dart';
+import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
 //import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -38,14 +40,17 @@ class _ChatPageState extends State<ChatPage> {
     myName = await SharedPreferenceHelper().getDisplayName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
 
-    chatRoomId = getChatRoomIdbyUsername(widget.username, myUserName!);
+    // chatRoomId = getChatRoomIdbyUsername(widget.username, myUserName!);
+    chatRoomId = widget.channel;
     setState(() {});
   }
 
   ontheload() async {
     await getthesharedpref();
     await getAndSetMessages();
-    startListeningToLastMessage(chatRoomId!);
+
+    print('listening in chatpage: ${widget.channel}');
+    startListeningToLastMessage(widget.channel);
 
     setState(() {});
   }
@@ -131,7 +136,7 @@ class _ChatPageState extends State<ChatPage> {
         setLastMessage(chatroomId, lastMessageData, true);
       }
 
-      print('Last message data updated in chat page: $lastMessageData');
+      //print('Last message data updated in chat page: $lastMessageData');
     });
   }
 
@@ -153,7 +158,7 @@ class _ChatPageState extends State<ChatPage> {
   Map<String, dynamic>? lastMessageData;
   Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    // print('listening: $chatRoomId');
+    //print('listening: $chatRoomId');
     return firestore
         .collection('chatrooms')
         .doc(chatroomId)
@@ -165,6 +170,7 @@ class _ChatPageState extends State<ChatPage> {
         // Return the last message data as a stream
         return lastMessageData ?? {};
       } else {
+        print('none here');
         // Return an empty map if the chatroom document doesn't exist
         return {};
       }
@@ -197,8 +203,9 @@ class _ChatPageState extends State<ChatPage> {
 
       int to = 0;
 
-      if (lastMessageData!["lastMessage"] is String) {
-        log('$lastMessageData');
+      if (lastMessageData != null &&
+          lastMessageData!["lastMessage"] is String) {
+        //log('$lastMessageData');
         to = lastMessageData!['to_msg_${widget.username}'] + 1;
       } else
         to = 1;
@@ -418,20 +425,17 @@ class _ChatPageState extends State<ChatPage> {
                                       .map((String item) =>
                                           DropdownMenuItem<String>(
                                               value: item,
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    item,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                              child: Container(
+                                                child: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
                                                   ),
-                                                ],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               )))
                                       .toList()
                                   : chat_in_lans
@@ -724,22 +728,30 @@ class _ChatPageState extends State<ChatPage> {
                       margin: const EdgeInsets.only(right: 10),
                       width: 24,
                       child: RawMaterialButton(
-                        onPressed: () {
-                          if (translation_status % 2 == 0)
+                        onPressed: () async {
+                          if (translation_status % 2 == 0) {
+                            int intValue = Random().nextInt(100) +
+                                10000; // Value is >= 50 and < 150.
+                            String token = await Data.generate_token(
+                                widget.channel, intValue);
+
+                            print('channel token $token, uid: $intValue');
                             Get.to(Video_call_screen(
                                 widget.channel,
                                 myUserName!,
                                 widget.username,
                                 selectedValueFrom ?? 'Halh Mongolian',
-                                selectedValueTo ?? 'Halh Mongolian'));
-                          else {
+                                selectedValueTo ?? 'Halh Mongolian',
+                                token,
+                                intValue));
+                          } else {
                             Fluttertoast.showToast(
-                              msg: 'Tadsc sd sd ',
+                              msg: 'Ta voice translation icon-ийг сонгоно уу.',
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
                               backgroundColor:
-                                  const Color.fromARGB(255, 126, 65, 65),
+                                  Color.fromARGB(255, 199, 197, 197),
                               textColor: Colors.black,
                             );
                           }
@@ -779,13 +791,21 @@ class _ChatPageState extends State<ChatPage> {
                         MenuItems.onChanged(context, value! as MenuItem);
                       },
                       dropdownStyleData: DropdownStyleData(
-                        width: 160,
-                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        width: 180,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 10),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30.0), // Top-left corner
+                            topRight: Radius.circular(10.0), // Top-right corner
+                            bottomLeft:
+                                Radius.circular(30.0), // Bottom-left corner
+                            bottomRight:
+                                Radius.circular(30.0), // Bottom-right corner
+                          ),
+                          color: Color(0xff2675EC),
                         ),
-                        offset: const Offset(0, 8),
+                        offset: const Offset(100, 00),
                       ),
                       menuItemStyleData: MenuItemStyleData(
                         customHeights: [
@@ -802,20 +822,6 @@ class _ChatPageState extends State<ChatPage> {
                   SizedBox(
                     width: 20,
                   )
-                  // Container(
-                  //   margin: const EdgeInsets.only(right: 10),
-                  //   width: 24,
-                  //   child: RawMaterialButton(
-                  //     onPressed: () {
-
-                  //     },
-                  //     shape: const CircleBorder(),
-                  //     child: Image.asset("assets/images/ic_chat_more.png",
-                  //         color: Get.theme.colorScheme.secondary,
-                  //         width: 20,
-                  //         height: 20),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -847,10 +853,10 @@ abstract class MenuItems {
   static const List<MenuItem> firstItems = [home, share, settings];
   static const List<MenuItem> secondItems = [logout];
 
-  static const home = MenuItem(text: 'Home', icon: Icons.home);
-  static const share = MenuItem(text: 'Share', icon: Icons.share);
+  static const home = MenuItem(text: 'About', icon: Icons.info);
+  static const share = MenuItem(text: 'Mute', icon: Icons.circle_notifications);
   static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
-  static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
+  static const logout = MenuItem(text: 'Back', icon: Icons.arrow_back);
 
   static Widget buildItem(MenuItem item) {
     return Row(
@@ -883,6 +889,7 @@ abstract class MenuItems {
         //Do something
         break;
       case MenuItems.logout:
+        Get.back();
         //Do something
         break;
     }
