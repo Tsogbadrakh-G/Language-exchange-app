@@ -98,7 +98,8 @@ class _Video_call_screen extends State<Video_call_screen> {
 
           //  print('New Message: $messageData, $myUserName');
 
-          log(' new message: ${messageData}, widget username: ${widget.username}');
+          print(
+              ' new message: ${messageData}, widget username: ${widget.username}, exited: $exited');
           if (exited) {
             updateChatReadState(messageData["id"]);
           } else if (messageData["type"] == "audio" &&
@@ -253,51 +254,54 @@ class _Video_call_screen extends State<Video_call_screen> {
                 log('click $mute');
                 if (mute % 2 == 0) {
                   await _engine.muteLocalAudioStream(true);
-                  await _engine.stopAudioRecording();
 
-                  Directory tempDir = await getTemporaryDirectory();
-                  String record = '${tempDir.absolute.path}/record.wav';
+                  if (widget.from != widget.to) {
+                    await _engine.stopAudioRecording();
 
-                  log('recorded file: $record');
-                  // Uint8List hha = await File(record).readAsBytesSync();
+                    Directory tempDir = await getTemporaryDirectory();
+                    String record = '${tempDir.absolute.path}/record.wav';
 
-                  setState(() {});
+                    log('recorded file: $record');
+                    setState(() {});
+                    var val;
+                    if (widget.to == "Halh Mongolian") {
+                      val = await Data.sendAudio(record, widget.from, widget.to,
+                          "S2TT (Speech to Text translation)", widget.channel);
+                    } else {
+                      val = await Data.sendAudio(
+                        record,
+                        widget.from,
+                        widget.to,
+                        "S2ST (Speech to Speech translation)",
+                        widget.channel,
+                      );
+                    }
 
-                  var val = await Data.sendAudio(
-                      record,
-                      "English",
-                      "Halh Mongolian",
-                      "S2TT (Speech to Text translation)",
-                      widget.channel,
-                      widget.myUserName);
-                  // var val = await Data.sendAudio(record, "English", "German",
-                  //     "S2ST (Speech to Speech translation)");
-                  await sendAudioLink(val);
-
-                  // final audioPlayer = AudioPlayer();
-                  // await audioPlayer.setAudioSource(CustomSource(val));
-
-                  // await audioPlayer.load();
-
-                  // audioPlayer.play();
+                    sendAudioLink(val);
+                  } else
+                    setState(() {});
                 } else {
                   await _engine.muteLocalAudioStream(false);
-                  Directory tempDir = await getTemporaryDirectory();
-                  String record = '${tempDir.absolute.path}/record.wav';
-                  await File(record).create(exclusive: false, recursive: false);
 
-                  _engine.startAudioRecording(
-                    AudioRecordingConfiguration(
-                      sampleRate: 32000,
-                      filePath: record,
-                      fileRecordingType:
-                          AudioFileRecordingType.audioFileRecordingMic,
-                      recordingChannel: 1,
-                      quality:
-                          AudioRecordingQualityType.audioRecordingQualityMedium,
-                      encode: true,
-                    ),
-                  );
+                  if (widget.from != widget.to) {
+                    Directory tempDir = await getTemporaryDirectory();
+                    String record = '${tempDir.absolute.path}/record.wav';
+                    await File(record)
+                        .create(exclusive: false, recursive: false);
+
+                    _engine.startAudioRecording(
+                      AudioRecordingConfiguration(
+                        sampleRate: 32000,
+                        filePath: record,
+                        fileRecordingType:
+                            AudioFileRecordingType.audioFileRecordingMic,
+                        recordingChannel: 1,
+                        quality: AudioRecordingQualityType
+                            .audioRecordingQualityMedium,
+                        encode: true,
+                      ),
+                    );
+                  }
 
                   setState(() {});
                 }

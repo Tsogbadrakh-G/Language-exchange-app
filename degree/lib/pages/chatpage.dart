@@ -278,15 +278,43 @@ class _ChatPageState extends State<ChatPage> {
   ];
 
   final List<String> chat_in_lans = [
-    'Halh Mongolian'
-        'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
+    'Halh Mongolian',
+    'Bengali',
+    'Catalan',
+    'Czech',
+    'Danish',
+    'Dutch',
+    'English',
+    'Estonian',
+    'Finnish',
+    'French',
+    'German',
+    'Hindi',
+    'Indonesian',
+    'Italian',
+    'Japanese',
+    'Korean',
+    'Maltese',
+    'Mandarin Chinese',
+    'Modern Standard Arabic',
+    'Northern Uzbek',
+    'Polish',
+    'Portuguese',
+    'Romanian',
+    'Russian',
+    'Slovak',
+    'Spanish',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
+    'Telugu',
+    'Thai',
+    'Turkish',
+    'Ukrainian',
+    'Urdu',
+    'Vietnamese',
+    'Welsh',
+    'Western Persian'
   ];
   List<String> voice_out_lans = [
     'Bengali',
@@ -328,15 +356,43 @@ class _ChatPageState extends State<ChatPage> {
   ];
 
   final List<String> chat_out_lans = [
-    'Halh Mongolian'
-        'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
+    'Halh Mongolian',
+    'Bengali',
+    'Catalan',
+    'Czech',
+    'Danish',
+    'Dutch',
+    'English',
+    'Estonian',
+    'Finnish',
+    'French',
+    'German',
+    'Hindi',
+    'Indonesian',
+    'Italian',
+    'Japanese',
+    'Korean',
+    'Maltese',
+    'Mandarin Chinese',
+    'Modern Standard Arabic',
+    'Northern Uzbek',
+    'Polish',
+    'Portuguese',
+    'Romanian',
+    'Russian',
+    'Slovak',
+    'Spanish',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
+    'Telugu',
+    'Thai',
+    'Turkish',
+    'Ukrainian',
+    'Urdu',
+    'Vietnamese',
+    'Welsh',
+    'Western Persian'
   ];
 
   String? selectedValueFrom;
@@ -564,40 +620,34 @@ class _ChatPageState extends State<ChatPage> {
                                       .map((String item) =>
                                           DropdownMenuItem<String>(
                                               value: item,
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    item,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                              child: Container(
+                                                child: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
                                                   ),
-                                                ],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               )))
                                       .toList()
                                   : chat_out_lans
                                       .map((String item) =>
                                           DropdownMenuItem<String>(
                                               value: item,
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    item,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                              child: Container(
+                                                child: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
                                                   ),
-                                                ],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               )))
                                       .toList(),
                               value: selectedValueTo,
@@ -730,8 +780,8 @@ class _ChatPageState extends State<ChatPage> {
                       child: RawMaterialButton(
                         onPressed: () async {
                           if (translation_status % 2 == 0) {
-                            int intValue = Random().nextInt(100) +
-                                10000; // Value is >= 50 and < 150.
+                            int intValue = Random()
+                                .nextInt(10000); // Value is >= 50 and < 150.
                             String token = await Data.generate_token(
                                 widget.channel, intValue);
 

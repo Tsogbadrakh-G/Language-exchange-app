@@ -9,7 +9,7 @@ class Data {
   String app_certificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
 
   static Future<dynamic> sendAudio(String path, String from, String to,
-      String tranlsation, String chatroomId, String itsUser) async {
+      String tranlsation, String chatroomId) async {
     final url = 'http://51.20.44.63:5000/todo';
     //final url = 'http://192.168.1.74:5000/todo';
     final dio = Dio();
@@ -30,7 +30,6 @@ class Data {
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
     log('response: ${response}');
-    // dio.download(response.data[''], savePath)
 
     if (response.statusCode == 200) {
       //translated audio file URL on the server
@@ -61,14 +60,9 @@ class Data {
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
     log('response: ${response}');
-    // dio.download(response.data[''], savePath)
 
     if (response.statusCode == 200) {
-      //final res = await dio.get(response.data['message'],
-      //  options: Options(responseType: ResponseType.plain));
       print('download: ${response.data['message']}');
-      // Map<String, dynamic> responsePayload = json.decode(response.data);
-      //log(responsePayload["res"]);
 
       return response.data['message'];
     } else {
