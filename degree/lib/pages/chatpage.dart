@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';

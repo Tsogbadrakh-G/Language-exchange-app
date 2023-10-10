@@ -148,7 +148,6 @@ class _Video_call_screen extends State<Video_call_screen> {
 
   Future<void> initAgora() async {
     // retrieve permissions
-    await [Permission.microphone, Permission.camera].request();
 
     //create the engine
     _engine = createAgoraRtcEngine();

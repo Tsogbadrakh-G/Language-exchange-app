@@ -56,6 +56,8 @@ dependencies:
   firebase_messaging: ^14.6.8
   dropdown_button2: ^2.3.9
   fluttertoast: ^8.2.2
+  image_picker: ^1.0.4
+  firebase_storage: ^11.2.8
  
 
 

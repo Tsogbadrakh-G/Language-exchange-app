@@ -30,6 +30,8 @@
 	<string>Video call with other users</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Talk to other users</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library usage</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

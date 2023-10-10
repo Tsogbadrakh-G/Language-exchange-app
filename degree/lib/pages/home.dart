@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
+import '../service/utils.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -19,11 +24,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool search = false;
-  String? myName, myProfilePic, myUserName, myEmail;
+  String? myName, myProfilePic, myUserName, myEmail, myId;
   Stream? chatRoomsStream;
   PageController controller = PageController();
   int _curr = 0;
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
+  FocusNode _focusNode = FocusNode();
+  TextEditingController textEditingController = TextEditingController();
 
   // void startListeningToLastMessage(String chatroomId) {
   //   lastMessageStream =
@@ -61,14 +68,32 @@ class _HomeState extends State<Home> {
     myProfilePic = await SharedPreferenceHelper().getUserPic();
     myUserName = await SharedPreferenceHelper().getUserName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
+    myId = await SharedPreferenceHelper().getUserId();
     setState(() {});
   }
 
   ontheload() async {
     await getthesharedpref();
     chatRoomsStream = await DatabaseMethods().getChatRooms();
+    Permission.photos.request();
+    await [Permission.microphone, Permission.camera].request();
+  }
 
-    setState(() {});
+  @override
+  void initState() {
+    ontheload();
+    _focusNode.addListener(_handleFocusChange);
+    super.initState();
+  }
+
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      // TextField is currently active (has focus)
+      print('TextField is active');
+    } else {
+      // TextField is currently inactive (doesn't have focus)
+      print('TextField is inactive');
+    }
   }
 
   Widget ChatRoomList(int indx) {
@@ -82,6 +107,7 @@ class _HomeState extends State<Home> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
+
                     //  print(
                     //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
                     if (indx == 0)
@@ -150,12 +176,6 @@ class _HomeState extends State<Home> {
         });
   }
 
-  @override
-  void initState() {
-    ontheload();
-    super.initState();
-  }
-
   getChatRoomIdbyUsername(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
       return "$b\_$a";
@@ -202,7 +222,42 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void selectedImage() async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (_file == null) return;
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = referenceRoot.child('images');
+    Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
+    File img = File(_file.path);
+    // print('myid: $myUserName, filepath: ${_file.path}');
+    try {
+      referenceImageToUpload.putFile(img);
+      referenceImageToUpload.getDownloadURL();
+    } catch (e) {
+      print('upload image to firebase: $e');
+    }
+
+    myProfilePic = await referenceImageToUpload.getDownloadURL();
+    print('uploaded its url :$myProfilePic, userid: $myId');
+    setState(() {});
+    updateUser();
+  }
+
+  updateUser() async {
+    Map<String, dynamic> userInfoMap = {
+      "Name": myName,
+      "E-mail": myEmail,
+      "username": myUserName,
+      "SearchKey": myUserName!.substring(0, 1).toUpperCase(),
+      "Photo": myProfilePic,
+      "Id": myId,
+    };
+    await DatabaseMethods().addUserDetails(userInfoMap, myId!);
+  }
+
   Widget DrawerBuilder(String name) {
+    print('my profile: $myProfilePic');
     return Drawer(
       width: 330,
       elevation: 30,
@@ -265,16 +320,36 @@ class _HomeState extends State<Home> {
                     ),
                     Row(
                       children: [
-                        myProfilePic == ""
+                        myProfilePic == null
                             ? CircularProgressIndicator()
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(
-                                  myProfilePic!,
-                                  height: 100,
-                                  width: 100,
-                                  fit: BoxFit.cover,
-                                )),
+                            : GestureDetector(
+                                onDoubleTap: selectedImage,
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.network(
+                                      myProfilePic!,
+                                      height: 100,
+                                      width: 100,
+                                      fit: BoxFit.cover,
+                                    )),
+                              ),
+                        // if (myProfilePic != null) ...[
+                        //   GestureDetector(
+                        //     onDoubleTap: selectedImage,
+                        //     child: CircleAvatar(
+                        //       radius: 64,
+                        //       backgroundImage: MemoryImage(myProfilePic!),
+                        //     ),
+                        //   ),
+                        // ] else ...[
+                        //   GestureDetector(
+                        //     onDoubleTap: selectedImage,
+                        //     child: CircleAvatar(
+                        //       radius: 64,
+                        //       backgroundImage: NetworkImage(myProfilePic!),
+                        //     ),
+                        //   ),
+                        // ],
                         SizedBox(
                           width: 12,
                         ),
@@ -382,89 +457,121 @@ class _HomeState extends State<Home> {
         color: Colors.white,
         child: Column(children: [
           Container(
-            decoration: BoxDecoration(
-                // border: Border(
-                //     bottom: BorderSide(
-                //   color: Colors.black,
-                // )),
-                ),
-            padding: const EdgeInsets.only(
-                left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _globalKey.currentState!.openDrawer();
-                  },
-                  child: Image.asset(
-                    'assets/images/img_menu.png',
-                    width: 25,
-                    height: 25,
+              decoration: BoxDecoration(
+                  // border: Border(
+                  //     bottom: BorderSide(
+                  //   color: Colors.black,
+                  // )),
                   ),
-                ),
-                search
-                    ? Expanded(
-                        child: TextField(
-                          textAlign: TextAlign.center,
-                          onChanged: (value) {
-                            log('$value');
-                            initiateSearch(value.toUpperCase());
-                          },
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Search User',
-                              hintStyle: TextStyle(
-                                  color: Color(0Xff2675EC),
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w500)),
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w500),
+              padding: const EdgeInsets.only(
+                  left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _globalKey.currentState!.openDrawer();
+                        },
+                        child: Image.asset(
+                          'assets/images/img_menu.png',
+                          width: 25,
+                          height: 25,
                         ),
-                      )
-                    : Text(
+                      ),
+                      Text(
                         "ChatUp",
                         style: TextStyle(
                             color: Color(0Xff2675EC),
                             fontSize: 22.0,
                             fontWeight: FontWeight.bold),
                       ),
-                GestureDetector(
-                  onTap: () {
-                    search = true;
-                    setState(() {});
-                  },
-                  child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20)),
-                      child: search
-                          ? GestureDetector(
-                              onTap: () {
-                                search = false;
-                                queryResultSet = [];
-                                tempSearchStore = [];
+                      Icon(
+                        size: 35,
+                        Icons.compost,
+                        color: Color(0Xff2675EC),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    // padding: EdgeInsets.symmetric(vertical: 2),
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 205, 205, 206),
 
-                                setState(() {});
-                              },
-                              child: Icon(
-                                size: 35,
-                                Icons.close,
-                                color: Color(0Xff2675EC),
-                              ),
-                            )
-                          : Icon(
-                              size: 35,
-                              Icons.search,
-                              color: Color(0Xff2675EC),
-                            )),
-                )
-              ],
-            ),
-          ),
+                      borderRadius: BorderRadius.circular(8.0), // Border radius
+                    ),
+                    child: TextField(
+                      controller: textEditingController,
+                      focusNode: _focusNode,
+                      textAlign: TextAlign.center,
+                      onChanged: (value) {
+                        log('$value');
+
+                        initiateSearch(value.toUpperCase());
+                      },
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: search
+                              ? GestureDetector(
+                                  onTap: () {
+                                    textEditingController.clear();
+                                    _focusNode.unfocus();
+                                    search = false;
+                                    queryResultSet = [];
+                                    tempSearchStore = [];
+
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    size: 25,
+                                    Icons.close,
+                                    color: Color(0Xff2675EC),
+                                  ))
+                              : GestureDetector(
+                                  onTap: () {
+                                    print('clicked');
+                                    search = true;
+                                    _focusNode.requestFocus();
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    size: 30,
+                                    Icons.search,
+                                    color: Color(0Xff2675EC),
+                                  ),
+                                ),
+                          onPressed: () {
+                            search = true;
+                            setState(() {});
+                          },
+                        ),
+                        border: InputBorder.none,
+                        hintText: 'Search User',
+                        hintStyle: const TextStyle(
+                          fontFamily: "SF Pro Text",
+                          fontSize: 17,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff3c3c43),
+                          height: 22 / 17,
+                        ),
+                      ),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              )),
           Container(
             // decoration: BoxDecoration(border: Border.all()),
             height: 50,
@@ -758,7 +865,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   getthisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
-    //print(username);
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
     name = "${querySnapshot.docs[0]["Name"]}";
@@ -886,8 +992,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      ] else if (widget.read)
-                        //    widget.sendBy == widget.myUsername)
+                      ] else if (widget.read &&
+                          widget.sendBy == widget.myUsername)
                         Image.asset(
                           'assets/images/img_viewed.png',
                           scale: 1.9,
