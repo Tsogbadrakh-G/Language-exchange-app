@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/login.dart';
+import 'package:degree/service/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,7 +12,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
 import '../service/shared_pref.dart';
-import '../service/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Home extends StatefulWidget {
@@ -90,6 +89,8 @@ class _HomeState extends State<Home> {
     if (_focusNode.hasFocus) {
       // TextField is currently active (has focus)
       print('TextField is active');
+      search = true;
+      setState(() {});
     } else {
       // TextField is currently inactive (doesn't have focus)
       print('TextField is inactive');
@@ -108,6 +109,7 @@ class _HomeState extends State<Home> {
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
 
+                    //   NotificationService.showNotifications(ds.id,'',);
                     //  print(
                     //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
                     if (indx == 0)
@@ -199,11 +201,10 @@ class _HomeState extends State<Home> {
     setState(() {
       search = true;
     });
-    log('qset: $queryResultSet');
-    var capitalizedValue =
-        value.substring(0, 1).toUpperCase() + value.substring(1);
+    print('qset: $queryResultSet');
+    var capitalizedValue = value.substring(0, 1).toUpperCase();
     if (queryResultSet.isEmpty && value.length == 1) {
-      log('search in DataStore');
+      print('search in DataStore');
       DatabaseMethods().Search(value).then((QuerySnapshot docs) {
         for (int i = 0; i < docs.docs.length; ++i) {
           queryResultSet.add(docs.docs[i].data());
@@ -212,7 +213,7 @@ class _HomeState extends State<Home> {
     } else {
       tempSearchStore = [];
       queryResultSet.forEach((element) {
-        log('search in local');
+        print('search in local');
         if (element['username'].startsWith(capitalizedValue)) {
           setState(() {
             tempSearchStore.add(element);
@@ -429,6 +430,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     print('build home');
+    // textEditingController.clear();
     return Scaffold(
       key: _globalKey,
       drawer: DrawerBuilder(myName!),
@@ -454,7 +456,17 @@ class _HomeState extends State<Home> {
 
   Widget PageViewItem(int index) {
     return Container(
-        color: Colors.white,
+      color: Colors.white,
+      child: GestureDetector(
+        onTap: () {
+          if (_focusNode.hasFocus) {
+            print('object');
+            FocusScope.of(context).requestFocus(FocusNode());
+            textEditingController.clear();
+            search = false;
+            setState(() {});
+          }
+        },
         child: Column(children: [
           Container(
               decoration: BoxDecoration(
@@ -499,7 +511,7 @@ class _HomeState extends State<Home> {
                     height: 20,
                   ),
                   Container(
-                    // padding: EdgeInsets.symmetric(vertical: 2),
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
                     height: 40,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 205, 205, 206),
@@ -509,10 +521,10 @@ class _HomeState extends State<Home> {
                     child: TextField(
                       controller: textEditingController,
                       focusNode: _focusNode,
-                      textAlign: TextAlign.center,
+                      textAlign: search ? TextAlign.start : TextAlign.center,
+                      autocorrect: true,
+                      textCapitalization: TextCapitalization.words,
                       onChanged: (value) {
-                        log('$value');
-
                         initiateSearch(value.toUpperCase());
                       },
                       decoration: InputDecoration(
@@ -535,7 +547,6 @@ class _HomeState extends State<Home> {
                                   ))
                               : GestureDetector(
                                   onTap: () {
-                                    print('clicked');
                                     search = true;
                                     _focusNode.requestFocus();
                                     setState(() {});
@@ -572,184 +583,153 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               )),
-          Container(
-            // decoration: BoxDecoration(border: Border.all()),
-            height: 50,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 10),
-              children: [
-                TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Adjust the radius as needed
+          if (!search)
+            Container(
+              // decoration: BoxDecoration(border: Border.all()),
+              height: 50,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(left: 10),
+                children: [
+                  TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              20.0), // Adjust the radius as needed
+                        ),
                       ),
+                      backgroundColor: MaterialStateProperty.all(index == 0
+                          ? Colors.blue
+                          : Colors.white), // Background color
+                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                          horizontal: 15.0, vertical: 5)), // Padding
                     ),
-                    backgroundColor: MaterialStateProperty.all(index == 0
-                        ? Colors.blue
-                        : Colors.white), // Background color
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 5)), // Padding
-                  ),
-                  onPressed: () {
-                    _curr = 0;
+                    onPressed: () {
+                      _curr = 0;
 
-                    setState(() {});
-                  },
-                  child: Text(
-                    "All",
-                    style: TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: index == 0 ? Colors.white : Color(0xff131313),
-                      height: 25 / 20,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-                TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Adjust the radius as needed
+                      setState(() {});
+                    },
+                    child: Text(
+                      "All",
+                      style: TextStyle(
+                        fontFamily: "Gilroy",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: index == 0 ? Colors.white : Color(0xff131313),
+                        height: 25 / 20,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    backgroundColor: MaterialStateProperty.all(index == 1
-                        ? Colors.blue
-                        : Colors.white), // Background color
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 5)), // Padding
                   ),
-                  onPressed: () {
-                    _curr = 1;
-
-                    setState(() {});
-                  },
-                  child: Text(
-                    "Important",
-                    style: TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: index == 1 ? Colors.white : Color(0xff131313),
-                      height: 25 / 20,
-                    ),
-                    textAlign: TextAlign.center,
+                  const SizedBox(
+                    width: 25,
                   ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-                TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Adjust the radius as needed
+                  TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              20.0), // Adjust the radius as needed
+                        ),
                       ),
+                      backgroundColor: MaterialStateProperty.all(index == 1
+                          ? Colors.blue
+                          : Colors.white), // Background color
+                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 5)), // Padding
                     ),
-                    backgroundColor: MaterialStateProperty.all(index == 2
-                        ? Colors.blue
-                        : Colors.white), // Background color
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 5)), // Padding
-                  ),
-                  onPressed: () {
-                    _curr = 2;
+                    onPressed: () {
+                      _curr = 1;
 
-                    setState(() {});
-                  },
-                  child: Text(
-                    "Unread",
-                    style: TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: index == 2 ? Colors.white : Color(0xff131313),
-                      height: 25 / 20,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-                TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Adjust the radius as needed
+                      setState(() {});
+                    },
+                    child: Text(
+                      "Important",
+                      style: TextStyle(
+                        fontFamily: "Gilroy",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: index == 1 ? Colors.white : Color(0xff131313),
+                        height: 25 / 20,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    backgroundColor: MaterialStateProperty.all(index == 3
-                        ? Colors.blue
-                        : Colors.white), // Background color
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 5)), // Padding
                   ),
-                  onPressed: () {
-                    _curr = 3;
+                  const SizedBox(
+                    width: 25,
+                  ),
+                  TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              20.0), // Adjust the radius as needed
+                        ),
+                      ),
+                      backgroundColor: MaterialStateProperty.all(index == 2
+                          ? Colors.blue
+                          : Colors.white), // Background color
+                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                          horizontal: 15.0, vertical: 5)), // Padding
+                    ),
+                    onPressed: () {
+                      _curr = 2;
 
-                    setState(() {});
-                  },
-                  child: Text(
-                    "Read",
-                    style: TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: index == 3 ? Colors.white : Color(0xff131313),
-                      height: 25 / 20,
+                      setState(() {});
+                    },
+                    child: Text(
+                      "Unread",
+                      style: TextStyle(
+                        fontFamily: "Gilroy",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: index == 2 ? Colors.white : Color(0xff131313),
+                        height: 25 / 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(
-                  width: 35,
-                ),
-              ],
+                  const SizedBox(
+                    width: 25,
+                  ),
+                  TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              20.0), // Adjust the radius as needed
+                        ),
+                      ),
+                      backgroundColor: MaterialStateProperty.all(index == 3
+                          ? Colors.blue
+                          : Colors.white), // Background color
+                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                          horizontal: 15.0, vertical: 5)), // Padding
+                    ),
+                    onPressed: () {
+                      _curr = 3;
+
+                      setState(() {});
+                    },
+                    child: Text(
+                      "Read",
+                      style: TextStyle(
+                        fontFamily: "Gilroy",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: index == 3 ? Colors.white : Color(0xff131313),
+                        height: 25 / 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 35,
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Expanded(
-          //   child: Container(
-          //     padding:
-          //         EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-          //     width: double.infinity,
-          //     height: double.infinity,
-          //     // width: MediaQuery.of(context).size.width,
-          //     // height: search
-          //     //     ? MediaQuery.of(context).size.height / 1.19
-          //     //     : MediaQuery.of(context).size.height / 1.15,
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       // borderRadius: BorderRadius.only(
-          //       //     topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          //     ),
-          //     child: Column(
-          //       children: [
-          //   search
-          //              ? ListView(
-          //                 padding:
-          //                     EdgeInsets.only(left: 10.0, right: 10.0),
-          //                 primary: false,
-          //                 shrinkWrap: true,
-          //                 children: tempSearchStore.map((element) {
-          //                   return buildResultCard(element);
-          //                 }).toList())
-          //             : ChatRoomList(),
-          //       ],
-          //     ),
-          //    ),
-
-          // ),
           Expanded(
               child: Container(
             padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
@@ -765,7 +745,9 @@ class _HomeState extends State<Home> {
                     }).toList())
                 : ChatRoomList(_curr),
           ))
-        ]));
+        ]),
+      ),
+    );
   }
 
   Widget buildResultCard(data) {

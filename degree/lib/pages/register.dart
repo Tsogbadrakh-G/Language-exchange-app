@@ -27,7 +27,7 @@ class _Register extends State<Register> {
   final _formkey = GlobalKey<FormState>();
 
   registration() async {
-    if (password != null && password == confirmPassword) {
+    if (password != "" && password == confirmPassword) {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email.toLowerCase(), password: password);

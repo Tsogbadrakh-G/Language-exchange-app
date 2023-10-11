@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
+import 'package:degree/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -721,7 +722,7 @@ class _ChatPageState extends State<ChatPage> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      Get.back();
+                      Get.to(Home());
                     },
                     icon: Image.asset('assets/images/ic_chevron_left.png',
                         height: 20, width: 20, color: Colors.black),
