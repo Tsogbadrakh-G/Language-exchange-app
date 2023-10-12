@@ -5,14 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
 import 'package:degree/pages/home.dart';
+import 'package:degree/service/Controller.dart';
+import 'package:degree/service/model/Customer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../service/database.dart';
-import '../service/shared_pref.dart';
-import 'package:random_string/random_string.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 class ChatPage extends StatefulWidget {
@@ -28,18 +27,22 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  DataController _dataController = Get.find();
   TextEditingController messagecontroller = new TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
   int translation_status = 1;
+  //bool exited = false;
 
   getthesharedpref() async {
-    myUserName = await SharedPreferenceHelper().getUserName();
-    myProfilePic = await SharedPreferenceHelper().getUserPic();
-    myName = await SharedPreferenceHelper().getDisplayName();
-    myEmail = await SharedPreferenceHelper().getUserEmail();
+    // print('user: $user');
+    myUserName = _dataController.myusername;
+    myName = _dataController.myname;
+    myProfilePic = _dataController.picUrl;
+    myEmail = _dataController.email;
 
-    // chatRoomId = getChatRoomIdbyUsername(widget.username, myUserName!);
+    print(
+        'name $myName, usrname: $myUserName, pic: $myProfilePic, id: $myEmail, exited:${_dataController.exitedForEachChannel[myUserName]} ');
     chatRoomId = widget.channel;
     setState(() {});
   }
@@ -47,9 +50,12 @@ class _ChatPageState extends State<ChatPage> {
   ontheload() async {
     await getthesharedpref();
     await getAndSetMessages();
+    _dataController
+        .exitedForEachChannel[myUserName ?? _dataController.myusername] = false;
 
-    print('listening in chatpage: ${widget.channel}');
-    startListeningToLastMessage(widget.channel);
+    print('listening in chatpage name: ${widget.channel}');
+    _dataController.startListeningToLastMessage(
+        widget.channel, myUserName!, widget.username);
 
     setState(() {});
   }
@@ -60,6 +66,8 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     ontheload();
+
+    print('object');
   }
 
   getChatRoomIdbyUsername(String a, String b) {
@@ -114,7 +122,6 @@ class _ChatPageState extends State<ChatPage> {
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
 
-                    // log('chat: ${ds["message"]}');
                     return chatMessageTile(
                         ds["message"], myUserName == ds["sendBy"]);
                   })
@@ -122,114 +129,6 @@ class _ChatPageState extends State<ChatPage> {
                   child: CircularProgressIndicator(),
                 );
         });
-  }
-
-  StreamSubscription<Map<String, dynamic>>? lastMessageStream;
-
-  void startListeningToLastMessage(String chatroomId) {
-    lastMessageStream =
-        listenToLastMessage(chatroomId).listen((lastMessageData) {
-      // Handle updates to the last message data here
-      if (lastMessageData['read'] == false &&
-          lastMessageData['lastMessageSendBy'] == widget.username) {
-        setLastMessage(chatroomId, lastMessageData, true);
-      }
-
-      //print('Last message data updated in chat page: $lastMessageData');
-    });
-  }
-
-  void setLastMessage(
-      String chatroomId, Map<String, dynamic> lasMessageMap, bool read) {
-    Map<String, dynamic> lastMessageInfoMap = {
-      "lastMessage": lasMessageMap['lastMessage'],
-      "lastMessageSendTs": lasMessageMap['lastMessageSendTs'],
-      "time": lasMessageMap['time'],
-      "lastMessageSendBy": lasMessageMap['lastMessageSendBy'],
-      "read": read,
-      "to_msg_$myUserName": 0,
-      "to_msg_${widget.username}": lasMessageMap['to_msg_${widget.username}']
-    };
-
-    DatabaseMethods().updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
-  }
-
-  Map<String, dynamic>? lastMessageData;
-  Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //print('listening: $chatRoomId');
-    return firestore
-        .collection('chatrooms')
-        .doc(chatroomId)
-        .snapshots()
-        .map((chatroomSnapshot) {
-      if (chatroomSnapshot.exists) {
-        lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
-        print('last listen in Chat Page:$lastMessageData');
-        // Return the last message data as a stream
-        return lastMessageData ?? {};
-      } else {
-        print('none here');
-        // Return an empty map if the chatroom document doesn't exist
-        return {};
-      }
-    });
-  }
-
-  addMessage(bool sendClicked) async {
-    if (messagecontroller.text != "") {
-      String message = messagecontroller.text;
-      messagecontroller.text = "";
-      if (selectedValueFrom != selectedValueTo) {
-        String translation_text = await Data.sendText(
-            message,
-            selectedValueFrom ?? "Halh Mongolian",
-            selectedValueTo ?? "Halh Mongolian");
-        message = message + "\n${translation_text}";
-      }
-
-      DateTime now = DateTime.now();
-      String formattedDate = DateFormat('h:mma').format(now);
-      Map<String, dynamic> messageInfoMap = {
-        "type": "text",
-        "message": message,
-        "sendBy": myUserName,
-        "ts": formattedDate,
-        "time": FieldValue.serverTimestamp(),
-        "imgUrl": myProfilePic,
-      };
-      messageId ??= randomAlphaNumeric(10);
-
-      int to = 0;
-
-      if (lastMessageData != null &&
-          lastMessageData!["lastMessage"] is String) {
-        //log('$lastMessageData');
-        to = lastMessageData!['to_msg_${widget.username}'] + 1;
-      } else
-        to = 1;
-
-      DatabaseMethods()
-          .addMessage(chatRoomId!, messageId!, messageInfoMap)
-          .then((value) {
-        Map<String, dynamic> lastMessageInfoMap = {
-          "lastMessage": message,
-          "lastMessageSendTs": formattedDate,
-          "time": FieldValue.serverTimestamp(),
-          "lastMessageSendBy": myUserName,
-          "read": false,
-          "to_msg_$myUserName": 0,
-          "to_msg_${widget.username}": to,
-          "sendByNameFrom": myName,
-          "sendByNameTo": widget.name
-        };
-        DatabaseMethods()
-            .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
-        if (sendClicked) {
-          messageId = null;
-        }
-      });
-    }
   }
 
   getAndSetMessages() async {
@@ -431,7 +330,15 @@ class _ChatPageState extends State<ChatPage> {
                         hintStyle: TextStyle(color: Colors.black45),
                         suffixIcon: GestureDetector(
                             onTap: () {
-                              addMessage(true);
+                              _dataController.addMessage(
+                                  widget.channel,
+                                  messagecontroller.text,
+                                  selectedValueFrom ?? "Halh Mongolian",
+                                  selectedValueTo ?? "Halh Mongolian",
+                                  widget.username,
+                                  widget.name);
+
+                              messagecontroller.clear();
                             },
                             child: Icon(Icons.send_rounded))),
                   ),
@@ -722,6 +629,8 @@ class _ChatPageState extends State<ChatPage> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
+                      _dataController.exitedForEachChannel[
+                          myUserName ?? _dataController.myusername] = true;
                       Get.to(Home());
                     },
                     icon: Image.asset('assets/images/ic_chevron_left.png',
@@ -779,8 +688,7 @@ class _ChatPageState extends State<ChatPage> {
                       child: RawMaterialButton(
                         onPressed: () async {
                           if (translation_status % 2 == 0) {
-                            int intValue = Random()
-                                .nextInt(10000); // Value is >= 50 and < 150.
+                            int intValue = Random().nextInt(10000);
                             String token = await Data.generate_token(
                                 widget.channel, intValue);
 
@@ -813,64 +721,24 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton2(
-                      customButton: Image.asset(
-                          "assets/images/ic_chat_more.png",
-                          color: Get.theme.colorScheme.secondary,
-                          width: 20,
-                          height: 20),
-                      items: [
-                        ...MenuItems.firstItems.map(
-                          (item) => DropdownMenuItem<MenuItem>(
-                            value: item,
-                            child: MenuItems.buildItem(item),
-                          ),
-                        ),
-                        const DropdownMenuItem<Divider>(
-                            enabled: false, child: Divider()),
-                        ...MenuItems.secondItems.map(
-                          (item) => DropdownMenuItem<MenuItem>(
-                            value: item,
-                            child: MenuItems.buildItem(item),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        MenuItems.onChanged(context, value! as MenuItem);
-                      },
-                      dropdownStyleData: DropdownStyleData(
-                        width: 180,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30.0), // Top-left corner
-                            topRight: Radius.circular(10.0), // Top-right corner
-                            bottomLeft:
-                                Radius.circular(30.0), // Bottom-left corner
-                            bottomRight:
-                                Radius.circular(30.0), // Bottom-right corner
-                          ),
-                          color: Color(0xff2675EC),
-                        ),
-                        offset: const Offset(100, 00),
-                      ),
-                      menuItemStyleData: MenuItemStyleData(
-                        customHeights: [
-                          ...List<double>.filled(
-                              MenuItems.firstItems.length, 48),
-                          8,
-                          ...List<double>.filled(
-                              MenuItems.secondItems.length, 48),
-                        ],
-                        padding: const EdgeInsets.only(left: 16, right: 16),
+                  // SizedBox(
+                  //   width: 20,
+                  // ),
+                  Visibility(
+                    visible: true,
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      width: 24,
+                      child: RawMaterialButton(
+                        onPressed: () async {},
+                        shape: const CircleBorder(),
+                        child: Image.asset("assets/images/ic_chat_more.png",
+                            color: Get.theme.colorScheme.secondary,
+                            width: 20,
+                            height: 20),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 20,
-                  )
                 ],
               ),
             ),
@@ -883,64 +751,9 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     print('closing chatpage');
-    lastMessageStream?.cancel();
+    _dataController
+        .exitedForEachChannel[myUserName ?? _dataController.myusername] = true;
+    // lastMessageStream?.cancel();
     super.dispose();
-  }
-}
-
-class MenuItem {
-  const MenuItem({
-    required this.text,
-    required this.icon,
-  });
-
-  final String text;
-  final IconData icon;
-}
-
-abstract class MenuItems {
-  static const List<MenuItem> firstItems = [home, share, settings];
-  static const List<MenuItem> secondItems = [logout];
-
-  static const home = MenuItem(text: 'About', icon: Icons.info);
-  static const share = MenuItem(text: 'Mute', icon: Icons.circle_notifications);
-  static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
-  static const logout = MenuItem(text: 'Back', icon: Icons.arrow_back);
-
-  static Widget buildItem(MenuItem item) {
-    return Row(
-      children: [
-        Icon(item.icon, color: Colors.white, size: 22),
-        const SizedBox(
-          width: 10,
-        ),
-        Expanded(
-          child: Text(
-            item.text,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  static void onChanged(BuildContext context, MenuItem item) {
-    switch (item) {
-      case MenuItems.home:
-        //Do something
-        break;
-      case MenuItems.settings:
-        //Do something
-        break;
-      case MenuItems.share:
-        //Do something
-        break;
-      case MenuItems.logout:
-        Get.back();
-        //Do something
-        break;
-    }
   }
 }

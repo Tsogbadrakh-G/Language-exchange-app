@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:degree/pages/login.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ class Register extends StatefulWidget {
 }
 
 class _Register extends State<Register> {
+  DataController _dataController = Get.find();
   String email = "", password = "", name = "", confirmPassword = "";
 
   TextEditingController mailcontroller = new TextEditingController();
@@ -29,8 +31,10 @@ class _Register extends State<Register> {
   registration() async {
     if (password != "" && password == confirmPassword) {
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email.toLowerCase(), password: password);
+        email = email.toLowerCase().trim();
+
+        await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
 
         String Id = randomAlphaNumeric(10);
         String user = mailcontroller.text.replaceAll("@gmail.com", "");
@@ -47,14 +51,23 @@ class _Register extends State<Register> {
               "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a",
           "Id": Id,
         };
+
         await DatabaseMethods().addUserDetails(userInfoMap, Id);
-        await SharedPreferenceHelper().saveUserId(Id);
-        await SharedPreferenceHelper().saveUserDisplayName(namecontroller.text);
-        await SharedPreferenceHelper().saveUserEmail(mailcontroller.text);
-        await SharedPreferenceHelper().saveUserPic(
-            "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a");
-        await SharedPreferenceHelper().saveUserName(
-            mailcontroller.text.replaceAll("@gmail.com", "").toUpperCase());
+
+        _dataController.SaveUser(
+            Id,
+            namecontroller.text,
+            updateusername.toUpperCase(),
+            userInfoMap["Photo"],
+            firstletter,
+            email);
+        // await SharedPreferenceHelper().saveUserId(Id);
+        // await SharedPreferenceHelper().saveUserDisplayName(namecontroller.text);
+        // await SharedPreferenceHelper().saveUserEmail(mailcontroller.text);
+        // await SharedPreferenceHelper().saveUserPic(
+        //     "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a");
+        // await SharedPreferenceHelper().saveUserName(
+        //     mailcontroller.text.replaceAll("@gmail.com", "").toUpperCase());
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(

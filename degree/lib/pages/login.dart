@@ -1,7 +1,7 @@
 import 'package:degree/pages/register.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';
 import '../service/database.dart';
-import '../service/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -20,11 +20,13 @@ class _LogInState extends State<LogIn> {
   String email = "", password = "", name = "", pic = "", username = "", id = "";
   TextEditingController usermailcontroller = new TextEditingController();
   TextEditingController userpasswordcontroller = new TextEditingController();
+  DataController _dataController = Get.find();
 
   final _formkey = GlobalKey<FormState>();
 
   userLogin() async {
     try {
+      print('1');
       // await FirebaseAuth.instance.
       email = email.trim().toLowerCase();
       await FirebaseAuth.instance
@@ -38,12 +40,12 @@ class _LogInState extends State<LogIn> {
       username = "${querySnapshot.docs[0]["username"]}";
       pic = "${querySnapshot.docs[0]["Photo"]}";
       id = querySnapshot.docs[0].id;
-      //log('name $name, usrname: $username, pic: $pic, id: $id');
 
-      await SharedPreferenceHelper().saveUserDisplayName(name);
-      await SharedPreferenceHelper().saveUserName(username);
-      await SharedPreferenceHelper().saveUserId(id);
-      await SharedPreferenceHelper().saveUserPic(pic);
+      _dataController.SaveUser(id, name, username, pic,
+          "${querySnapshot.docs[0]["SearchKey"]}", email);
+
+      print('object: ${FirebaseAuth.instance.currentUser}');
+      print('name $name, usrname: $username, pic: $pic, id: $id');
 
       Get.to(Home());
     } on FirebaseAuthException catch (e) {

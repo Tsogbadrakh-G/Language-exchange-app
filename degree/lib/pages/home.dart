@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/login.dart';
-import 'package:degree/service/utils.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
-import '../service/shared_pref.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Home extends StatefulWidget {
@@ -22,11 +22,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  DataController _dataController = Get.find();
   bool search = false;
   String? myName, myProfilePic, myUserName, myEmail, myId;
   Stream? chatRoomsStream;
   PageController controller = PageController();
-  int _curr = 0;
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
   FocusNode _focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
@@ -62,22 +62,6 @@ class _HomeState extends State<Home> {
   //   });
   // }
 
-  getthesharedpref() async {
-    myName = await SharedPreferenceHelper().getDisplayName();
-    myProfilePic = await SharedPreferenceHelper().getUserPic();
-    myUserName = await SharedPreferenceHelper().getUserName();
-    myEmail = await SharedPreferenceHelper().getUserEmail();
-    myId = await SharedPreferenceHelper().getUserId();
-    setState(() {});
-  }
-
-  ontheload() async {
-    await getthesharedpref();
-    chatRoomsStream = await DatabaseMethods().getChatRooms();
-    Permission.photos.request();
-    await [Permission.microphone, Permission.camera].request();
-  }
-
   @override
   void initState() {
     ontheload();
@@ -85,61 +69,54 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+  ontheload() async {
+    await getthesharedpref();
+    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    setState(() {});
+    [Permission.microphone, Permission.camera, Permission.photos].request();
+  }
+
+  getthesharedpref() async {
+    myUserName = _dataController.myusername;
+    myName = _dataController.myname;
+    myProfilePic = _dataController.picUrl;
+    myEmail = _dataController.email;
+    myId = _dataController.id;
+
+    // print(
+    //     'name ${me!.name}, usrname: ${me!.username}, pic: ${me!.picUrl}, id: ${me!.id}, box: ');
+    setState(() {});
+  }
+
   void _handleFocusChange() {
     if (_focusNode.hasFocus) {
       // TextField is currently active (has focus)
-      print('TextField is active');
+
       search = true;
       setState(() {});
     } else {
       // TextField is currently inactive (doesn't have focus)
-      print('TextField is inactive');
     }
   }
 
-  Widget ChatRoomList(int indx) {
+  Widget ChatRoomList() {
     return StreamBuilder(
         stream: chatRoomsStream,
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
-              ? ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: snapshot.data.docs.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot ds = snapshot.data.docs[index];
+              ? Flexible(
+                  child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: snapshot.data.docs.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        DocumentSnapshot ds = snapshot.data.docs[index];
+                        print('chatroom');
 
-                    //   NotificationService.showNotifications(ds.id,'',);
-                    //  print(
-                    //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
-                    if (indx == 0)
-                      return ChatRoomListTile(
-                        chatRoomId: ds.id,
-                        lastMessage: ds["lastMessage"],
-                        myUsername: myUserName!,
-                        sendBy: ds["lastMessageSendBy"],
-                        time: ds["lastMessageSendTs"],
-                        read: ds["read"],
-                        to_msg_num: ds['to_msg_$myUserName'],
-                        name: ds['sendByNameFrom'] == myName
-                            ? ds['sendByNameTo']
-                            : ds['sendByNameFrom'],
-                      );
-                    else if (indx == 1)
-                      return ChatRoomListTile(
-                        chatRoomId: ds.id,
-                        lastMessage: ds["lastMessage"],
-                        myUsername: myUserName!,
-                        sendBy: ds["lastMessageSendBy"],
-                        time: ds["lastMessageSendTs"],
-                        read: ds["read"],
-                        to_msg_num: ds['to_msg_$myUserName'],
-                        name: ds['sendByNameFrom'] == myName
-                            ? ds['sendByNameTo']
-                            : ds['sendByNameFrom'],
-                      );
-                    else if (indx == 2) {
-                      if (!ds["read"] && ds["lastMessageSendBy"] != myUserName)
+                        //   NotificationService.showNotifications(ds.id,'',);
+                        //  print(
+                        //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
+
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
                           lastMessage: ds["lastMessage"],
@@ -152,26 +129,7 @@ class _HomeState extends State<Home> {
                               ? ds['sendByNameTo']
                               : ds['sendByNameFrom'],
                         );
-                      else
-                        return Offstage();
-                    } else {
-                      if (ds["read"] && ds['sendByNameTo'] == myName)
-                        return ChatRoomListTile(
-                          chatRoomId: ds.id,
-                          lastMessage: ds["lastMessage"],
-                          myUsername: myUserName!,
-                          sendBy: ds["lastMessageSendBy"],
-                          time: ds["lastMessageSendTs"],
-                          read: ds["read"],
-                          to_msg_num: ds['to_msg_$myUserName'],
-                          name: ds['sendByNameFrom'] == myName
-                              ? ds['sendByNameTo']
-                              : ds['sendByNameFrom'],
-                        );
-                      else
-                        return Offstage();
-                    }
-                  })
+                      }))
               : Center(
                   child: CircularProgressIndicator(),
                 );
@@ -258,7 +216,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget DrawerBuilder(String name) {
-    print('my profile: $myProfilePic');
+    // print('my profile: $myProfilePic');
     return Drawer(
       width: 330,
       elevation: 30,
@@ -321,19 +279,39 @@ class _HomeState extends State<Home> {
                     ),
                     Row(
                       children: [
-                        myProfilePic == null
-                            ? CircularProgressIndicator()
-                            : GestureDetector(
-                                onDoubleTap: selectedImage,
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Image.network(
-                                      myProfilePic!,
-                                      height: 100,
-                                      width: 100,
-                                      fit: BoxFit.cover,
+                        Container(
+                          decoration: BoxDecoration(border: Border.all()),
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Stack(
+                            children: [
+                              myProfilePic == null
+                                  ? CircularProgressIndicator()
+                                  : GestureDetector(
+                                      onDoubleTap: selectedImage,
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: Image.network(
+                                            myProfilePic!,
+                                            height: 100,
+                                            width: 100,
+                                            fit: BoxFit.cover,
+                                          )),
+                                    ),
+                              Positioned.fill(
+                                bottom: -80,
+                                right: -90,
+                                child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.camera_alt,
+                                      size: 40,
                                     )),
                               ),
+                            ],
+                          ),
+                        ),
+
                         // if (myProfilePic != null) ...[
                         //   GestureDetector(
                         //     onDoubleTap: selectedImage,
@@ -433,28 +411,12 @@ class _HomeState extends State<Home> {
     // textEditingController.clear();
     return Scaffold(
       key: _globalKey,
-      drawer: DrawerBuilder(myName!),
-      body: PageView(
-        allowImplicitScrolling: true,
-        scrollDirection: Axis.horizontal,
-        controller: controller,
-        onPageChanged: (num) {
-          setState(() {
-            _curr = num;
-            log('$num');
-          });
-        },
-        children: [
-          if (_curr == 0) PageViewItem(0),
-          if (_curr == 1) PageViewItem(1),
-          if (_curr == 2) PageViewItem(2),
-          if (_curr == 3) PageViewItem(3),
-        ],
-      ),
+      drawer: DrawerBuilder(myName ?? ''),
+      body: PageViewItem(),
     );
   }
 
-  Widget PageViewItem(int index) {
+  Widget PageViewItem() {
     return Container(
       color: Colors.white,
       child: GestureDetector(
@@ -469,47 +431,59 @@ class _HomeState extends State<Home> {
         },
         child: Column(children: [
           Container(
-              decoration: BoxDecoration(
-                  // border: Border(
-                  //     bottom: BorderSide(
-                  //   color: Colors.black,
-                  // )),
-                  ),
-              padding: const EdgeInsets.only(
-                  left: 20.0, right: 20.0, top: 50.0, bottom: 10.0),
+            decoration: BoxDecoration(
+                // border: Border(
+                //     bottom: BorderSide(
+                //   color: Colors.black,
+                // )),
+                ),
+            padding: const EdgeInsets.only(
+                left: 20.0, right: 20.0, top: 30.0, bottom: 10.0),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _globalKey.currentState!.openDrawer();
+                      },
+                      child: Image.asset(
+                        'assets/images/img_menu.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                    ),
+                    Text(
+                      "ChatUp",
+                      style: TextStyle(
+                          color: Color(0Xff2675EC),
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Icon(
+                      size: 35,
+                      Icons.compost,
+                      color: Color(0Xff2675EC),
+                    ),
+                  ],
+                ),
+
+                //Expanded(child: SingleChildScrollView(child: Column(ch),))
+              ],
+            ),
+          ),
+
+          // ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              width: double.infinity,
+              height: double.infinity,
               child: Column(
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _globalKey.currentState!.openDrawer();
-                        },
-                        child: Image.asset(
-                          'assets/images/img_menu.png',
-                          width: 25,
-                          height: 25,
-                        ),
-                      ),
-                      Text(
-                        "ChatUp",
-                        style: TextStyle(
-                            color: Color(0Xff2675EC),
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Icon(
-                        size: 35,
-                        Icons.compost,
-                        color: Color(0Xff2675EC),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
                     height: 40,
@@ -581,170 +555,21 @@ class _HomeState extends State<Home> {
                   const SizedBox(
                     height: 10,
                   ),
-                ],
-              )),
-          if (!search)
-            Container(
-              // decoration: BoxDecoration(border: Border.all()),
-              height: 50,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 10),
-                children: [
-                  TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              20.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all(index == 0
-                          ? Colors.blue
-                          : Colors.white), // Background color
-                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 5)), // Padding
-                    ),
-                    onPressed: () {
-                      _curr = 0;
-
-                      setState(() {});
-                    },
-                    child: Text(
-                      "All",
-                      style: TextStyle(
-                        fontFamily: "Gilroy",
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: index == 0 ? Colors.white : Color(0xff131313),
-                        height: 25 / 20,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 25,
-                  ),
-                  TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              20.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all(index == 1
-                          ? Colors.blue
-                          : Colors.white), // Background color
-                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 5)), // Padding
-                    ),
-                    onPressed: () {
-                      _curr = 1;
-
-                      setState(() {});
-                    },
-                    child: Text(
-                      "Important",
-                      style: TextStyle(
-                        fontFamily: "Gilroy",
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: index == 1 ? Colors.white : Color(0xff131313),
-                        height: 25 / 20,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 25,
-                  ),
-                  TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              20.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all(index == 2
-                          ? Colors.blue
-                          : Colors.white), // Background color
-                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 5)), // Padding
-                    ),
-                    onPressed: () {
-                      _curr = 2;
-
-                      setState(() {});
-                    },
-                    child: Text(
-                      "Unread",
-                      style: TextStyle(
-                        fontFamily: "Gilroy",
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: index == 2 ? Colors.white : Color(0xff131313),
-                        height: 25 / 20,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 25,
-                  ),
-                  TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              20.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all(index == 3
-                          ? Colors.blue
-                          : Colors.white), // Background color
-                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 5)), // Padding
-                    ),
-                    onPressed: () {
-                      _curr = 3;
-
-                      setState(() {});
-                    },
-                    child: Text(
-                      "Read",
-                      style: TextStyle(
-                        fontFamily: "Gilroy",
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: index == 3 ? Colors.white : Color(0xff131313),
-                        height: 25 / 20,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 35,
-                  ),
+                  search
+                      ? Flexible(
+                          child: ListView(
+                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                              primary: false,
+                              shrinkWrap: true,
+                              children: tempSearchStore.map((element) {
+                                return buildResultCard(element);
+                              }).toList()),
+                        )
+                      : ChatRoomList(),
                 ],
               ),
             ),
-          Expanded(
-              child: Container(
-            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-            width: double.infinity,
-            height: double.infinity,
-            child: search
-                ? ListView(
-                    padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                    primary: false,
-                    shrinkWrap: true,
-                    children: tempSearchStore.map((element) {
-                      return buildResultCard(element);
-                    }).toList())
-                : ChatRoomList(_curr),
-          ))
+          )
         ]),
       ),
     );

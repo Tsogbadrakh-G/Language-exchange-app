@@ -1,14 +1,27 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:degree/pages/home.dart';
 import 'package:degree/pages/login.dart';
 import 'package:degree/pages/register.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:degree/service/auth.dart';
+import 'package:degree/service/model/Customer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  var appDoc = await path_provider.getApplicationDocumentsDirectory();
+  // Hive.init(appDoc.path);
+  // Hive.registerAdapter(CustomerAdapter());
+  // userBox = await Hive.openBox('myBox');
+
+  Get.put(DataController());
+
   //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
