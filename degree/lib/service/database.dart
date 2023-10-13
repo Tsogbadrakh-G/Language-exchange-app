@@ -1,10 +1,7 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:get/get.dart';
-
-import 'shared_pref.dart';
 
 class DatabaseMethods {
   DataController _dataController = Get.find();

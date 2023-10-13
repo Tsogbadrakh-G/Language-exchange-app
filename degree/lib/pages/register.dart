@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'home.dart';
 import '../service/database.dart';
-import '../service/shared_pref.dart';
 import 'package:random_string/random_string.dart';
 
 class Register extends StatefulWidget {

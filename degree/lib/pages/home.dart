@@ -6,12 +6,13 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Home extends StatefulWidget {
@@ -93,8 +94,12 @@ class _HomeState extends State<Home> {
       // TextField is currently active (has focus)
 
       search = true;
+      print('active textfield search: $search');
       setState(() {});
     } else {
+      search = false;
+      print('inactive textfield search: $search');
+      setState(() {});
       // TextField is currently inactive (doesn't have focus)
     }
   }
@@ -198,6 +203,7 @@ class _HomeState extends State<Home> {
     }
 
     myProfilePic = await referenceImageToUpload.getDownloadURL();
+    await DefaultCacheManager().emptyCache();
     print('uploaded its url :$myProfilePic, userid: $myId');
     setState(() {});
     updateUser();
@@ -216,7 +222,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget DrawerBuilder(String name) {
-    // print('my profile: $myProfilePic');
+    print('my profile in drawer: $myProfilePic');
     return Drawer(
       width: 330,
       elevation: 30,
@@ -252,16 +258,6 @@ class _HomeState extends State<Home> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        // IconButton(
-                        //   onPressed: () {
-                        //     Navigator.pop(context);
-                        //   },
-                        //   icon: Icon(
-                        //     Icons.settings_accessibility_outlined,
-                        //     color: Color(0xff2675ec),
-                        //     size: 30,
-                        //   ),
-                        // ),
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
@@ -280,7 +276,11 @@ class _HomeState extends State<Home> {
                     Row(
                       children: [
                         Container(
-                          decoration: BoxDecoration(border: Border.all()),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                              border: Border.all(
+                                  color: Colors.black.withOpacity(0.5))),
                           padding: EdgeInsets.symmetric(horizontal: 5),
                           child: Stack(
                             children: [
@@ -289,25 +289,27 @@ class _HomeState extends State<Home> {
                                   : GestureDetector(
                                       onDoubleTap: selectedImage,
                                       child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          child: Image.network(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image(
+                                          image: NetworkImage(
                                             myProfilePic!,
-                                            height: 100,
-                                            width: 100,
-                                            fit: BoxFit.cover,
-                                          )),
+                                          ),
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                                     ),
-                              Positioned.fill(
-                                bottom: -80,
-                                right: -90,
-                                child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.camera_alt,
-                                      size: 40,
-                                    )),
-                              ),
+                              // Positioned.fill(
+                              //   bottom: -80,
+                              //   right: -90,
+                              //   child: IconButton(
+                              //       onPressed: () {},
+                              //       icon: Icon(
+                              //         Icons.add_a_photo,
+                              //         size: 40,
+                              //       )),
+                              // ),
                             ],
                           ),
                         ),
@@ -333,17 +335,18 @@ class _HomeState extends State<Home> {
                           width: 12,
                         ),
                         Expanded(
-                            child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontFamily: "Gilroy",
-                            fontSize: 23,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xff2675ec),
-                            height: 30 / 23,
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontFamily: "Gilroy",
+                              fontSize: 23,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xff2675ec),
+                              height: 30 / 23,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
-                          textAlign: TextAlign.left,
-                        )),
+                        ),
                       ],
                     ),
                     const SizedBox(
@@ -405,14 +408,97 @@ class _HomeState extends State<Home> {
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
+  PreferredSizeWidget HomeAppbar() {
+    return AppBar(
+      elevation: 0.5,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 90,
+      backgroundColor: Colors.white,
+      flexibleSpace: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+              // border: Border(
+              //     bottom: BorderSide(
+              //   color: Colors.black,
+              // )),
+              ),
+          padding: const EdgeInsets.only(
+              left: 20.0, right: 20.0, top: 20.0, bottom: 10.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        color: Color.fromARGB(255, 218, 216, 215)
+                            .withOpacity(0.3)),
+                    child: IconButton(
+                        onPressed: () {
+                          _globalKey.currentState!.openDrawer();
+                        },
+                        icon: Icon(
+                          Icons.menu,
+                          size: 40,
+                          color: Colors.black.withOpacity(0.8),
+                        )),
+                  ),
+                  Text(
+                    "ChatUp",
+                    style: TextStyle(
+                        color: Color(0Xff2675EC),
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Image.asset(
+                    'assets/images/img_new_chat.png',
+                    scale: 1.5,
+                  )
+                ],
+              ),
+
+              //Expanded(child: SingleChildScrollView(child: Column(ch),))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('build home');
-    // textEditingController.clear();
+    print('build home ');
+
     return Scaffold(
       key: _globalKey,
-      drawer: DrawerBuilder(myName ?? ''),
+      //appBar: HomeAppbar(),
+      drawer: DrawerBuilder(myName ?? _dataController.myname),
       body: PageViewItem(),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.home,
+                size: 45,
+              ),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -422,7 +508,6 @@ class _HomeState extends State<Home> {
       child: GestureDetector(
         onTap: () {
           if (_focusNode.hasFocus) {
-            print('object');
             FocusScope.of(context).requestFocus(FocusNode());
             textEditingController.clear();
             search = false;
@@ -445,15 +530,21 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        _globalKey.currentState!.openDrawer();
-                      },
-                      child: Image.asset(
-                        'assets/images/img_menu.png',
-                        width: 25,
-                        height: 25,
-                      ),
+                    Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          color: Color.fromARGB(255, 218, 216, 215)
+                              .withOpacity(0.3)),
+                      child: IconButton(
+                          onPressed: () {
+                            _globalKey.currentState!.openDrawer();
+                          },
+                          icon: Icon(
+                            Icons.menu,
+                            size: 40,
+                            color: Colors.black.withOpacity(0.8),
+                          )),
                     ),
                     Text(
                       "ChatUp",
@@ -462,11 +553,10 @@ class _HomeState extends State<Home> {
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold),
                     ),
-                    Icon(
-                      size: 35,
-                      Icons.compost,
-                      color: Color(0Xff2675EC),
-                    ),
+                    Image.asset(
+                      'assets/images/img_new_chat.png',
+                      scale: 1.5,
+                    )
                   ],
                 ),
 
@@ -507,10 +597,13 @@ class _HomeState extends State<Home> {
                               ? GestureDetector(
                                   onTap: () {
                                     textEditingController.clear();
-                                    _focusNode.unfocus();
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+
                                     search = false;
-                                    queryResultSet = [];
+                                    //  queryResultSet = [];
                                     tempSearchStore = [];
+                                    print('search');
 
                                     setState(() {});
                                   },
@@ -523,6 +616,7 @@ class _HomeState extends State<Home> {
                                   onTap: () {
                                     search = true;
                                     _focusNode.requestFocus();
+                                    print('not search');
                                     setState(() {});
                                   },
                                   child: Icon(
@@ -713,14 +807,21 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 children: [
                   profilePicUrl == ""
                       ? CircularProgressIndicator()
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            profilePicUrl,
-                            height: 70,
-                            width: 70,
-                            fit: BoxFit.cover,
-                          )),
+                      : Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Colors.black.withOpacity(0.5)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                profilePicUrl,
+                                height: 70,
+                                width: 70,
+                                fit: BoxFit.cover,
+                              )),
+                        ),
                   SizedBox(
                     width: 10.0,
                   ),

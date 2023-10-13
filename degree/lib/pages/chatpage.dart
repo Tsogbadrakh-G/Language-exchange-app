@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
 import 'package:degree/pages/home.dart';
 import 'package:degree/service/Controller.dart';
-import 'package:degree/service/model/Customer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -638,23 +637,17 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      // border: Border.all(color: (user?.online ?? false) ? LimeColors.primaryColor : const Color(0xffd8d8d8), width: size > 40 ? 3 : 1.5),
-                    ),
-                    width: 50,
-                    height: 50,
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border:
+                            Border.all(color: Colors.black.withOpacity(0.5))),
+                    width: 55,
+                    height: 55,
                     child: myProfilePic != null
                         ? ClipOval(
-                            child: CachedNetworkImage(
-                            width: 50,
-                            height: 50,
+                            child: Image.network(
+                            widget.profileurl,
                             fit: BoxFit.cover,
-                            imageUrl: myProfilePic!,
-                            // placeholder: (context, url) => _textAvatar(text: LimeChatHelper.getChannelName(channel!)),
-                            // errorWidget: (context, url, e) => _textAvatar(
-                            //   text: LimeChatHelper.getChannelName(channel!),
-                            // ),
                           ))
                         : Offstage(),
                   ),
