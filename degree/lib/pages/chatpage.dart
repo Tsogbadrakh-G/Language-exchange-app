@@ -31,10 +31,9 @@ class _ChatPageState extends State<ChatPage> {
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
   int translation_status = 1;
-  //bool exited = false;
+  var args;
 
   getthesharedpref() async {
-    // print('user: $user');
     myUserName = _dataController.myusername;
     myName = _dataController.myname;
     myProfilePic = _dataController.picUrl;
@@ -213,89 +212,18 @@ class _ChatPageState extends State<ChatPage> {
     'Welsh',
     'Western Persian'
   ];
-  List<String> voice_out_lans = [
-    'Bengali',
-    'Catalan',
-    'Czech',
-    'Danish',
-    'Dutch',
-    'English',
-    'Estonian',
-    'Finnish',
-    'French',
-    'German',
-    'Hindi',
-    'Indonesian',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Maltese',
-    'Mandarin Chinese',
-    'Modern Standard Arabic',
-    'Northern Uzbek',
-    'Polish',
-    'Portuguese',
-    'Romanian',
-    'Russian',
-    'Slovak',
-    'Spanish',
-    'Swahili',
-    'Swedish',
-    'Tagalog',
-    'Telugu',
-    'Thai',
-    'Turkish',
-    'Ukrainian',
-    'Urdu',
-    'Vietnamese',
-    'Welsh',
-    'Western Persian'
-  ];
+  List<String> voice_out_lans = [];
 
-  final List<String> chat_out_lans = [
-    'Halh Mongolian',
-    'Bengali',
-    'Catalan',
-    'Czech',
-    'Danish',
-    'Dutch',
-    'English',
-    'Estonian',
-    'Finnish',
-    'French',
-    'German',
-    'Hindi',
-    'Indonesian',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Maltese',
-    'Mandarin Chinese',
-    'Modern Standard Arabic',
-    'Northern Uzbek',
-    'Polish',
-    'Portuguese',
-    'Romanian',
-    'Russian',
-    'Slovak',
-    'Spanish',
-    'Swahili',
-    'Swedish',
-    'Tagalog',
-    'Telugu',
-    'Thai',
-    'Turkish',
-    'Ukrainian',
-    'Urdu',
-    'Vietnamese',
-    'Welsh',
-    'Western Persian'
-  ];
+  List<String> chat_out_lans = [];
 
   String? selectedValueFrom;
   String? selectedValueTo;
   @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments;
+    chat_out_lans = args as List<String>;
+    voice_out_lans = args as List<String>;
+    print('args- $args');
     return Scaffold(
       appBar: buildAppBar(),
       backgroundColor: Color(0xFF553370),
@@ -303,7 +231,6 @@ class _ChatPageState extends State<ChatPage> {
         child: Stack(
           children: [
             Container(
-                // margin: EdgeInsets.only(top: 50.0),
                 width: double.infinity,
                 height: double.infinity,
                 decoration: BoxDecoration(

@@ -26,6 +26,14 @@ class _Register extends State<Register> {
   TextEditingController confirmPasswordcontroller = new TextEditingController();
 
   final _formkey = GlobalKey<FormState>();
+  var args;
+
+  @override
+  void initState() {
+    // args = ModalRoute.of(context)!.settings.arguments;
+    //
+    super.initState();
+  }
 
   registration() async {
     if (password != "" && password == confirmPassword) {
@@ -36,19 +44,20 @@ class _Register extends State<Register> {
             .createUserWithEmailAndPassword(email: email, password: password);
 
         String Id = randomAlphaNumeric(10);
-        String user = mailcontroller.text.replaceAll("@gmail.com", "");
+        String user = email.replaceAll("@gmail.com", "");
         String updateusername =
             user.replaceFirst(user[0], user[0].toUpperCase());
         String firstletter = user.substring(0, 1).toUpperCase();
 
         Map<String, dynamic> userInfoMap = {
           "Name": namecontroller.text,
-          "E-mail": mailcontroller.text.toLowerCase(),
+          "E-mail": email.toLowerCase(),
           "username": updateusername.toUpperCase(),
           "SearchKey": firstletter,
           "Photo":
               "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a",
           "Id": Id,
+          "native_lans": args as List<String>
         };
 
         await DatabaseMethods().addUserDetails(userInfoMap, Id);
@@ -99,6 +108,8 @@ class _Register extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments;
+    print('args $args');
     return Scaffold(
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -319,25 +330,25 @@ class _Register extends State<Register> {
               SizedBox(
                 height: 20,
               ),
-              Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account?",
-                    style: TextStyle(color: Colors.black, fontSize: 16.0),
-                  ),
-                  GestureDetector(
-                    onTap: () => Get.to(LogIn()),
-                    child: Text(
-                      " Login",
-                      style: TextStyle(
-                          color: Color(0xFf000000),
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w800),
-                    ),
-                  )
-                ],
-              ),
+              // Wrap(
+              //   alignment: WrapAlignment.center,
+              //   children: [
+              //     Text(
+              //       "Already have an account?",
+              //       style: TextStyle(color: Colors.black, fontSize: 16.0),
+              //     ),
+              //     GestureDetector(
+              //       onTap: () => Get.to(LogIn()),
+              //       child: Text(
+              //         " Login",
+              //         style: TextStyle(
+              //             color: Color(0xFf000000),
+              //             fontSize: 16.0,
+              //             fontWeight: FontWeight.w800),
+              //       ),
+              //     )
+              //   ],
+              // ),
             ],
           ),
         ),

@@ -6,13 +6,11 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Home extends StatefulWidget {
@@ -109,11 +107,13 @@ class _HomeState extends State<Home> {
         stream: chatRoomsStream,
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
-              ? Flexible(
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: ListView.builder(
                       padding: EdgeInsets.zero,
                       itemCount: snapshot.data.docs.length,
                       shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data.docs[index];
                         print('chatroom');
@@ -189,37 +189,43 @@ class _HomeState extends State<Home> {
   void selectedImage() async {
     final ImagePicker _imagePicker = ImagePicker();
     XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+
     if (_file == null) return;
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
     Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
     File img = File(_file.path);
-    // print('myid: $myUserName, filepath: ${_file.path}');
+
     try {
       referenceImageToUpload.putFile(img);
       referenceImageToUpload.getDownloadURL();
     } catch (e) {
-      print('upload image to firebase: $e');
+      print('upload image to firebase exception: $e');
     }
 
     myProfilePic = await referenceImageToUpload.getDownloadURL();
-    await DefaultCacheManager().emptyCache();
+    _dataController.picUrl = myProfilePic!;
+    // await DefaultCacheManager().emptyCache();
     print('uploaded its url :$myProfilePic, userid: $myId');
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(myId ?? _dataController.id)
+        .update({"Photo": myProfilePic});
     setState(() {});
-    updateUser();
+    // updateUser();
   }
 
-  updateUser() async {
-    Map<String, dynamic> userInfoMap = {
-      "Name": myName,
-      "E-mail": myEmail,
-      "username": myUserName,
-      "SearchKey": myUserName!.substring(0, 1).toUpperCase(),
-      "Photo": myProfilePic,
-      "Id": myId,
-    };
-    await DatabaseMethods().addUserDetails(userInfoMap, myId!);
-  }
+  // updateUser() async {
+  //   Map<String, dynamic> userInfoMap = {
+  //     "Name": myName,
+  //     "E-mail": myEmail,
+  //     "username": myUserName,
+  //     "SearchKey": myUserName!.substring(0, 1).toUpperCase(),
+  //     "Photo": myProfilePic,
+  //     "Id": myId,
+  //   };
+  //   await DatabaseMethods().addUserDetails(userInfoMap, myId!);
+  // }
 
   Widget DrawerBuilder(String name) {
     print('my profile in drawer: $myProfilePic');
@@ -470,31 +476,137 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print('build home ');
+    print('build home page');
 
     return Scaffold(
       key: _globalKey,
-      //appBar: HomeAppbar(),
+      appBar: HomeAppbar(),
       drawer: DrawerBuilder(myName ?? _dataController.myname),
-      body: PageViewItem(),
+      body: CustomScrollView(slivers: [
+        SliverAppBar(
+          elevation: 0,
+          floating: true,
+          titleSpacing: 0,
+          automaticallyImplyLeading: false,
+          title: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
+            height: 40,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 205, 205, 206),
+              borderRadius: BorderRadius.circular(8.0), // Border radius
+            ),
+            child: TextField(
+              controller: textEditingController,
+              focusNode: _focusNode,
+              textAlign: search ? TextAlign.start : TextAlign.center,
+              autocorrect: true,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (value) {
+                initiateSearch(value.toUpperCase());
+              },
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: search
+                      ? GestureDetector(
+                          onTap: () {
+                            textEditingController.clear();
+                            FocusScope.of(context).requestFocus(FocusNode());
+
+                            search = false;
+                            //  queryResultSet = [];
+                            tempSearchStore = [];
+                            print('search');
+
+                            setState(() {});
+                          },
+                          child: Icon(
+                            size: 25,
+                            Icons.close,
+                            color: Color(0Xff2675EC),
+                          ))
+                      : GestureDetector(
+                          onTap: () {
+                            search = true;
+                            _focusNode.requestFocus();
+                            print('not search');
+                            setState(() {});
+                          },
+                          child: Icon(
+                            size: 30,
+                            Icons.search,
+                            color: Color(0Xff2675EC),
+                          ),
+                        ),
+                  onPressed: () {
+                    search = true;
+                    setState(() {});
+                  },
+                ),
+                border: InputBorder.none,
+                hintText: 'Search User',
+                hintStyle: const TextStyle(
+                  fontFamily: "SF Pro Text",
+                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xff3c3c43),
+                  height: 22 / 17,
+                ),
+              ),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              // Build the list of items
+              return search
+                  ? ListView(
+                      padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                      primary: false,
+                      shrinkWrap: true,
+                      children: [...tempSearchStore].map((element) {
+                        return buildResultCard(element);
+                      }).toList())
+                  : ChatRoomList();
+            },
+            childCount: 1, // Number of items in the list
+          ),
+        ),
+      ]),
       bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                size: 45,
+            InkWell(
+              onTap: () {},
+              child: Image.asset(
+                'assets/images/ic_call.png',
+                width: 80,
+                height: 80,
               ),
-              onPressed: () {},
             ),
-            IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {},
+            InkWell(
+              onTap: () {},
+              child: Image.asset(
+                'assets/images/ic_chat.png',
+                width: 80,
+                height: 80,
+                color: Color(0xff007AFF),
+              ),
             ),
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
+            InkWell(
+              onTap: () {},
+              child: Image.asset(
+                'assets/images/ic_setting.png',
+                width: 70,
+                height: 70,
+              ),
             ),
           ],
         ),
@@ -762,8 +874,9 @@ class ChatRoomListTile extends StatefulWidget {
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String profilePicUrl = "", name = "", username = "", id = "";
-
+  List<String> native_lans = [];
   getthisUserInfo() async {
+    log('message');
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
@@ -771,8 +884,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     name = "${querySnapshot.docs[0]["Name"]}";
     profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
-    // print('getting chat list item  data fetching is finished');
-    //setState(() {});
+    native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+
+    print('native lans: ${native_lans} ');
   }
 
   @override
@@ -783,19 +897,20 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
-    // print('chat list item username: $username ');
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
           return GestureDetector(
             onTap: () async {
               log('to ${widget.chatRoomId}');
-              await Get.to(ChatPage(
-                name: name,
-                profileurl: profilePicUrl,
-                username: username,
-                channel: widget.chatRoomId,
-              ));
+              await Get.to(
+                  ChatPage(
+                    name: name,
+                    profileurl: profilePicUrl,
+                    username: username,
+                    channel: widget.chatRoomId,
+                  ),
+                  arguments: native_lans);
 
               setState(() {});
             },
@@ -814,13 +929,17 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                profilePicUrl,
-                                height: 70,
-                                width: 70,
-                                fit: BoxFit.cover,
-                              )),
+                            borderRadius: BorderRadius.circular(20),
+                            // child: CachedNetworkImage(imageUrl: profilePicUrl,width: 70,height: 70,
+                            // errorWidget: (context, url, error) => const CircularProgressIndicator(),
+                            // ),
+                            child: Image.network(
+                              profilePicUrl,
+                              height: 70,
+                              width: 70,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                   SizedBox(
                     width: 10.0,

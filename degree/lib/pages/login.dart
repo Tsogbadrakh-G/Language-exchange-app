@@ -310,34 +310,34 @@ class _LogInState extends State<LogIn> {
               SizedBox(
                 height: 35,
               ),
-              Container(
-                  child: Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  Text(
-                    "Don’t have an account ?",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 34 / 16,
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(Register());
-                    },
-                    child: Text(
-                      " Register Now ",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          height: 34 / 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black),
-                      textAlign: TextAlign.left,
-                    ),
-                  )
-                ],
-              )),
+              // Container(
+              //     child: Wrap(
+              //   alignment: WrapAlignment.center,
+              //   children: [
+              //     Text(
+              //       "Don’t have an account ?",
+              //       style: const TextStyle(
+              //         fontSize: 16,
+              //         height: 34 / 16,
+              //       ),
+              //       textAlign: TextAlign.left,
+              //     ),
+              //     GestureDetector(
+              //       onTap: () {
+              //         Get.to(Register());
+              //       },
+              //       child: Text(
+              //         " Register Now ",
+              //         style: const TextStyle(
+              //             fontSize: 16,
+              //             height: 34 / 16,
+              //             fontWeight: FontWeight.w800,
+              //             color: Colors.black),
+              //         textAlign: TextAlign.left,
+              //       ),
+              //     )
+              //   ],
+              // )),
             ],
           ),
         ),
