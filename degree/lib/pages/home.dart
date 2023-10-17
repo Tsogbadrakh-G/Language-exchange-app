@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/DataAPI.dart';
 import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
+import 'package:degree/service/model/Customer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,6 +67,7 @@ class _HomeState extends State<Home> {
   void initState() {
     ontheload();
     _focusNode.addListener(_handleFocusChange);
+
     super.initState();
   }
 
@@ -794,6 +797,7 @@ class _HomeState extends State<Home> {
         await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
 
         await Get.to(ChatPage(
+          userId: data['Id'],
           name: data["Name"],
           profileurl: data["Photo"],
           username: data["username"],
@@ -886,7 +890,19 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     id = "${querySnapshot.docs[0]["Id"]}";
     native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
-    print('native lans: ${native_lans} ');
+    if (usersBox.get(id) != null)
+      print('user  selected lans $id: ${usersBox.get(id)!.trans_from_voice}');
+    else {
+      usersBox.put(
+          id,
+          Customer(
+            id: id,
+            trans_from_voice: 'Halh Mongolian',
+            trans_to_voice: native_lans[0],
+            trans_from_msg: 'Halh Mongolian',
+            trans_to_msg: native_lans[0],
+          ));
+    }
   }
 
   @override
@@ -905,6 +921,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               log('to ${widget.chatRoomId}');
               await Get.to(
                   ChatPage(
+                    userId: id,
                     name: name,
                     profileurl: profilePicUrl,
                     username: username,

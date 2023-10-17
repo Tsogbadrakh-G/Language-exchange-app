@@ -1,4 +1,3 @@
-import 'package:degree/pages/register.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';
 import '../service/database.dart';

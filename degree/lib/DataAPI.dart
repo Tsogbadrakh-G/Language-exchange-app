@@ -1,10 +1,10 @@
 import 'dart:developer';
-import 'dart:io';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/model/Customer.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:hive/hive.dart';
+
+late Box<Customer> usersBox;
 
 class Data {
   //DataController _dataController
@@ -28,9 +28,10 @@ class Data {
       'input': from,
       'output': to,
       'translation': tranlsation,
+      'roomId': chatroomId
     });
 
-    log('pre res ');
+    log('pre res and its roomid: $chatroomId');
 
     final response = await dio.post(
       url,
@@ -106,6 +107,19 @@ class Data {
       log('unsuccessfull req');
       return 'error';
     }
+  }
+
+  static addUser(String id, String fromVoice, String toVoice, String fromMsg,
+      String toMsg) {
+    usersBox.put(
+        id,
+        Customer(
+          id: id,
+          trans_from_voice: fromVoice,
+          trans_to_voice: toVoice,
+          trans_from_msg: fromMsg,
+          trans_to_msg: toMsg,
+        ));
   }
 
   static Future<void> getFirebaseMessagingToken() async {

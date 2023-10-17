@@ -261,10 +261,14 @@ class _Video_call_screen extends State<Video_call_screen> {
 
                     log('recorded file: $record');
                     setState(() {});
-                    var val;
+                    String val;
                     if (widget.to == "Halh Mongolian") {
-                      val = await Data.sendAudio(record, widget.from, widget.to,
-                          "S2TT (Speech to Text translation)", widget.channel);
+                      val = await Data.sendAudio(
+                          record,
+                          widget.from,
+                          "Halh Mongolian",
+                          "S2TT (Speech to Text translation)",
+                          widget.channel);
                     } else {
                       val = await Data.sendAudio(
                         record,

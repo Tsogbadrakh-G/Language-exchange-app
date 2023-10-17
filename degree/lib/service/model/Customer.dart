@@ -6,27 +6,24 @@ class Customer {
   String id;
 
   @HiveField(1)
-  String name;
+  String trans_from_voice;
 
   @HiveField(2)
-  String username;
+  String trans_to_voice;
 
   @HiveField(3)
-  String picUrl;
+  String trans_from_msg;
 
   @HiveField(4)
-  String SearchKey;
+  String trans_to_msg;
 
-  @HiveField(5)
-  String email;
-
-  Customer(
-      {required this.id,
-      required this.name,
-      required this.username,
-      required this.picUrl,
-      required this.SearchKey,
-      required this.email});
+  Customer({
+    required this.id,
+    required this.trans_from_voice,
+    required this.trans_to_voice,
+    required this.trans_from_msg,
+    required this.trans_to_msg,
+  });
 }
 
 class CustomerAdapter extends TypeAdapter<Customer> {
@@ -36,12 +33,12 @@ class CustomerAdapter extends TypeAdapter<Customer> {
   @override
   Customer read(BinaryReader reader) {
     Customer model = Customer(
-        id: reader.read(),
-        name: reader.read(),
-        username: reader.read(),
-        picUrl: reader.read(),
-        SearchKey: reader.read(),
-        email: reader.read());
+      id: reader.read(),
+      trans_from_voice: reader.read(),
+      trans_to_voice: reader.read(),
+      trans_from_msg: reader.read(),
+      trans_to_msg: reader.read(),
+    );
 
     return model;
   }
@@ -49,10 +46,9 @@ class CustomerAdapter extends TypeAdapter<Customer> {
   @override
   void write(BinaryWriter writer, Customer obj) {
     writer.write(obj.id);
-    writer.write(obj.name);
-    writer.write(obj.username);
-    writer.write(obj.picUrl);
-    writer.write(obj.SearchKey);
-    writer.write(obj.email);
+    writer.write(obj.trans_from_voice);
+    writer.write(obj.trans_to_voice);
+    writer.write(obj.trans_from_msg);
+    writer.write(obj.trans_to_msg);
   }
 }
