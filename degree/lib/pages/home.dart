@@ -95,11 +95,11 @@ class _HomeState extends State<Home> {
       // TextField is currently active (has focus)
 
       search = true;
-      print('active textfield search: $search');
+      //print('active textfield search: $search');
       setState(() {});
     } else {
       search = false;
-      print('inactive textfield search: $search');
+      //print('inactive textfield search: $search');
       setState(() {});
       // TextField is currently inactive (doesn't have focus)
     }
@@ -120,10 +120,6 @@ class _HomeState extends State<Home> {
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data.docs[index];
                         print('chatroom');
-
-                        //   NotificationService.showNotifications(ds.id,'',);
-                        //  print(
-                        //    'ds send BY: ${ds["lastMessageSendBy"]}, ds msg: ${ds["lastMessage"]}');
 
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
@@ -784,77 +780,110 @@ class _HomeState extends State<Home> {
     );
   }
 
+  List<String> user_native_lans = [];
+  getthisUserInfo(String username, String usrId, String chatroomId) async {
+    QuerySnapshot querySnapshot =
+        await DatabaseMethods().getUserInfo(username.toUpperCase());
+
+    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+    String key = chatroomId + myUserName!;
+
+    if (usersBox.get(key) != null)
+      print(
+          'user  selected lans $usrId: ${usersBox.get(key)!.trans_from_voice}');
+    else {
+      print('user: $usrId is null');
+      usersBox.put(
+          chatroomId,
+          Customer(
+            id: usrId,
+            trans_from_voice: 'Halh Mongolian',
+            trans_to_voice: user_native_lans[0],
+            trans_from_msg: 'Halh Mongolian',
+            trans_to_msg: user_native_lans[0],
+          ));
+    }
+  }
+
   Widget buildResultCard(data) {
-    return GestureDetector(
-      onTap: () async {
-        search = false;
+    var chatRoomId = getChatRoomIdbyUsername(myUserName!, data["username"]);
+    return FutureBuilder(
+        future: getthisUserInfo(data["username"], data['Id'], chatRoomId),
+        builder: (context, snapshot) {
+          return GestureDetector(
+            onTap: () async {
+              search = false;
 
-        var chatRoomId = getChatRoomIdbyUsername(myUserName!, data["username"]);
-        Map<String, dynamic> chatRoomInfoMap = {
-          "users": [myUserName, data["username"]],
-        };
-        print('created channel: $chatRoomId');
-        await DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
+              Map<String, dynamic> chatRoomInfoMap = {
+                "users": [myUserName, data["username"]],
+              };
+              print('created channel: $chatRoomId');
+              await DatabaseMethods()
+                  .createChatRoom(chatRoomId, chatRoomInfoMap);
 
-        await Get.to(ChatPage(
-          userId: data['Id'],
-          name: data["Name"],
-          profileurl: data["Photo"],
-          username: data["username"],
-          channel: chatRoomId,
-        ));
-        setState(() {});
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
-        child: Material(
-          elevation: 5.0,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: EdgeInsets.all(18),
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(10)),
-            child: Row(
-              children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(60),
-                    child: Image.network(
-                      data["Photo"],
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.cover,
-                    )),
-                SizedBox(
-                  width: 20.0,
+              await Get.to(
+                  ChatPage(
+                    userId: data['Id'],
+                    name: data["Name"],
+                    profileurl: data["Photo"],
+                    username: data["username"],
+                    channel: chatRoomId,
+                  ),
+                  arguments: user_native_lans);
+              setState(() {});
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: Material(
+                elevation: 5.0,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: Image.network(
+                            data["Photo"],
+                            height: 70,
+                            width: 70,
+                            fit: BoxFit.cover,
+                          )),
+                      SizedBox(
+                        width: 20.0,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            data["Name"],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0),
+                          ),
+                          SizedBox(
+                            height: 8.0,
+                          ),
+                          Text(
+                            data["username"],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.w500),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data["Name"],
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0),
-                    ),
-                    SizedBox(
-                      height: 8.0,
-                    ),
-                    Text(
-                      data["username"],
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.w500),
-                    )
-                  ],
-                )
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -878,9 +907,8 @@ class ChatRoomListTile extends StatefulWidget {
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String profilePicUrl = "", name = "", username = "", id = "";
-  List<String> native_lans = [];
+  List<String> user_native_lans = [];
   getthisUserInfo() async {
-    log('message');
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
@@ -888,19 +916,26 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     name = "${querySnapshot.docs[0]["Name"]}";
     profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
-    native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
-    if (usersBox.get(id) != null)
-      print('user  selected lans $id: ${usersBox.get(id)!.trans_from_voice}');
-    else {
+    String key = widget.chatRoomId + widget.myUsername;
+
+    if (usersBox.get(key) != null) {
+      print('user  selected lans ${widget.chatRoomId} ');
+      print(
+          'from msg: ${usersBox.get(key)!.trans_from_msg}, to msg:${usersBox.get(key)!.trans_to_msg},  ');
+      print(
+          'from voice: ${usersBox.get(key)!.trans_from_voice}, to voice:${usersBox.get(key)!.trans_to_voice}');
+    } else {
+      print('user: ${widget.chatRoomId} is null');
       usersBox.put(
-          id,
+          key,
           Customer(
-            id: id,
+            id: widget.chatRoomId,
             trans_from_voice: 'Halh Mongolian',
-            trans_to_voice: native_lans[0],
+            trans_to_voice: user_native_lans[0],
             trans_from_msg: 'Halh Mongolian',
-            trans_to_msg: native_lans[0],
+            trans_to_msg: user_native_lans[0],
           ));
     }
   }
@@ -918,7 +953,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         builder: (context, snapshot) {
           return GestureDetector(
             onTap: () async {
-              log('to ${widget.chatRoomId}');
+              print('click to ${widget.chatRoomId}');
               await Get.to(
                   ChatPage(
                     userId: id,
@@ -927,13 +962,18 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     username: username,
                     channel: widget.chatRoomId,
                   ),
-                  arguments: native_lans);
+                  arguments: user_native_lans);
 
               setState(() {});
             },
             child: Container(
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              decoration: BoxDecoration(
+                  //border: Border.all(),
+                  color: Color.fromARGB(255, 225, 222, 222),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 10.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

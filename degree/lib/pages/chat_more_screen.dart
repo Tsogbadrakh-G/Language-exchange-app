@@ -1,12 +1,93 @@
 import 'package:degree/DataAPI.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+List<String> voice_in_lans = [
+  'Halh Mongolian',
+  'Bengali',
+  'Catalan',
+  'Czech',
+  'Danish',
+  'Dutch',
+  'English',
+  'Estonian',
+  'Finnish',
+  'French',
+  'German',
+  'Hindi',
+  'Indonesian',
+  'Italian',
+  'Japanese',
+  'Korean',
+  'Maltese',
+  'Mandarin Chinese',
+  'Modern Standard Arabic',
+  'Northern Uzbek',
+  'Polish',
+  'Portuguese',
+  'Romanian',
+  'Russian',
+  'Slovak',
+  'Spanish',
+  'Swahili',
+  'Swedish',
+  'Tagalog',
+  'Telugu',
+  'Thai',
+  'Turkish',
+  'Ukrainian',
+  'Urdu',
+  'Vietnamese',
+  'Welsh',
+  'Western Persian'
+];
+
+final List<String> input_lans = [
+  'Halh Mongolian',
+  'Bengali',
+  'Catalan',
+  'Czech',
+  'Danish',
+  'Dutch',
+  'English',
+  'Estonian',
+  'Finnish',
+  'French',
+  'German',
+  'Hindi',
+  'Indonesian',
+  'Italian',
+  'Japanese',
+  'Korean',
+  'Maltese',
+  'Mandarin Chinese',
+  'Modern Standard Arabic',
+  'Northern Uzbek',
+  'Polish',
+  'Portuguese',
+  'Romanian',
+  'Russian',
+  'Slovak',
+  'Spanish',
+  'Swahili',
+  'Swedish',
+  'Tagalog',
+  'Telugu',
+  'Thai',
+  'Turkish',
+  'Ukrainian',
+  'Urdu',
+  'Vietnamese',
+  'Welsh',
+  'Western Persian'
+];
+
 class Chat_more_screen extends StatefulWidget {
-  final usrId, name, profileUrl, native_lans, input_lans;
+  final usrId, name, profileUrl, native_lans, channel;
   const Chat_more_screen(
-      this.usrId, this.name, this.profileUrl, this.native_lans, this.input_lans,
+      this.usrId, this.name, this.profileUrl, this.native_lans, this.channel,
       {Key? key})
       : super(key: key);
 
@@ -15,19 +96,26 @@ class Chat_more_screen extends StatefulWidget {
 }
 
 class _Chat_more_screen extends State<Chat_more_screen> {
+  DataController _dataController = Get.find();
   String? selectedValueFrom1;
   String? selectedValueTo1;
   String? selectedValueFrom2;
   String? selectedValueTo2;
-
+  String key = '';
   @override
   void initState() {
-    if (usersBox.get(widget.usrId) != null) {
-      selectedValueFrom1 = usersBox.get(widget.usrId)!.trans_from_voice;
-      selectedValueTo1 = usersBox.get(widget.usrId)!.trans_to_voice;
-      selectedValueFrom2 = usersBox.get(widget.usrId)!.trans_from_msg;
-      selectedValueTo2 = usersBox.get(widget.usrId)!.trans_to_msg;
-    }
+    key = widget.channel + _dataController.myusername;
+    print('init key: $key');
+    if (usersBox.get(key) != null) {
+      print('users box is not null');
+      selectedValueFrom1 = usersBox.get(key)!.trans_from_voice;
+      selectedValueTo1 = usersBox.get(key)!.trans_to_voice;
+      selectedValueFrom2 = usersBox.get(key)!.trans_from_msg;
+      selectedValueTo2 = usersBox.get(key)!.trans_to_msg;
+      print(
+          'selected vals: from1: $selectedValueFrom1 to1:$selectedValueTo1 from2: $selectedValueFrom2 to2: $selectedValueTo2');
+    } else
+      print('users box is null');
 
     super.initState();
   }
@@ -35,7 +123,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
   @override
   Widget build(BuildContext context) {
     print(
-        'name: ${widget.name}, profile url:  ${widget.profileUrl}, native lans: ${widget.native_lans}, input lans: ${widget.input_lans}');
+        'name: ${widget.name}, profile url:  ${widget.profileUrl}, native lans: ${widget.native_lans}, input lans: ${input_lans}');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: SelectLanguage(),
@@ -197,6 +285,215 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                   children: [
                     Row(
                       children: [
+                        Icon(Icons.chat_bubble),
+                        Spacer(
+                          flex: 2,
+                        ),
+                        Text(
+                          "Your language ",
+                          style: const TextStyle(
+                            fontFamily: "Inter",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff000000),
+                            height: 17 / 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Spacer(
+                          flex: 3,
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton2<String>(
+                        isExpanded: true,
+                        hint: Row(
+                          children: [
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Expanded(
+                              child: Text(
+                                selectedValueFrom2 ?? 'Halh Mongolian',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        items: List<String>.from(input_lans)
+                            .map((String item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Container(
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                )))
+                            .toList(),
+                        //   value: selectedValueFrom2,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedValueFrom2 = value;
+                          });
+                        },
+                        buttonStyleData: ButtonStyleData(
+                          height: 50,
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(left: 14, right: 14),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black26,
+                              ),
+                              color: Colors.white),
+                          elevation: 2,
+                        ),
+                        dropdownStyleData: DropdownStyleData(
+                          maxHeight: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            color: Colors.white,
+                          ),
+                          offset: const Offset(0, 0),
+                          scrollbarTheme: ScrollbarThemeData(
+                            radius: const Radius.circular(40),
+                            thickness: MaterialStateProperty.all<double>(6),
+                            thumbVisibility:
+                                MaterialStateProperty.all<bool>(true),
+                          ),
+                        ),
+                        menuItemStyleData: const MenuItemStyleData(
+                          height: 40,
+                          padding: EdgeInsets.only(left: 14, right: 14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "will be transated to",
+                      style: const TextStyle(
+                        fontFamily: "Inter",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff000000),
+                        height: 17 / 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton2<String>(
+                        isExpanded: true,
+                        hint: Row(
+                          children: [
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Expanded(
+                              child: Text(
+                                selectedValueTo2 ?? widget.native_lans[0],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        items: List<String>.from(widget.native_lans)
+                            .map((String item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Container(
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                )))
+                            .toList(),
+                        //   value: selectedValueTo2,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedValueTo2 = value;
+                          });
+                        },
+                        buttonStyleData: ButtonStyleData(
+                          height: 50,
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(left: 14, right: 14),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.black26,
+                              ),
+                              //color: Color(0xffC6E2EE),
+                              color: Colors.white),
+                          elevation: 2,
+                        ),
+                        dropdownStyleData: DropdownStyleData(
+                          maxHeight: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            color: Colors.white,
+                          ),
+                          offset: const Offset(-20, 0),
+                          scrollbarTheme: ScrollbarThemeData(
+                            radius: const Radius.circular(40),
+                            thickness: MaterialStateProperty.all<double>(6),
+                            thumbVisibility:
+                                MaterialStateProperty.all<bool>(true),
+                          ),
+                        ),
+                        menuItemStyleData: const MenuItemStyleData(
+                          height: 40,
+                          padding: EdgeInsets.only(left: 14, right: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xffF9F9F9F0),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
                         Icon(Icons.keyboard_voice),
                         // Image.asset("assets/images/ic_chat_translation.png",
                         //     color: Get.theme.colorScheme.secondary,
@@ -245,7 +542,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                             ),
                           ],
                         ),
-                        items: List<String>.from(widget.input_lans)
+                        items: List<String>.from(input_lans)
                             .map((String item) => DropdownMenuItem<String>(
                                 value: item,
                                 child: Container(
@@ -260,12 +557,11 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   ),
                                 )))
                             .toList(),
-                        value: selectedValueFrom1,
+                        //  value: selectedValueFrom1,
                         onChanged: (String? value) {
                           setState(() {
                             selectedValueFrom1 = value;
                           });
-                          print('vl: ${selectedValueFrom1}');
                         },
                         buttonStyleData: ButtonStyleData(
                           height: 50,
@@ -354,12 +650,11 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   ),
                                 )))
                             .toList(),
-                        value: selectedValueTo1,
+                        //value: 'Bengali',
                         onChanged: (String? value) {
                           setState(() {
                             selectedValueTo1 = value;
                           });
-                          print('vl: ${selectedValueTo1}');
                         },
                         buttonStyleData: ButtonStyleData(
                           height: 50,
@@ -382,218 +677,6 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                             color: Colors.white,
                           ),
                           offset: const Offset(0, 0),
-                          scrollbarTheme: ScrollbarThemeData(
-                            radius: const Radius.circular(40),
-                            thickness: MaterialStateProperty.all<double>(6),
-                            thumbVisibility:
-                                MaterialStateProperty.all<bool>(true),
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
-                          padding: EdgeInsets.only(left: 14, right: 14),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xffF9F9F9F0),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.chat_bubble),
-                        Spacer(
-                          flex: 2,
-                        ),
-                        Text(
-                          "Your language ",
-                          style: const TextStyle(
-                            fontFamily: "Inter",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xff000000),
-                            height: 17 / 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Spacer(
-                          flex: 3,
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Expanded(
-                              child: Text(
-                                selectedValueFrom2 ?? 'Halh Mongolian',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        items: List<String>.from(widget.input_lans)
-                            .map((String item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Container(
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )))
-                            .toList(),
-                        value: selectedValueFrom2,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedValueFrom2 = value;
-                          });
-                          print('vl: ${selectedValueFrom2}');
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 50,
-                          width: double.infinity,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.black26,
-                              ),
-                              //color: Color(0xffC6E2EE),
-                              color: Colors.white),
-                          elevation: 2,
-                        ),
-                        dropdownStyleData: DropdownStyleData(
-                          maxHeight: 200,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Colors.white,
-                          ),
-                          offset: const Offset(0, 0),
-                          scrollbarTheme: ScrollbarThemeData(
-                            radius: const Radius.circular(40),
-                            thickness: MaterialStateProperty.all<double>(6),
-                            thumbVisibility:
-                                MaterialStateProperty.all<bool>(true),
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
-                          padding: EdgeInsets.only(left: 14, right: 14),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    Text(
-                      "will be transated to",
-                      style: const TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff000000),
-                        height: 17 / 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Expanded(
-                              child: Text(
-                                selectedValueTo2 ?? widget.native_lans[0],
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        items: List<String>.from(widget.native_lans)
-                            .map((String item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Container(
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )))
-                            .toList(),
-                        value: selectedValueTo2,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedValueTo2 = value;
-                          });
-                          print('vl: ${selectedValueTo2}');
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 50,
-                          width: double.infinity,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.black26,
-                              ),
-                              //color: Color(0xffC6E2EE),
-                              color: Colors.white),
-                          elevation: 2,
-                        ),
-                        dropdownStyleData: DropdownStyleData(
-                          maxHeight: 200,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Colors.white,
-                          ),
-                          offset: const Offset(-20, 0),
                           scrollbarTheme: ScrollbarThemeData(
                             radius: const Radius.circular(40),
                             thickness: MaterialStateProperty.all<double>(6),
@@ -630,8 +713,9 @@ class _Chat_more_screen extends State<Chat_more_screen> {
       backgroundColor: Colors.white,
       leading: IconButton(
           onPressed: () {
+            print('key: $key');
             Data.addUser(
-                widget.usrId,
+                key,
                 selectedValueFrom1 ?? 'Halh Mongolian', //voice from
                 selectedValueTo1 ??
                     List<String>.from(widget.native_lans)[0], //voice to

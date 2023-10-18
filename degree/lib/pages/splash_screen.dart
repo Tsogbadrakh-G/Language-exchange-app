@@ -34,7 +34,6 @@ class SplashScreen extends StatelessWidget {
   }
 
   Future callDelay(BuildContext context) async {
-    print("call dellay21");
     await Future.delayed(const Duration(milliseconds: 3000), () {});
 
     Get.to(const OnboardScreen());

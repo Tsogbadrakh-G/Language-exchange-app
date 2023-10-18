@@ -31,14 +31,19 @@ class _ChatPageState extends State<ChatPage> {
   int translation_status = 1;
   var args;
 
+  String? selectedValueFromMsg;
+  String? selectedValueToMsg;
+  String? selectedValueFromVoice;
+  String? selectedValueToVoice;
+
   getthesharedpref() async {
     myUserName = _dataController.myusername;
     myName = _dataController.myname;
     myProfilePic = _dataController.picUrl;
     myEmail = _dataController.email;
 
-    print(
-        'name $myName, usrname: $myUserName, pic: $myProfilePic, id: $myEmail, exited:${_dataController.exitedForEachChannel[myUserName]} ');
+    // print(
+    //   'name $myName, usrname: $myUserName, pic: $myProfilePic, id: $myEmail, exited:${_dataController.exitedForEachChannel[myUserName]} ');
     chatRoomId = widget.channel;
     setState(() {});
   }
@@ -49,21 +54,31 @@ class _ChatPageState extends State<ChatPage> {
     _dataController
         .exitedForEachChannel[myUserName ?? _dataController.myusername] = false;
 
-    print('listening in chatpage name: ${widget.channel}');
+    //print('listening in chatpage name: ${widget.channel}');
     _dataController.startListeningToLastMessage(
         widget.channel, myUserName!, widget.username);
 
     setState(() {});
   }
 
-//
-
+  String key = '';
   @override
   void initState() {
-    super.initState();
     ontheload();
 
-    print('object');
+    super.initState();
+  }
+
+  void languageSelection() {
+    key = widget.channel + _dataController.myusername;
+    if (usersBox.get(key) != null) {
+      print('users box is not null in chatpage');
+      selectedValueFromVoice = usersBox.get(key)!.trans_from_voice;
+      selectedValueToVoice = usersBox.get(key)!.trans_to_voice;
+      selectedValueFromMsg = usersBox.get(key)!.trans_from_msg;
+      selectedValueToMsg = usersBox.get(key)!.trans_to_msg;
+    } else
+      print('users box is null in chatpage');
   }
 
   getChatRoomIdbyUsername(String a, String b) {
@@ -132,96 +147,17 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
-  List<String> voice_in_lans = [
-    'Halh Mongolian',
-    'Bengali',
-    'Catalan',
-    'Czech',
-    'Danish',
-    'Dutch',
-    'English',
-    'Estonian',
-    'Finnish',
-    'French',
-    'German',
-    'Hindi',
-    'Indonesian',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Maltese',
-    'Mandarin Chinese',
-    'Modern Standard Arabic',
-    'Northern Uzbek',
-    'Polish',
-    'Portuguese',
-    'Romanian',
-    'Russian',
-    'Slovak',
-    'Spanish',
-    'Swahili',
-    'Swedish',
-    'Tagalog',
-    'Telugu',
-    'Thai',
-    'Turkish',
-    'Ukrainian',
-    'Urdu',
-    'Vietnamese',
-    'Welsh',
-    'Western Persian'
-  ];
-
-  final List<String> chat_in_lans = [
-    'Halh Mongolian',
-    'Bengali',
-    'Catalan',
-    'Czech',
-    'Danish',
-    'Dutch',
-    'English',
-    'Estonian',
-    'Finnish',
-    'French',
-    'German',
-    'Hindi',
-    'Indonesian',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Maltese',
-    'Mandarin Chinese',
-    'Modern Standard Arabic',
-    'Northern Uzbek',
-    'Polish',
-    'Portuguese',
-    'Romanian',
-    'Russian',
-    'Slovak',
-    'Spanish',
-    'Swahili',
-    'Swedish',
-    'Tagalog',
-    'Telugu',
-    'Thai',
-    'Turkish',
-    'Ukrainian',
-    'Urdu',
-    'Vietnamese',
-    'Welsh',
-    'Western Persian'
-  ];
-  List<String> voice_out_lans = [];
+  //List<String> voice_out_lans = [];
 
   List<String> chat_out_lans = [];
+  List<String> out_lans = [];
 
-  String? selectedValueFrom;
-  String? selectedValueTo;
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments;
+    languageSelection();
 
-    voice_out_lans = args as List<String>;
+    out_lans = args as List<String>;
     print('args- $args');
     return Scaffold(
       appBar: buildAppBar(),
@@ -258,8 +194,8 @@ class _ChatPageState extends State<ChatPage> {
                               _dataController.addMessage(
                                   widget.channel,
                                   messagecontroller.text,
-                                  selectedValueFrom ?? "Halh Mongolian",
-                                  selectedValueTo ?? "Halh Mongolian",
+                                  selectedValueFromMsg ?? "Halh Mongolian",
+                                  selectedValueToMsg ?? out_lans[0],
                                   widget.username,
                                   widget.name);
 
@@ -355,8 +291,8 @@ class _ChatPageState extends State<ChatPage> {
                               widget.channel,
                               myUserName!,
                               widget.username,
-                              selectedValueFrom ?? 'Halh Mongolian',
-                              selectedValueTo ?? 'English',
+                              selectedValueFromVoice ?? 'Halh Mongolian',
+                              selectedValueToVoice ?? out_lans[0],
                               token,
                               intValue));
                           // } else {
@@ -388,13 +324,14 @@ class _ChatPageState extends State<ChatPage> {
                       margin: const EdgeInsets.only(right: 10),
                       width: 24,
                       child: RawMaterialButton(
-                        onPressed: () {
-                          Get.to(Chat_more_screen(
+                        onPressed: () async {
+                          await Get.to(Chat_more_screen(
                               widget.userId,
                               widget.name,
                               widget.profileurl,
-                              voice_out_lans,
-                              voice_in_lans));
+                              out_lans,
+                              chatRoomId));
+                          setState(() {});
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_more.png",
