@@ -60,25 +60,26 @@ class _OnboardScreen extends State<Select_languages> {
       backgroundColor: Colors.white,
       appBar: SelectLanguage(),
       body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           width: double.infinity,
           height: double.infinity,
           child: Column(
             children: [
               SizedBox(
-                height: 10,
+                height: 15,
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Spacer(),
                   Image.asset('assets/images/ic_somni.png',
-                      width: (MediaQuery.of(context).size.width - 40) * 2 / 6),
+                      width: (MediaQuery.of(context).size.width - 40) * 2 / 7),
                   // SizedBox(
                   //   width: (MediaQuery.of(context).size.width - 40) * 1 / 5,
                   // ),
                   Spacer(),
                   Container(
-                    width: (MediaQuery.of(context).size.width - 40) * 3 / 6,
+                    width: (MediaQuery.of(context).size.width - 40) * 4 / 7,
                     padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
                     margin: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
@@ -89,41 +90,40 @@ class _OnboardScreen extends State<Select_languages> {
                       'Та ямар хэлээр ярьж чаддаг вэ?',
                       style: TextStyle(
                           decoration: TextDecoration.none,
-                          fontSize: 20,
+                          fontSize: 17,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                           height: 1.5),
                       textAlign: TextAlign.start,
                     ),
                   ),
-                  // Spacer(
-                  //   flex: 1,
-                  // ),
+                  Spacer(
+                    flex: 2,
+                  ),
                 ],
               ),
               SizedBox(
-                height: 30,
+                height: 20,
               ),
               Container(
                 decoration: BoxDecoration(color: Colors.black12),
                 width: double.infinity,
                 height: 3,
               ),
-              SizedBox(
-                height: 30,
-              ),
               Container(
+                // decoration: BoxDecoration(
+                //   border: Border(
+                //       bottom: BorderSide(color: Color(0xff8E8383), width: 1)),
+                // ),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: double.infinity,
                 child: Text(
-                  'Өөрийн ярьдаг хэлээ сонгоно уу',
+                  'Өөрийн ярьдаг хэлээ сонгоно уу:',
                   style: TextStyle(
                       color: Colors.black,
-                      fontSize: 20,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500),
                 ),
-              ),
-              SizedBox(
-                height: 20,
               ),
               Expanded(
                   child: ListView.builder(
@@ -136,7 +136,8 @@ class _OnboardScreen extends State<Select_languages> {
                             },
                             child: Obx(
                               () => Container(
-                                margin: EdgeInsets.symmetric(vertical: 10),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         width: isSelected[index].value ? 3 : 1,
@@ -149,13 +150,13 @@ class _OnboardScreen extends State<Select_languages> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(20))),
                                 padding: EdgeInsets.symmetric(
-                                    vertical: 20, horizontal: 20),
+                                    vertical: 18, horizontal: 15),
                                 child: Row(
                                   children: [
                                     Text(
                                       out_lans[index],
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w500),
                                     )
                                   ],
@@ -164,31 +165,46 @@ class _OnboardScreen extends State<Select_languages> {
                             ));
                       })),
               SizedBox(
-                height: 30,
+                height: 10,
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 40),
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () {
-                    for (var i = 0; i < out_lans.length; i++) {
-                      if (isSelected[i].value) retval.add(out_lans[i]);
-                    }
+                decoration: BoxDecoration(
+                    border: Border(
+                        top: BorderSide(color: Color(0xff8E8383), width: 1))),
+                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                width: double.infinity,
+                child: Container(
+                  decoration: BoxDecoration(
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.black38, // Shadow color
+                      //     offset: Offset(2, 2), // Shadow position (x, y)
+                      //     blurRadius: 4, // Spread of the shadow
+                      //     spreadRadius: 0, // How much the shadow should expand
+                      //   ),
+                      // ],
+                      ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      for (var i = 0; i < out_lans.length; i++) {
+                        if (isSelected[i].value) retval.add(out_lans[i]);
+                      }
 
-                    Get.to(Register(), arguments: retval);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Color(0xff2675EC),
-                  ),
-                  child: const Text(
-                    'Үргэлжлүүлэх',
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        color: Colors.white,
-                        fontSize: 17),
+                      Get.to(Register(), arguments: retval);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      backgroundColor: Color(0xff2675EC),
+                    ),
+                    child: const Text(
+                      'Үргэлжлүүлэх',
+                      style: TextStyle(
+                          decoration: TextDecoration.none,
+                          color: Colors.white,
+                          fontSize: 17),
+                    ),
                   ),
                 ),
               ),

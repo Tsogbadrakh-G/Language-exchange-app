@@ -22,6 +22,10 @@ class _Register extends State<Register> {
   TextEditingController passwordcontroller = new TextEditingController();
   TextEditingController namecontroller = new TextEditingController();
   TextEditingController confirmPasswordcontroller = new TextEditingController();
+  FocusNode focusNode1 = FocusNode();
+  FocusNode focusNode2 = FocusNode();
+  FocusNode focusNode3 = FocusNode();
+  FocusNode focusNode4 = FocusNode();
 
   final _formkey = GlobalKey<FormState>();
   var args;
@@ -109,245 +113,299 @@ class _Register extends State<Register> {
     args = ModalRoute.of(context)!.settings.arguments;
     print('args $args');
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        width: double.infinity,
-        height: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                    ),
-                    Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                        child: Text(
-                          "Lets Register Account",
-                          style: const TextStyle(
-                            fontFamily: "Outfit",
-                            fontSize: 37,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xff000000),
-                            height: 37 / 37,
-                          ),
-                          textAlign: TextAlign.left,
-                        )),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.fromLTRB(0, 0, 50, 0),
-                      child: Text(
-                        "Hello user, you have a greatful journey",
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 28,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff000000),
-                          height: 47 / 37,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                width: double.infinity,
-                child: Form(
-                  key: _formkey,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back)),
+        centerTitle: true,
+      ),
+      body: GestureDetector(
+        onTap: () {
+          if (focusNode1.hasFocus) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          }
+          if (focusNode2.hasFocus) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          }
+          if (focusNode3.hasFocus) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          }
+          if (focusNode4.hasFocus) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          }
+        },
+        child: Container(
+          color: Colors.white,
+          width: double.infinity,
+          height: double.infinity,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1.0, color: Color(0xff8E8383)),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          textAlignVertical: TextAlignVertical.center,
-                          controller: namecontroller,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter Name';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Name",
-                            border: InputBorder.none,
-                            // prefixIcon: Icon(
-                            //   Icons.person_outline,
-                            //   color: Color(0xFF7f30fe),
-                            // ),
-                          ),
-                        ),
-                      ),
                       SizedBox(
-                        height: 15.0,
+                        height: 10,
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1.0, color: Color(0xff8E8383)),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          textAlignVertical: TextAlignVertical.center,
-                          controller: mailcontroller,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter E-mail';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Email",
-                            border: InputBorder.none,
-                            // prefixIcon: Icon(
-                            //   Icons.mail_outline,
-                            //   color: Color(0xFF7f30fe),
-                            // ),
-                          ),
-                        ),
-                      ),
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          width: double.infinity,
+                          padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                          child: Text(
+                            "Бүртгүүлэх ✌️",
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 27,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff000000),
+                              height: 37 / 37,
+                            ),
+                            textAlign: TextAlign.left,
+                          )),
                       SizedBox(
-                        height: 15.0,
+                        height: 20,
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1.0, color: Color(0xff8E8383)),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          textAlignVertical: TextAlignVertical.center,
-                          controller: passwordcontroller,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter Password';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Password",
-                            border: InputBorder.none,
-                            // prefixIcon: Icon(
-                            //   Icons.password,
-                            //   color: Color(0xFF7f30fe),
-                            // )
-                          ),
-                          obscureText: true,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 15.0,
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1.0, color: Color(0xff8E8383)),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          textAlignVertical: TextAlignVertical.center,
-                          controller: confirmPasswordcontroller,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter Confirm Password';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Confirm password",
-                            border: InputBorder.none,
-                            // prefixIcon: Icon(
-                            //   Icons.password,
-                            //   color: Color(0xFF7f30fe),
-                            // ),
-                          ),
-                          obscureText: true,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30.0,
-                      ),
+                      // Container(
+                      //   width: double.infinity,
+                      //   padding: EdgeInsets.fromLTRB(0, 0, 50, 0),
+                      //   child: Text(
+                      //     "Hello user, you have a greatful journey",
+                      //     style: const TextStyle(
+                      //       fontFamily: "Outfit",
+                      //       fontSize: 28,
+                      //       fontWeight: FontWeight.w400,
+                      //       color: Color(0xff000000),
+                      //       height: 47 / 37,
+                      //     ),
+                      //     textAlign: TextAlign.left,
+                      //   ),
+                      // )
                     ],
                   ),
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  if (_formkey.currentState!.validate()) {
-                    setState(() {
-                      email = mailcontroller.text;
-                      name = namecontroller.text;
-                      password = passwordcontroller.text;
-                      confirmPassword = confirmPasswordcontroller.text;
-                    });
-                  }
-
-                  registration();
-                },
-                child: Center(
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  width: double.infinity,
+                  child: Form(
+                    key: _formkey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          //  margin: EdgeInsets.symmetric(horizontal: 20),
+                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                          width: double.infinity,
+                          child: Text(
+                            'Нэр',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 1.0, color: Color(0xff8E8383)),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                            focusNode: focusNode1,
+                            textAlignVertical: TextAlignVertical.center,
+                            controller: namecontroller,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter Name';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Нэр",
+                              border: InputBorder.none,
+                              // prefixIcon: Icon(
+                              //   Icons.person_outline,
+                              //   color: Color(0xFF7f30fe),
+                              // ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        Container(
+                          //  margin: EdgeInsets.symmetric(horizontal: 20),
+                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                          width: double.infinity,
+                          child: Text(
+                            'Имэйл',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 1.0, color: Color(0xff8E8383)),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                            focusNode: focusNode2,
+                            textAlignVertical: TextAlignVertical.center,
+                            controller: mailcontroller,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter E-mail';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Имэйл",
+                              border: InputBorder.none,
+                              // prefixIcon: Icon(
+                              //   Icons.mail_outline,
+                              //   color: Color(0xFF7f30fe),
+                              // ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25.0,
+                        ),
+                        Container(
+                          //  margin: EdgeInsets.symmetric(horizontal: 20),
+                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                          width: double.infinity,
+                          child: Text(
+                            'Нууц үг',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 1.0, color: Color(0xff8E8383)),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                            focusNode: focusNode3,
+                            textAlignVertical: TextAlignVertical.center,
+                            controller: passwordcontroller,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter Password';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Нууц үг",
+                              border: InputBorder.none,
+                              // prefixIcon: Icon(
+                              //   Icons.password,
+                              //   color: Color(0xFF7f30fe),
+                              // )
+                            ),
+                            obscureText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 25.0,
+                        ),
+                        Container(
+                          //  margin: EdgeInsets.symmetric(horizontal: 20),
+                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                          width: double.infinity,
+                          child: Text(
+                            'Нууц үг баталгаажуулах',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 1.0, color: Color(0xff8E8383)),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                            focusNode: focusNode4,
+                            textAlignVertical: TextAlignVertical.center,
+                            controller: confirmPasswordcontroller,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter Confirm Password';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Нууц үг баталгаажуулах",
+                              border: InputBorder.none,
+                              // prefixIcon: Icon(
+                              //   Icons.password,
+                              //   color: Color(0xFF7f30fe),
+                              // ),
+                            ),
+                            obscureText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Divider(),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10.0),
-                    width: MediaQuery.of(context).size.width,
-                    child: Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Color(0xFF000000),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Center(
-                            child: Text(
-                          "SIGN UP",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold),
-                        )),
+                    decoration: BoxDecoration(
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: Colors.black38, // Shadow color
+                        //     offset: Offset(2, 2), // Shadow position (x, y)
+                        //     blurRadius: 4, // Spread of the shadow
+                        //     spreadRadius: 0, // How much the shadow should expand
+                        //   ),
+                        // ],
+                        ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formkey.currentState!.validate()) {
+                          setState(() {
+                            email = mailcontroller.text;
+                            name = namecontroller.text;
+                            password = passwordcontroller.text;
+                            confirmPassword = confirmPasswordcontroller.text;
+                          });
+                        }
+
+                        registration();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        backgroundColor: Color(0xff2675EC),
+                      ),
+                      child: const Text(
+                        'Бүртгүүлэх',
+                        style: TextStyle(
+                            decoration: TextDecoration.none,
+                            color: Colors.white,
+                            fontSize: 17),
                       ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              // Wrap(
-              //   alignment: WrapAlignment.center,
-              //   children: [
-              //     Text(
-              //       "Already have an account?",
-              //       style: TextStyle(color: Colors.black, fontSize: 16.0),
-              //     ),
-              //     GestureDetector(
-              //       onTap: () => Get.to(LogIn()),
-              //       child: Text(
-              //         " Login",
-              //         style: TextStyle(
-              //             color: Color(0xFf000000),
-              //             fontSize: 16.0,
-              //             fontWeight: FontWeight.w800),
-              //       ),
-              //     )
-              //   ],
-              // ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

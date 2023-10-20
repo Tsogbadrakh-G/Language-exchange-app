@@ -59,6 +59,7 @@ class DataController extends GetxController {
       "to_msg_${username}": lasMessageMap['to_msg_${username}']
     };
 
+    print('set last message');
     DatabaseMethods().updateLastMessageSend(chatroomId, lastMessageInfoMap);
   }
 
@@ -90,7 +91,7 @@ class DataController extends GetxController {
       if (chatroomSnapshot.exists) {
         lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
         print(
-            'last listen in Chat Page:$lastMessageData, and exit: ${exitedForEachChannel[this.myusername]}');
+            'listening a last message in Chat Page:$lastMessageData, and exit: ${exitedForEachChannel[this.myusername]}');
         // Return the last message data as a stream
         return lastMessageData ?? {};
       } else {

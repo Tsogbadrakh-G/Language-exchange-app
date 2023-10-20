@@ -119,7 +119,6 @@ class _HomeState extends State<Home> {
                       physics: ClampingScrollPhysics(),
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data.docs[index];
-                        print('chatroom');
 
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
@@ -488,23 +487,21 @@ class _HomeState extends State<Home> {
           titleSpacing: 0,
           automaticallyImplyLeading: false,
           title: Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
-            padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
-            height: 40,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 205, 205, 206),
-              borderRadius: BorderRadius.circular(8.0), // Border radius
-            ),
+            margin: EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(border: Border.all()),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: TextField(
               controller: textEditingController,
               focusNode: _focusNode,
               textAlign: search ? TextAlign.start : TextAlign.center,
-              autocorrect: true,
-              textCapitalization: TextCapitalization.words,
               onChanged: (value) {
                 initiateSearch(value.toUpperCase());
               },
               decoration: InputDecoration(
+                filled: true,
+                fillColor: Color.fromARGB(255, 205, 205, 206),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 2, color: Colors.black)),
                 suffixIcon: IconButton(
                   icon: search
                       ? GestureDetector(
@@ -542,7 +539,7 @@ class _HomeState extends State<Home> {
                     setState(() {});
                   },
                 ),
-                border: InputBorder.none,
+                //     border: OutlineInputBorder(),
                 hintText: 'Search User',
                 hintStyle: const TextStyle(
                   fontFamily: "SF Pro Text",
@@ -558,6 +555,78 @@ class _HomeState extends State<Home> {
                   fontWeight: FontWeight.w500),
             ),
           ),
+          // title: Container(
+          //   margin: EdgeInsets.symmetric(horizontal: 20),
+          //   //    padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
+          //   height: 40,
+          //   decoration: BoxDecoration(
+          //     color: Color.fromARGB(255, 205, 205, 206),
+          //     borderRadius: BorderRadius.circular(8.0), // Border radius
+          //   ),
+          //   child: TextField(
+          //     controller: textEditingController,
+          //     focusNode: _focusNode,
+          //     textAlign: search ? TextAlign.start : TextAlign.center,
+          //     autocorrect: true,
+          //     textCapitalization: TextCapitalization.words,
+          //     onChanged: (value) {
+          //       initiateSearch(value.toUpperCase());
+          //     },
+          //     decoration: InputDecoration(
+          //       contentPadding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+          //       suffixIcon: IconButton(
+          //         icon: search
+          //             ? GestureDetector(
+          //                 onTap: () {
+          //                   textEditingController.clear();
+          //                   FocusScope.of(context).requestFocus(FocusNode());
+
+          //                   search = false;
+          //                   //  queryResultSet = [];
+          //                   tempSearchStore = [];
+          //                   print('search');
+
+          //                   setState(() {});
+          //                 },
+          //                 child: Icon(
+          //                   size: 25,
+          //                   Icons.close,
+          //                   color: Color(0Xff2675EC),
+          //                 ))
+          //             : GestureDetector(
+          //                 onTap: () {
+          //                   search = true;
+          //                   _focusNode.requestFocus();
+          //                   print('not search');
+          //                   setState(() {});
+          //                 },
+          //                 child: Icon(
+          //                   size: 30,
+          //                   Icons.search,
+          //                   color: Color(0Xff2675EC),
+          //                 ),
+          //               ),
+          //         onPressed: () {
+          //           search = true;
+          //           setState(() {});
+          //         },
+          //       ),
+          //       border: InputBorder.none,
+          //       hintText: 'Search User',
+          //       hintStyle: const TextStyle(
+          //         fontFamily: "SF Pro Text",
+          //         fontSize: 17,
+          //         fontWeight: FontWeight.w400,
+          //         color: Color(0xff3c3c43),
+          //         height: 22 / 17,
+          //       ),
+          //     ),
+          //     style: TextStyle(
+          //         color: Colors.black,
+          //         fontSize: 18.0,
+          //         fontWeight: FontWeight.w500),
+          //   ),
+          // ),
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -686,14 +755,14 @@ class _HomeState extends State<Home> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Container(
-                    padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
+                    padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
                     height: 40,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 205, 205, 206),
-
                       borderRadius: BorderRadius.circular(8.0), // Border radius
                     ),
                     child: TextField(
+                      cursorHeight: 10,
                       controller: textEditingController,
                       focusNode: _focusNode,
                       textAlign: search ? TextAlign.start : TextAlign.center,

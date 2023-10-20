@@ -1,3 +1,4 @@
+import 'package:degree/pages/select_languages.dart';
 import 'package:degree/pages/splash_screen.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:degree/pages/login.dart';
@@ -51,8 +52,8 @@ class MyApp extends StatelessWidget {
       //         return Register();
       //       }
       //     }),
-      home: SplashScreen(),
-      //home: LogIn(),
+      //home: SplashScreen(),
+      home: LogIn(),
     );
   }
 }

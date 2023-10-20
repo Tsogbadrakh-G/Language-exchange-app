@@ -17,7 +17,7 @@ class Data {
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   static Future<dynamic> sendAudio(String path, String from, String to,
-      String tranlsation, String chatroomId) async {
+      String tranlsation, String chatroomId, String myUsername) async {
     final url = 'http://51.20.44.63:5000/todo';
     //final url = 'http://192.168.1.74:5000/todo';
     final dio = Dio();
@@ -28,17 +28,18 @@ class Data {
       'input': from,
       'output': to,
       'translation': tranlsation,
-      'roomId': chatroomId
+      'roomId': chatroomId,
+      'myUsername': myUsername
     });
 
-    log('pre res and its roomid: $chatroomId');
+    //log('pre res and its roomid: $chatroomId');
 
     final response = await dio.post(
       url,
       data: formData,
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
-    log('response: ${response}');
+    print('response: ${response}');
 
     if (response.statusCode == 200) {
       //translated audio file URL on the server

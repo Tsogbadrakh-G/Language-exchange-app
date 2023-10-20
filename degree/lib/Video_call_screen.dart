@@ -210,7 +210,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    print('from ${widget.from}, to: ${widget.to}');
+    print('from ${widget.from}, to: ${widget.to} in Video call screen');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agora Video Call'),
@@ -249,7 +249,7 @@ class _Video_call_screen extends State<Video_call_screen> {
               foregroundColor: mute % 2 == 1 ? Colors.red : Colors.white,
               onPressed: () async {
                 mute++;
-                log('click $mute');
+                print('click $mute');
                 if (mute % 2 == 0) {
                   await _engine.muteLocalAudioStream(true);
 
@@ -259,7 +259,7 @@ class _Video_call_screen extends State<Video_call_screen> {
                     Directory tempDir = await getTemporaryDirectory();
                     String record = '${tempDir.absolute.path}/record.wav';
 
-                    log('recorded file: $record');
+                    print('recorded file: $record');
                     setState(() {});
                     String val;
                     if (widget.to == "Halh Mongolian") {
@@ -268,15 +268,16 @@ class _Video_call_screen extends State<Video_call_screen> {
                           widget.from,
                           "Halh Mongolian",
                           "S2TT (Speech to Text translation)",
-                          widget.channel);
+                          widget.channel,
+                          widget.myUserName);
                     } else {
                       val = await Data.sendAudio(
-                        record,
-                        widget.from,
-                        widget.to,
-                        "S2ST (Speech to Speech translation)",
-                        widget.channel,
-                      );
+                          record,
+                          widget.from,
+                          widget.to,
+                          "S2ST (Speech to Speech translation)",
+                          widget.channel,
+                          widget.myUserName);
                     }
 
                     sendAudioLink(val);

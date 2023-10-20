@@ -65,6 +65,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     ontheload();
+    print('init chat page');
 
     super.initState();
   }
@@ -231,7 +232,8 @@ class _ChatPageState extends State<ChatPage> {
                     onPressed: () {
                       _dataController.exitedForEachChannel[
                           myUserName ?? _dataController.myusername] = true;
-                      Get.to(Home());
+                      //  Get.to(Home());
+                      Get.back();
                     },
                     icon: Image.asset('assets/images/ic_chevron_left.png',
                         height: 20, width: 20, color: Colors.black),
