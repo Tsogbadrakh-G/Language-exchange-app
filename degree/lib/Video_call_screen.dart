@@ -5,6 +5,7 @@ import 'package:degree/DataAPI.dart';
 import 'package:degree/custom_source.dart';
 import 'package:degree/service/database.dart';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -318,13 +319,16 @@ class _Video_call_screen extends State<Video_call_screen> {
 
   sendAudioLink(String val) async {
     String messageId = randomAlphaNumeric(10);
-
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('h:mma').format(now);
     Map<String, dynamic> messageInfoMap = {
       "id": messageId,
       "type": "audio",
       "url": val,
       "sendBy": widget.myUserName,
-      "read": 0
+      "read": 0,
+      "time": FieldValue.serverTimestamp(),
+      "ts": formattedDate
     };
 
     DatabaseMethods().addMessage(widget.channel, messageId, messageInfoMap);
