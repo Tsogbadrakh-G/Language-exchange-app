@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
+import 'package:degree/pages/call_history_screen.dart';
 import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/model/Customer.dart';
@@ -487,21 +488,20 @@ class _HomeState extends State<Home> {
           titleSpacing: 0,
           automaticallyImplyLeading: false,
           title: Container(
-            margin: EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(border: Border.all()),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               controller: textEditingController,
               focusNode: _focusNode,
               textAlign: search ? TextAlign.start : TextAlign.center,
+              autocorrect: true,
+              textCapitalization: TextCapitalization.words,
               onChanged: (value) {
                 initiateSearch(value.toUpperCase());
               },
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Color.fromARGB(255, 205, 205, 206),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 2, color: Colors.black)),
+                contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                 suffixIcon: IconButton(
                   icon: search
                       ? GestureDetector(
@@ -539,7 +539,21 @@ class _HomeState extends State<Home> {
                     setState(() {});
                   },
                 ),
-                //     border: OutlineInputBorder(),
+                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 205, 205,
+                        206), // Set the border color when not focused
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 205, 205,
+                        206), // Set the border color when focused
+                  ),
+                ),
                 hintText: 'Search User',
                 hintStyle: const TextStyle(
                   fontFamily: "SF Pro Text",
@@ -555,94 +569,25 @@ class _HomeState extends State<Home> {
                   fontWeight: FontWeight.w500),
             ),
           ),
-          // title: Container(
-          //   margin: EdgeInsets.symmetric(horizontal: 20),
-          //   //    padding: EdgeInsets.fromLTRB(10, 0, 0, 2),
-          //   height: 40,
-          //   decoration: BoxDecoration(
-          //     color: Color.fromARGB(255, 205, 205, 206),
-          //     borderRadius: BorderRadius.circular(8.0), // Border radius
-          //   ),
-          //   child: TextField(
-          //     controller: textEditingController,
-          //     focusNode: _focusNode,
-          //     textAlign: search ? TextAlign.start : TextAlign.center,
-          //     autocorrect: true,
-          //     textCapitalization: TextCapitalization.words,
-          //     onChanged: (value) {
-          //       initiateSearch(value.toUpperCase());
-          //     },
-          //     decoration: InputDecoration(
-          //       contentPadding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-          //       suffixIcon: IconButton(
-          //         icon: search
-          //             ? GestureDetector(
-          //                 onTap: () {
-          //                   textEditingController.clear();
-          //                   FocusScope.of(context).requestFocus(FocusNode());
-
-          //                   search = false;
-          //                   //  queryResultSet = [];
-          //                   tempSearchStore = [];
-          //                   print('search');
-
-          //                   setState(() {});
-          //                 },
-          //                 child: Icon(
-          //                   size: 25,
-          //                   Icons.close,
-          //                   color: Color(0Xff2675EC),
-          //                 ))
-          //             : GestureDetector(
-          //                 onTap: () {
-          //                   search = true;
-          //                   _focusNode.requestFocus();
-          //                   print('not search');
-          //                   setState(() {});
-          //                 },
-          //                 child: Icon(
-          //                   size: 30,
-          //                   Icons.search,
-          //                   color: Color(0Xff2675EC),
-          //                 ),
-          //               ),
-          //         onPressed: () {
-          //           search = true;
-          //           setState(() {});
-          //         },
-          //       ),
-          //       border: InputBorder.none,
-          //       hintText: 'Search User',
-          //       hintStyle: const TextStyle(
-          //         fontFamily: "SF Pro Text",
-          //         fontSize: 17,
-          //         fontWeight: FontWeight.w400,
-          //         color: Color(0xff3c3c43),
-          //         height: 22 / 17,
-          //       ),
-          //     ),
-          //     style: TextStyle(
-          //         color: Colors.black,
-          //         fontSize: 18.0,
-          //         fontWeight: FontWeight.w500),
-          //   ),
-          // ),
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              // Build the list of items
-              return search
-                  ? ListView(
-                      padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                      primary: false,
-                      shrinkWrap: true,
-                      children: [...tempSearchStore].map((element) {
-                        return buildResultCard(element);
-                      }).toList())
-                  : ChatRoomList();
-            },
-            childCount: 1, // Number of items in the list
+        SliverPadding(
+          padding: EdgeInsets.only(top: 10),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                // Build the list of items
+                return search
+                    ? ListView(
+                        padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        primary: false,
+                        shrinkWrap: true,
+                        children: [...tempSearchStore].map((element) {
+                          return buildResultCard(element);
+                        }).toList())
+                    : ChatRoomList();
+              },
+              childCount: 1, // Number of items in the list
+            ),
           ),
         ),
       ]),
@@ -652,7 +597,9 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Get.to(Call_history_screen());
+              },
               child: Image.asset(
                 'assets/images/ic_call.png',
                 width: 80,
