@@ -169,21 +169,6 @@ class _Register extends State<Register> {
                       SizedBox(
                         height: 20,
                       ),
-                      // Container(
-                      //   width: double.infinity,
-                      //   padding: EdgeInsets.fromLTRB(0, 0, 50, 0),
-                      //   child: Text(
-                      //     "Hello user, you have a greatful journey",
-                      //     style: const TextStyle(
-                      //       fontFamily: "Outfit",
-                      //       fontSize: 28,
-                      //       fontWeight: FontWeight.w400,
-                      //       color: Color(0xff000000),
-                      //       height: 47 / 37,
-                      //     ),
-                      //     textAlign: TextAlign.left,
-                      //   ),
-                      // )
                     ],
                   ),
                 ),
@@ -198,21 +183,17 @@ class _Register extends State<Register> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          //  margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                          width: double.infinity,
-                          child: Text(
-                            'Нэр',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        // Container(
+
+                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     'Нэр',
+                        //     style: TextStyle(fontWeight: FontWeight.w600),
+                        //   ),
+                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1.0, color: Color(0xff8E8383)),
-                              borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode1,
                             textAlignVertical: TextAlignVertical.center,
@@ -224,6 +205,18 @@ class _Register extends State<Register> {
                               return null;
                             },
                             decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide:
+                                    BorderSide(width: 2, color: Colors.black38),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xff2675EC),
+                                ),
+                              ),
                               hintText: "Нэр",
                               border: InputBorder.none,
                               // prefixIcon: Icon(
@@ -236,21 +229,21 @@ class _Register extends State<Register> {
                         SizedBox(
                           height: 25,
                         ),
-                        Container(
-                          //  margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                          width: double.infinity,
-                          child: Text(
-                            'Имэйл',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        // Container(
+                        //
+                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     'Имэйл',
+                        //     style: TextStyle(fontWeight: FontWeight.w600),
+                        //   ),
+                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1.0, color: Color(0xff8E8383)),
-                              borderRadius: BorderRadius.circular(5)),
+                          // decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         width: 1.0, color: Color(0xff8E8383)),
+                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode2,
                             textAlignVertical: TextAlignVertical.center,
@@ -262,6 +255,18 @@ class _Register extends State<Register> {
                               return null;
                             },
                             decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide:
+                                    BorderSide(width: 2, color: Colors.black38),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xff2675EC),
+                                ),
+                              ),
                               hintText: "Имэйл",
                               border: InputBorder.none,
                               // prefixIcon: Icon(
@@ -274,21 +279,21 @@ class _Register extends State<Register> {
                         SizedBox(
                           height: 25.0,
                         ),
-                        Container(
-                          //  margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                          width: double.infinity,
-                          child: Text(
-                            'Нууц үг',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        // Container(
+
+                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     'Нууц үг',
+                        //     style: TextStyle(fontWeight: FontWeight.w600),
+                        //   ),
+                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1.0, color: Color(0xff8E8383)),
-                              borderRadius: BorderRadius.circular(5)),
+                          // decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         width: 1.0, color: Color(0xff8E8383)),
+                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode3,
                             textAlignVertical: TextAlignVertical.center,
@@ -300,6 +305,18 @@ class _Register extends State<Register> {
                               return null;
                             },
                             decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide:
+                                    BorderSide(width: 2, color: Colors.black38),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xff2675EC),
+                                ),
+                              ),
                               hintText: "Нууц үг",
                               border: InputBorder.none,
                               // prefixIcon: Icon(
@@ -313,21 +330,21 @@ class _Register extends State<Register> {
                         SizedBox(
                           height: 25.0,
                         ),
-                        Container(
-                          //  margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                          width: double.infinity,
-                          child: Text(
-                            'Нууц үг баталгаажуулах',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        // Container(
+
+                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                        //   width: double.infinity,
+                        //   child: Text(
+                        //     'Нууц үг баталгаажуулах',
+                        //     style: TextStyle(fontWeight: FontWeight.w600),
+                        //   ),
+                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1.0, color: Color(0xff8E8383)),
-                              borderRadius: BorderRadius.circular(5)),
+                          // decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         width: 1.0, color: Color(0xff8E8383)),
+                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode4,
                             textAlignVertical: TextAlignVertical.center,
@@ -339,6 +356,18 @@ class _Register extends State<Register> {
                               return null;
                             },
                             decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide:
+                                    BorderSide(width: 2, color: Colors.black38),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xff2675EC),
+                                ),
+                              ),
                               hintText: "Нууц үг баталгаажуулах",
                               border: InputBorder.none,
                               // prefixIcon: Icon(
