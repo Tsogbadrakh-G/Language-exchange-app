@@ -23,6 +23,8 @@ void main() async {
   // await Firebase.initializeApp(
   //     name: 'App', options: DefaultFirebaseOptions.currentPlatform);
 
+  print(DateTime.now());
+
   runApp(const MyApp());
 
   Get.put(DataController());
@@ -52,8 +54,8 @@ class MyApp extends StatelessWidget {
       //         return Register();
       //       }
       //     }),
-      //home: SplashScreen(),
-      home: LogIn(),
+      home: SplashScreen(),
+      //home: LogIn(),
     );
   }
 }

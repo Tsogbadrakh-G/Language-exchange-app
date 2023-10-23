@@ -1,13 +1,11 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/home.dart';
-import 'package:degree/pages/login.dart';
-import 'package:degree/pages/select_languages.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../models/Chat.dart';
 
 class Call_history_screen extends StatefulWidget {
   const Call_history_screen({Key? key}) : super(key: key);
@@ -20,23 +18,24 @@ class _Call_history_screen extends State<Call_history_screen> {
   DataController _dataController = Get.find();
   final firestoreInstance = FirebaseFirestore.instance;
   String myUserName = '';
-  List<String> chatRoomIds = [];
+
   @override
   void initState() {
     print('init call history');
-    super.initState();
     myUserName = _dataController.myusername;
     getChatRoomIds();
+    super.initState();
   }
 
-  List<Map<String, String>> chatMessages = List.empty(growable: true);
-  List<Map<String, String>> audioMessages = List.empty(growable: true);
+  List<Chat> chatMessages = List.empty(growable: true);
+  List<Chat> audioMessages = List.empty(growable: true);
+  List<bool> readOrMissed = List.empty(growable: true);
+  List<String> chaTime = List.empty(growable: true);
 
   void getChatRoomIds() async {
     QuerySnapshot querySnapshot =
         await firestoreInstance.collection('chatrooms').get();
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      chatRoomIds.add(doc.id);
       String username = doc.id.replaceAll(myUserName, "");
       username = username.replaceAll("_", "");
       log('user name: $username');
@@ -45,31 +44,30 @@ class _Call_history_screen extends State<Call_history_screen> {
           .doc(doc.id)
           .collection('chats')
           .get();
-      // chatMessages = chatSnapshot.docs.where((element) => )
+
+      //messages in doc.id chatroom
       chatMessages = chatSnapshot.docs.map((chatDoc) {
         Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-        Map<String, String> ret = Map();
-        ret['message'] = val['message'].toString();
-        ret['type'] = val['type'].toString();
-        ret['chatroomId'] = doc.id;
-        ret['username'] = username;
-        ret['type'] == 'audio' ? audioMessages.add(ret) : null;
+        Chat ret = Chat(
+            id: val['id'].toString(),
+            message: val['message'].toString(),
+            chatuserName: val['sendBy'].toString(),
+            callStatus: 'missed',
+            time: val['ts'].toString(),
+            channel: doc.id);
+
+        if (val['type'] == 'audio') {
+          audioMessages.add(ret);
+        }
+        print('time: ${ret.time}, val: $val in room id: ${doc.id}');
         return ret;
       }).toList();
+
       print('chats $chatMessages in chatroom with ${doc.id}');
+      print('audio chats len : ${audioMessages.length}');
     }
 
     setState(() {}); // Notify Flutter to rebuild the UI with the chat room IDs.
-  }
-
-  getthisUserInfo(String username) async {
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
-
-    String profilePicUrl = querySnapshot.docs[0]['Photo'];
-    log('profile url: $profilePicUrl');
-    // user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
-    //String key = chatroomId + myUserName!;
   }
 
   @override
@@ -92,18 +90,18 @@ class _Call_history_screen extends State<Call_history_screen> {
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(border: Border.all()),
         width: double.infinity,
         height: double.infinity,
         child: ListView.builder(
-          itemCount: chatMessages.length,
+          itemCount: audioMessages.length,
           itemBuilder: (BuildContext context, int index) {
             return ChatRoomListTile(
-              chatRoomId: chatMessages[index]['chatRoomId'] ?? 'GTSOG321_TEST1',
+              chatRoomId: audioMessages[index].channel,
               myUsername: _dataController.myusername,
-              name: _dataController.myname,
               read: false,
+              time: audioMessages[index].time,
             );
           },
         ),
@@ -146,15 +144,14 @@ class _Call_history_screen extends State<Call_history_screen> {
 }
 
 class ChatRoomListTile extends StatefulWidget {
-  final String chatRoomId, myUsername, name;
+  final String chatRoomId, myUsername, time;
 
   final bool read;
-  ChatRoomListTile({
-    required this.chatRoomId,
-    required this.myUsername,
-    required this.name,
-    required this.read,
-  });
+  ChatRoomListTile(
+      {required this.chatRoomId,
+      required this.myUsername,
+      required this.read,
+      required this.time});
 
   @override
   State<ChatRoomListTile> createState() => _ChatRoomListTileState();
@@ -162,6 +159,7 @@ class ChatRoomListTile extends StatefulWidget {
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String profilePicUrl = "", name = "", username = "", id = "";
+
   List<String> user_native_lans = [];
   getthisUserInfo() async {
     username =
@@ -173,7 +171,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     id = "${querySnapshot.docs[0]["Id"]}";
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
-    String key = widget.chatRoomId + widget.myUsername;
+    print('user info: ${querySnapshot.docs[0]}');
+
+    //String key = widget.chatRoomId + widget.myUsername;
   }
 
   @override
@@ -214,8 +214,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             borderRadius: BorderRadius.circular(20),
                             child: Image.network(
                               profilePicUrl,
-                              height: 70,
-                              width: 70,
+                              height: 50,
+                              width: 50,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -231,7 +231,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           height: 5.0,
                         ),
                         Text(
-                          widget.name,
+                          name,
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 17.0,
@@ -243,100 +243,28 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                   SizedBox(
                     width: 30,
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        'd',
-                        // widget.time,
-                        style: TextStyle(
-                            color: Colors.black45,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  )
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.time,
+                          style: TextStyle(
+                              color: Colors.black45,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           );
         });
-  }
-}
-
-class DrawerItem extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final void Function() myFunction;
-  DrawerItem(
-      {super.key,
-      required this.title,
-      required this.icon,
-      required this.myFunction});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: myFunction,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 25),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Color(0xff2675ec),
-              size: 40,
-            ),
-            const SizedBox(
-              width: 40,
-            ),
-            Expanded(
-              child: Text(title,
-                  style: const TextStyle(
-                    fontFamily: "Gilroy",
-                    fontSize: 19,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff2675ec),
-                    height: 23 / 19,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class UserAvatar extends StatelessWidget {
-  final String filename;
-  UserAvatar({
-    super.key,
-    required this.filename,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (filename != '')
-      return CircleAvatar(
-        radius: 32,
-        backgroundColor: Colors.white,
-        child: CircleAvatar(
-          radius: 29,
-          backgroundImage: Image.network(filename).image,
-        ),
-      );
-    else
-      return CircleAvatar(
-        radius: 32,
-        backgroundColor: Colors.white,
-        child: CircleAvatar(
-          radius: 29,
-          backgroundImage: Image.asset('assets/images/boy1.jpg').image,
-        ),
-      );
   }
 }

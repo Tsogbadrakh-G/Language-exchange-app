@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/custom_source.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -14,47 +16,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
-
-//const channel = "test_channel";
-
-List<String> out_lans = [
-  'Bengali',
-  'Catalan',
-  'Czech',
-  'Danish',
-  'Dutch',
-  'English',
-  'Estonian',
-  'Finnish',
-  'French',
-  'German',
-  'Hindi',
-  'Indonesian',
-  'Italian',
-  'Japanese',
-  'Korean',
-  'Maltese',
-  'Mandarin Chinese',
-  'Modern Standard Arabic',
-  'Northern Uzbek',
-  'Polish',
-  'Portuguese',
-  'Romanian',
-  'Russian',
-  'Slovak',
-  'Spanish',
-  'Swahili',
-  'Swedish',
-  'Tagalog',
-  'Telugu',
-  'Thai',
-  'Turkish',
-  'Ukrainian',
-  'Urdu',
-  'Vietnamese',
-  'Welsh',
-  'Western Persian'
-];
 
 class Video_call_screen extends StatefulWidget {
   final String channel, myUserName, username, from, to, channelToken;
@@ -77,12 +38,15 @@ class _Video_call_screen extends State<Video_call_screen> {
   final dio = Dio();
   bool isRecording = false;
   bool exited = false;
+  DataController _dataController = Get.find();
 
   @override
   void initState() {
-    super.initState();
+    print('init video call screen');
+    _dataController.exitedForEachChannel_Voice[widget.username] = false;
     initAgora();
     listenForNewMessages();
+    super.initState();
   }
 
   void listenForNewMessages() {
@@ -96,15 +60,15 @@ class _Video_call_screen extends State<Video_call_screen> {
 
           final messageData = change.doc.data() as Map<String, dynamic>;
 
-          //  print('New Message: $messageData, $myUserName');
-
           print(
-              ' new message: ${messageData}, widget username: ${widget.username}, exited: $exited');
-          if (exited) {
-            updateChatReadState(messageData["id"]);
+              'new message: ${messageData}, widget username: ${widget.username}, exited: ${_dataController.exitedForEachChannel_Voice[widget.username]}');
+
+          if (_dataController.exitedForEachChannel_Voice[widget.username] ??
+              true) {
+            updateChatReadState(messageData["id"], false, true);
           } else if (messageData["type"] == "audio" &&
               messageData["sendBy"] == widget.username &&
-              messageData["read"] == 0) {
+              messageData["read"] == false) {
             downloadAndPlayAudio(messageData["url"], messageData["id"]);
           }
 
@@ -114,7 +78,7 @@ class _Video_call_screen extends State<Video_call_screen> {
     });
   }
 
-  downloadAndPlayAudio(String url, chatId) async {
+  downloadAndPlayAudio(String url, String chatId) async {
     log('audio play');
     final res =
         await dio.get(url, options: Options(responseType: ResponseType.bytes));
@@ -128,10 +92,10 @@ class _Video_call_screen extends State<Video_call_screen> {
     log('3');
     await audioPlayer.play();
     log('4');
-    updateChatReadState(chatId);
+    updateChatReadState(chatId, true, false);
   }
 
-  updateChatReadState(String chatId) async {
+  updateChatReadState(String chatId, bool read, bool missed) async {
     try {
       final chatPairRef = FirebaseFirestore.instance
           .collection('chatrooms')
@@ -139,7 +103,8 @@ class _Video_call_screen extends State<Video_call_screen> {
           .collection('chats')
           .doc(chatId);
       await chatPairRef.update({
-        'read': 1,
+        'read': read,
+        'missed': missed,
       });
     } catch (e) {
       print('Error updating chat pair: $e');
@@ -195,8 +160,8 @@ class _Video_call_screen extends State<Video_call_screen> {
     await _engine.enableAudio();
     await _engine.muteLocalAudioStream(true);
     try {
-      print('token ${widget.channelToken}');
-      print('token ${widget.channel}');
+      // print('token ${widget.channelToken}');
+      // print('token ${widget.channel}');
       await _engine.joinChannel(
         token: widget.channelToken,
         channelId: widget.channel,
@@ -211,7 +176,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    print('from ${widget.from}, to: ${widget.to} in Video call screen');
+    //  print('from ${widget.from}, to: ${widget.to} in Video call screen');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agora Video Call'),
@@ -320,15 +285,20 @@ class _Video_call_screen extends State<Video_call_screen> {
   sendAudioLink(String val) async {
     String messageId = randomAlphaNumeric(10);
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('h:mma').format(now);
+    String formattedDate = DateFormat.yMd().format(now);
+    String hour = DateFormat.Hm().format(now);
+
+    print('video time: $formattedDate, $hour');
     Map<String, dynamic> messageInfoMap = {
       "id": messageId,
       "type": "audio",
       "url": val,
+      "message": "",
       "sendBy": widget.myUserName,
-      "read": 0,
+      "read": false,
       "time": FieldValue.serverTimestamp(),
-      "ts": formattedDate
+      "ts": hour + " , " + formattedDate,
+      "missed": false
     };
 
     DatabaseMethods().addMessage(widget.channel, messageId, messageInfoMap);
@@ -355,8 +325,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   Future<void> dispose() async {
     await _engine.leaveChannel();
     _engine.release();
-    super.dispose();
-
     exited = true;
+    super.dispose();
   }
 }

@@ -490,6 +490,7 @@ class _HomeState extends State<Home> {
           title: Container(
             margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
+              cursorHeight: 20,
               controller: textEditingController,
               focusNode: _focusNode,
               textAlign: search ? TextAlign.start : TextAlign.center,

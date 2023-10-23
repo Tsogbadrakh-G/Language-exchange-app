@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/Video_call_screen.dart';
 import 'package:degree/pages/chat_more_screen.dart';
-import 'package:degree/pages/home.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -51,10 +50,8 @@ class _ChatPageState extends State<ChatPage> {
   ontheload() async {
     await getthesharedpref();
     await getAndSetMessages();
-    _dataController
-        .exitedForEachChannel[myUserName ?? _dataController.myusername] = false;
+    _dataController.exitedForEachChannel[widget.username] = false;
 
-    //print('listening in chatpage name: ${widget.channel}');
     _dataController.startListeningToLastMessage(
         widget.channel, myUserName!, widget.username);
 
@@ -133,9 +130,11 @@ class _ChatPageState extends State<ChatPage> {
                   reverse: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
-
-                    return chatMessageTile(
-                        ds["message"], myUserName == ds["sendBy"]);
+                    if (ds['type'] == 'text')
+                      return chatMessageTile(
+                          ds["message"], myUserName == ds["sendBy"]);
+                    else
+                      return Offstage();
                   })
               : Center(
                   child: CircularProgressIndicator(),
@@ -230,8 +229,8 @@ class _ChatPageState extends State<ChatPage> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      _dataController.exitedForEachChannel[
-                          myUserName ?? _dataController.myusername] = true;
+                      _dataController.exitedForEachChannel[widget.username] =
+                          true;
                       //  Get.to(Home());
                       Get.back();
                     },
@@ -269,7 +268,6 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                       Text(
                         widget.username,
-                        //  LimeChatHelper.getChannelUserNumber(channel),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

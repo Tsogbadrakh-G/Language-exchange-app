@@ -23,6 +23,7 @@ class DataController extends GetxController {
   // }
 
   Map<String, bool> exitedForEachChannel = Map();
+  Map<String, bool> exitedForEachChannel_Voice = Map();
 
   void SaveUser(String id, String name, String username, String picUrl,
       String searchKey, String email) {
@@ -47,6 +48,21 @@ class DataController extends GetxController {
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
   Map<String, dynamic>? lastMessageData;
 
+  updateChatReadState(String chatId, String channel) async {
+    try {
+      final chatPairRef = FirebaseFirestore.instance
+          .collection('chatrooms')
+          .doc(channel)
+          .collection('chats')
+          .doc(chatId);
+      await chatPairRef.update({
+        'read': true,
+      });
+    } catch (e) {
+      print('Error updating chat pair: $e');
+    }
+  }
+
   void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap,
       bool read, String myUserName, String username) {
     Map<String, dynamic> lastMessageInfoMap = {
@@ -67,22 +83,20 @@ class DataController extends GetxController {
       String chatroomId, String myUserName, String ousername) {
     lastMessageStream =
         listenToLastMessage(chatroomId).listen((lastMessageData) {
+      print('exitedFromThisChannel ${exitedForEachChannel[ousername]}');
       // Handle updates to the last message data here
       if (lastMessageData['read'] == false &&
           lastMessageData['lastMessageSendBy'] == ousername &&
-          exitedForEachChannel[myusername] == false) {
-        print('setting');
+          exitedForEachChannel[ousername] == false) {
         setLastMessage(
             chatroomId, lastMessageData, true, this.myusername, ousername);
       }
-
-      //print('Last message data updated in chat page: $lastMessageData');
     });
   }
 
   Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //print('listening: $chatRoomId');
+
     return firestore
         .collection('chatrooms')
         .doc(chatroomId)
@@ -90,8 +104,7 @@ class DataController extends GetxController {
         .map((chatroomSnapshot) {
       if (chatroomSnapshot.exists) {
         lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
-        print(
-            'listening a last message in Chat Page:$lastMessageData, and exit: ${exitedForEachChannel[this.myusername]}');
+        print('listening a last message in Chat Page:$lastMessageData');
         // Return the last message data as a stream
         return lastMessageData ?? {};
       } else {
@@ -111,18 +124,20 @@ class DataController extends GetxController {
         String translation_text = await Data.sendText(message, from, transto);
         message = message + "\n${translation_text}";
       }
+      String messageId = randomAlphaNumeric(10);
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
       Map<String, dynamic> messageInfoMap = {
+        "id": messageId,
         "type": "text",
         "message": message,
         "sendBy": this.myusername,
-        "ts": formattedDate,
+        "ts": now,
         "time": FieldValue.serverTimestamp(),
         "imgUrl": this.picUrl,
+        //"missed": false
       };
-      String messageId = randomAlphaNumeric(10);
 
       int to = 0;
 
