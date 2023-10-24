@@ -16,6 +16,8 @@ class DataController extends GetxController {
       key = '',
       email = '';
 
+  List<String> native_lans = List.empty(growable: true);
+
   // Customer? getUser() {
   //   // return userBox.get('owner');
   //   print(userBox.values);
@@ -79,6 +81,7 @@ class DataController extends GetxController {
     DatabaseMethods().updateLastMessageSend(chatroomId, lastMessageInfoMap);
   }
 
+//Listening last chat
   void startListeningToLastMessage(
       String chatroomId, String myUserName, String ousername) {
     lastMessageStream =
@@ -128,6 +131,7 @@ class DataController extends GetxController {
 
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('h:mma').format(now);
+
       Map<String, dynamic> messageInfoMap = {
         "id": messageId,
         "type": "text",

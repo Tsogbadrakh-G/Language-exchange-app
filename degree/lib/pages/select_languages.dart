@@ -1,4 +1,5 @@
 import 'package:degree/pages/register.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,12 +51,21 @@ class Select_languages extends StatefulWidget {
 }
 
 class _OnboardScreen extends State<Select_languages> {
+  DataController _dataController = Get.find();
   List<RxBool> isSelected =
       List.generate(out_lans.length, (index) => false.obs, growable: false);
   List<String> retval = [];
 
   @override
+  void initState() {
+    print('init select languages page $retval');
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print('build select');
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: SelectLanguage(),
@@ -187,10 +197,11 @@ class _OnboardScreen extends State<Select_languages> {
                   child: ElevatedButton(
                     onPressed: () {
                       for (var i = 0; i < out_lans.length; i++) {
-                        if (isSelected[i].value) retval.add(out_lans[i]);
+                        if (isSelected[i].value)
+                          _dataController.native_lans.add(out_lans[i]);
                       }
 
-                      Get.to(Register(), arguments: retval);
+                      Get.to(Register());
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(

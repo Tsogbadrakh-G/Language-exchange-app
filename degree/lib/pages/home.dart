@@ -490,7 +490,7 @@ class _HomeState extends State<Home> {
           title: Container(
             margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
-              cursorHeight: 20,
+              // cursorHeight: 20,
               controller: textEditingController,
               focusNode: _focusNode,
               textAlign: search ? TextAlign.start : TextAlign.center,
@@ -511,7 +511,7 @@ class _HomeState extends State<Home> {
                             FocusScope.of(context).requestFocus(FocusNode());
 
                             search = false;
-                            //  queryResultSet = [];
+
                             tempSearchStore = [];
                             print('search');
 

@@ -231,7 +231,7 @@ class _ChatPageState extends State<ChatPage> {
                     onPressed: () {
                       _dataController.exitedForEachChannel[widget.username] =
                           true;
-                      //  Get.to(Home());
+
                       Get.back();
                     },
                     icon: Image.asset('assets/images/ic_chevron_left.png',
@@ -315,9 +315,6 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  // SizedBox(
-                  //   width: 20,
-                  // ),
                   Visibility(
                     visible: true,
                     child: Container(

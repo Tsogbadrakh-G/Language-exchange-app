@@ -5,6 +5,7 @@ import 'package:degree/DataAPI.dart';
 import 'package:degree/custom_source.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
+import 'package:degree/service/model/somni_alert.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +38,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   final audioPlayer = AudioPlayer();
   final dio = Dio();
   bool isRecording = false;
-  bool exited = false;
+
   DataController _dataController = Get.find();
 
   @override
@@ -54,20 +55,71 @@ class _Video_call_screen extends State<Video_call_screen> {
         .collection('chatrooms/${widget.channel}/chats');
 
     messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
-      snapshot.docChanges.forEach((change) {
+      snapshot.docChanges.forEach((change) async {
         if (change.type == DocumentChangeType.added) {
           // This message is newly added
 
           final messageData = change.doc.data() as Map<String, dynamic>;
-
+          bool exited =
+              _dataController.exitedForEachChannel_Voice[widget.username] ??
+                  true;
           print(
-              'new message: ${messageData}, widget username: ${widget.username}, exited: ${_dataController.exitedForEachChannel_Voice[widget.username]}');
+              'new message: ${messageData}, widget username: ${widget.username}, exited: ${exited}');
 
-          if (_dataController.exitedForEachChannel_Voice[widget.username] ??
-              true) {
+          await SomniAlerts.alertBoxVertical(
+            titleWidget: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                ' goal ',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            textWidget: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: RichText(
+                  textScaleFactor: MediaQuery.of(Get.context!).textScaleFactor,
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: 'Та',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: 'k ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(text: 'дугаарт '),
+                      TextSpan(
+                          text: 'stat ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(text: 'цагт залгах сэрүүлэг тохируулсан байна.'),
+                    ],
+                  )),
+            ),
+            button1: () {
+              Get.back();
+            },
+            button2: () {
+              Get.back();
+            },
+            imgAsset: 'alert/alert_reminder',
+            button1Text: '🤙 ',
+            button2Text: '😴 ',
+          );
+          if (messageData["type"] == "audio" && exited) {
             updateChatReadState(messageData["id"], false, true);
           } else if (messageData["type"] == "audio" &&
               messageData["sendBy"] == widget.username &&
+              messageData["missed"] == false &&
               messageData["read"] == false) {
             downloadAndPlayAudio(messageData["url"], messageData["id"]);
           }
@@ -96,6 +148,7 @@ class _Video_call_screen extends State<Video_call_screen> {
   }
 
   updateChatReadState(String chatId, bool read, bool missed) async {
+    print('update data: id-$chatId, read- $read, miss- $missed');
     try {
       final chatPairRef = FirebaseFirestore.instance
           .collection('chatrooms')
@@ -179,6 +232,13 @@ class _Video_call_screen extends State<Video_call_screen> {
     //  print('from ${widget.from}, to: ${widget.to} in Video call screen');
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              _dataController.exitedForEachChannel_Voice[widget.username] =
+                  true;
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back_ios)),
         title: const Text('Agora Video Call'),
       ),
       body: Stack(
@@ -288,7 +348,7 @@ class _Video_call_screen extends State<Video_call_screen> {
     String formattedDate = DateFormat.yMd().format(now);
     String hour = DateFormat.Hm().format(now);
 
-    print('video time: $formattedDate, $hour');
+    print('video time in vidoe call screen: $formattedDate, $hour');
     Map<String, dynamic> messageInfoMap = {
       "id": messageId,
       "type": "audio",
@@ -325,7 +385,8 @@ class _Video_call_screen extends State<Video_call_screen> {
   Future<void> dispose() async {
     await _engine.leaveChannel();
     _engine.release();
-    exited = true;
+
+    _dataController.exitedForEachChannel_Voice[widget.username] = true;
     super.dispose();
   }
 }

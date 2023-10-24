@@ -59,7 +59,7 @@ class _Register extends State<Register> {
           "Photo":
               "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a",
           "Id": Id,
-          "native_lans": args as List<String>
+          "native_lans": _dataController.native_lans
         };
 
         await DatabaseMethods().addUserDetails(userInfoMap, Id);
@@ -110,13 +110,14 @@ class _Register extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context)!.settings.arguments;
-    print('args $args');
+    // args = ModalRoute.of(context)!.settings.arguments;
+    print('args ${_dataController.native_lans}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
+              _dataController.native_lans = [];
               Get.back();
             },
             icon: Icon(Icons.arrow_back)),

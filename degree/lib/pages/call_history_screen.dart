@@ -4,7 +4,9 @@ import 'package:degree/pages/home.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../models/Chat.dart';
 
 class Call_history_screen extends StatefulWidget {
@@ -45,23 +47,73 @@ class _Call_history_screen extends State<Call_history_screen> {
           .collection('chats')
           .get();
 
-      //messages in doc.id chatroom
-      chatMessages = chatSnapshot.docs.map((chatDoc) {
+      chatSnapshot.docs.forEach((chatDoc) {
         Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-        Chat ret = Chat(
-            id: val['id'].toString(),
-            message: val['message'].toString(),
-            chatuserName: val['sendBy'].toString(),
-            callStatus: 'missed',
-            time: val['ts'].toString(),
-            channel: doc.id);
+
+        Chat ret;
 
         if (val['type'] == 'audio') {
+          String callStatus = '';
+          if (val['sendBy'] == myUserName)
+            callStatus = 'outbound';
+          else if (val['missed'] as bool == true)
+            callStatus = 'missed';
+          else if (val['read'] as bool == true) callStatus = 'inbound';
+
+          int year = int.parse(val['ts'].toString().substring(14, 18));
+          int month = int.parse(val['ts'].toString().substring(8, 10));
+          int day = int.parse(val['ts'].toString().substring(11, 13));
+          int hour = int.parse(val['ts'].toString().substring(0, 2));
+          int min = int.parse(val['ts'].toString().substring(3, 5));
+          ret = Chat(
+              id: val['id'].toString(),
+              message: val['message'].toString(),
+              chatuserName: val['sendBy'].toString(),
+              callStatus: callStatus,
+              time: val['ts'].toString(),
+              channel: doc.id,
+              officialTime: DateTime(year, month, day, hour, min));
           audioMessages.add(ret);
         }
-        print('time: ${ret.time}, val: $val in room id: ${doc.id}');
-        return ret;
-      }).toList();
+        audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
+      });
+
+      // messages in doc.id chatroom
+
+      // chatMessages = chatSnapshot.docs.map((chatDoc) {
+      //   Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
+
+      //   Chat ret;
+
+      //   if (val['type'] == 'audio') {
+      //     int year = int.parse(val['ts'].toString().substring(14, 18));
+      //     int month = int.parse(val['ts'].toString().substring(8, 10));
+      //     int day = int.parse(val['ts'].toString().substring(11, 13));
+      //     int hour = int.parse(val['ts'].toString().substring(0, 2));
+      //     int min = int.parse(val['ts'].toString().substring(3, 5));
+
+      //     ret = Chat(
+      //         id: val['id'].toString(),
+      //         message: val['message'].toString(),
+      //         chatuserName: val['sendBy'].toString(),
+      //         callStatus: val['missed'] as bool,
+      //         time: val['ts'].toString(),
+      //         channel: doc.id,
+      //         officialTime: DateTime(year, month, day, hour, min));
+      //     audioMessages.add(ret);
+      //   } else {
+      //     ret = Chat(
+      //         id: val['id'].toString(),
+      //         message: val['message'].toString(),
+      //         chatuserName: val['sendBy'].toString(),
+      //         callStatus: false,
+      //         time: val['ts'].toString(),
+      //         channel: doc.id,
+      //         officialTime: DateTime.now());
+      //   }
+      //   print('time: ${ret.time}, val: $val in room id: ${doc.id}');
+      //   return ret;
+      // }).toList();
 
       print('chats $chatMessages in chatroom with ${doc.id}');
       print('audio chats len : ${audioMessages.length}');
@@ -98,11 +150,11 @@ class _Call_history_screen extends State<Call_history_screen> {
           itemCount: audioMessages.length,
           itemBuilder: (BuildContext context, int index) {
             return ChatRoomListTile(
-              chatRoomId: audioMessages[index].channel,
-              myUsername: _dataController.myusername,
-              read: false,
-              time: audioMessages[index].time,
-            );
+                chatRoomId: audioMessages[index].channel,
+                myUsername: _dataController.myusername,
+                read: false,
+                time: audioMessages[index].time,
+                callStatus: audioMessages[index].callStatus);
           },
         ),
       ),
@@ -144,14 +196,15 @@ class _Call_history_screen extends State<Call_history_screen> {
 }
 
 class ChatRoomListTile extends StatefulWidget {
-  final String chatRoomId, myUsername, time;
+  final String chatRoomId, myUsername, time, callStatus;
 
   final bool read;
   ChatRoomListTile(
       {required this.chatRoomId,
       required this.myUsername,
       required this.read,
-      required this.time});
+      required this.time,
+      required this.callStatus});
 
   @override
   State<ChatRoomListTile> createState() => _ChatRoomListTileState();
@@ -184,6 +237,11 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
+    // DateTime now = DateTime.now();
+    // String formattedDate = DateFormat.yMd().format(now);
+    // String hour = DateFormat.Hm().format(now);
+    // print('video time: $formattedDate, $hour');
+
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
@@ -202,6 +260,11 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  SvgPicture.asset(
+                    _getAssetPath(widget.callStatus),
+                    height: 20,
+                    width: 20,
+                  ),
                   profilePicUrl == ""
                       ? CircularProgressIndicator()
                       : Container(
@@ -266,5 +329,18 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
             ),
           );
         });
+  }
+
+  String _getAssetPath(String type) {
+    String ret = '';
+    switch (type) {
+      case 'missed':
+        ret = 'assets/svg/missed_call.svg';
+      case 'inbound':
+        ret = 'assets/svg/inbound_call.svg';
+      case 'outbound':
+        ret = 'assets/svg/outbound_call.svg';
+    }
+    return ret;
   }
 }
