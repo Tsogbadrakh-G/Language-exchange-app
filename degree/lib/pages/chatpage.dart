@@ -295,6 +295,7 @@ class _ChatPageState extends State<ChatPage> {
                               selectedValueToVoice ?? out_lans[0],
                               token,
                               intValue));
+                          _dataController.sendJoinRequest(widget.channel);
                           // } else {
                           //   Fluttertoast.showToast(
                           //     msg: 'Ta voice translation icon-ийг сонгоно уу.',

@@ -2,10 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
-import 'package:degree/custom_source.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
-import 'package:degree/service/model/somni_alert.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -46,122 +44,9 @@ class _Video_call_screen extends State<Video_call_screen> {
     print('init video call screen');
     _dataController.exitedForEachChannel_Voice[widget.username] = false;
     initAgora();
-    listenForNewMessages();
+    //_dataController.sendJoinRequest(widget.channel);
+
     super.initState();
-  }
-
-  void listenForNewMessages() {
-    final CollectionReference messagesCollection = FirebaseFirestore.instance
-        .collection('chatrooms/${widget.channel}/chats');
-
-    messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
-      snapshot.docChanges.forEach((change) async {
-        if (change.type == DocumentChangeType.added) {
-          // This message is newly added
-
-          final messageData = change.doc.data() as Map<String, dynamic>;
-          bool exited =
-              _dataController.exitedForEachChannel_Voice[widget.username] ??
-                  true;
-          print(
-              'new message: ${messageData}, widget username: ${widget.username}, exited: ${exited}');
-
-          await SomniAlerts.alertBoxVertical(
-            titleWidget: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
-                ' goal ',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-            textWidget: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: RichText(
-                  textScaleFactor: MediaQuery.of(Get.context!).textScaleFactor,
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: 'Та',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: 'k ',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: 'дугаарт '),
-                      TextSpan(
-                          text: 'stat ',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: 'цагт залгах сэрүүлэг тохируулсан байна.'),
-                    ],
-                  )),
-            ),
-            button1: () {
-              Get.back();
-            },
-            button2: () {
-              Get.back();
-            },
-            imgAsset: 'alert/alert_reminder',
-            button1Text: '🤙 ',
-            button2Text: '😴 ',
-          );
-          if (messageData["type"] == "audio" && exited) {
-            updateChatReadState(messageData["id"], false, true);
-          } else if (messageData["type"] == "audio" &&
-              messageData["sendBy"] == widget.username &&
-              messageData["missed"] == false &&
-              messageData["read"] == false) {
-            downloadAndPlayAudio(messageData["url"], messageData["id"]);
-          }
-
-          // Process and display the new message as needed
-        }
-      });
-    });
-  }
-
-  downloadAndPlayAudio(String url, String chatId) async {
-    log('audio play');
-    final res =
-        await dio.get(url, options: Options(responseType: ResponseType.bytes));
-    print('download: ${res.data}');
-
-    final audioPlayer = AudioPlayer();
-
-    await audioPlayer.setAudioSource(CustomSource(res.data));
-
-    await audioPlayer.load();
-    log('3');
-    await audioPlayer.play();
-    log('4');
-    updateChatReadState(chatId, true, false);
-  }
-
-  updateChatReadState(String chatId, bool read, bool missed) async {
-    print('update data: id-$chatId, read- $read, miss- $missed');
-    try {
-      final chatPairRef = FirebaseFirestore.instance
-          .collection('chatrooms')
-          .doc(widget.channel)
-          .collection('chats')
-          .doc(chatId);
-      await chatPairRef.update({
-        'read': read,
-        'missed': missed,
-      });
-    } catch (e) {
-      print('Error updating chat pair: $e');
-    }
   }
 
   Future<void> initAgora() async {

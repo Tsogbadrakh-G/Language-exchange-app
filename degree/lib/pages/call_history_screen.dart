@@ -6,7 +6,6 @@ import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../models/Chat.dart';
 
 class Call_history_screen extends StatefulWidget {
@@ -23,16 +22,13 @@ class _Call_history_screen extends State<Call_history_screen> {
 
   @override
   void initState() {
-    print('init call history');
+    print('init call history ${audioMessages.length}');
     myUserName = _dataController.myusername;
     getChatRoomIds();
     super.initState();
   }
 
-  List<Chat> chatMessages = List.empty(growable: true);
   List<Chat> audioMessages = List.empty(growable: true);
-  List<bool> readOrMissed = List.empty(growable: true);
-  List<String> chaTime = List.empty(growable: true);
 
   void getChatRoomIds() async {
     QuerySnapshot querySnapshot =
@@ -52,13 +48,16 @@ class _Call_history_screen extends State<Call_history_screen> {
 
         Chat ret;
 
-        if (val['type'] == 'audio') {
+        if (val['type'] == 'request') {
           String callStatus = '';
           if (val['sendBy'] == myUserName)
             callStatus = 'outbound';
-          else if (val['missed'] as bool == true)
+          else if (val['rejected'] as bool == true)
             callStatus = 'missed';
-          else if (val['read'] as bool == true) callStatus = 'inbound';
+          else if (val['accept'] as bool == true)
+            callStatus = 'inbound';
+          else
+            callStatus = 'missed';
 
           int year = int.parse(val['ts'].toString().substring(14, 18));
           int month = int.parse(val['ts'].toString().substring(8, 10));
@@ -78,44 +77,6 @@ class _Call_history_screen extends State<Call_history_screen> {
         audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
       });
 
-      // messages in doc.id chatroom
-
-      // chatMessages = chatSnapshot.docs.map((chatDoc) {
-      //   Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-
-      //   Chat ret;
-
-      //   if (val['type'] == 'audio') {
-      //     int year = int.parse(val['ts'].toString().substring(14, 18));
-      //     int month = int.parse(val['ts'].toString().substring(8, 10));
-      //     int day = int.parse(val['ts'].toString().substring(11, 13));
-      //     int hour = int.parse(val['ts'].toString().substring(0, 2));
-      //     int min = int.parse(val['ts'].toString().substring(3, 5));
-
-      //     ret = Chat(
-      //         id: val['id'].toString(),
-      //         message: val['message'].toString(),
-      //         chatuserName: val['sendBy'].toString(),
-      //         callStatus: val['missed'] as bool,
-      //         time: val['ts'].toString(),
-      //         channel: doc.id,
-      //         officialTime: DateTime(year, month, day, hour, min));
-      //     audioMessages.add(ret);
-      //   } else {
-      //     ret = Chat(
-      //         id: val['id'].toString(),
-      //         message: val['message'].toString(),
-      //         chatuserName: val['sendBy'].toString(),
-      //         callStatus: false,
-      //         time: val['ts'].toString(),
-      //         channel: doc.id,
-      //         officialTime: DateTime.now());
-      //   }
-      //   print('time: ${ret.time}, val: $val in room id: ${doc.id}');
-      //   return ret;
-      // }).toList();
-
-      print('chats $chatMessages in chatroom with ${doc.id}');
       print('audio chats len : ${audioMessages.length}');
     }
 
@@ -180,14 +141,14 @@ class _Call_history_screen extends State<Call_history_screen> {
                 height: 80,
               ),
             ),
-            InkWell(
-              onTap: () {},
-              child: Image.asset(
-                'assets/images/ic_setting.png',
-                width: 70,
-                height: 70,
-              ),
-            ),
+            // InkWell(
+            //   onTap: () {},
+            //   child: Image.asset(
+            //     'assets/images/ic_setting.png',
+            //     width: 70,
+            //     height: 70,
+            //   ),
+            // ),
           ],
         ),
       ),

@@ -77,6 +77,21 @@ class _HomeState extends State<Home> {
     chatRoomsStream = await DatabaseMethods().getChatRooms();
     setState(() {});
     [Permission.microphone, Permission.camera, Permission.photos].request();
+    final firestoreInstance = FirebaseFirestore.instance;
+
+    QuerySnapshot querySnapshot =
+        await firestoreInstance.collection('chatrooms').get();
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String username =
+          doc.id.replaceAll(myUserName ?? _dataController.myusername, "");
+      username = username.replaceAll("_", "");
+      QuerySnapshot querySnapshot =
+          await DatabaseMethods().getUserInfo(username.toUpperCase());
+      user_native_lans =
+          List<String>.from(querySnapshot.docs[0]["native_lans"]);
+      _dataController.listenForNewMessages(doc.id, username, user_native_lans);
+    }
+    print('listening all');
   }
 
   getthesharedpref() async {
@@ -488,6 +503,10 @@ class _HomeState extends State<Home> {
           titleSpacing: 0,
           automaticallyImplyLeading: false,
           title: Container(
+            height: 30,
+            decoration: BoxDecoration(
+                color: Color.fromARGB(255, 205, 205, 206),
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               // cursorHeight: 20,
@@ -500,8 +519,8 @@ class _HomeState extends State<Home> {
                 initiateSearch(value.toUpperCase());
               },
               decoration: InputDecoration(
-                filled: true,
-                fillColor: Color.fromARGB(255, 205, 205, 206),
+                // filled: true,
+                // fillColor: Color.fromARGB(255, 205, 205, 206),
                 contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                 suffixIcon: IconButton(
                   icon: search
@@ -616,14 +635,14 @@ class _HomeState extends State<Home> {
                 color: Color(0xff007AFF),
               ),
             ),
-            InkWell(
-              onTap: () {},
-              child: Image.asset(
-                'assets/images/ic_setting.png',
-                width: 70,
-                height: 70,
-              ),
-            ),
+            // InkWell(
+            //   onTap: () {},
+            //   child: Image.asset(
+            //     'assets/images/ic_setting.png',
+            //     width: 70,
+            //     height: 70,
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -834,10 +853,12 @@ class _HomeState extends State<Home> {
               Map<String, dynamic> chatRoomInfoMap = {
                 "users": [myUserName, data["username"]],
               };
+
               print('created channel: $chatRoomId');
               await DatabaseMethods()
                   .createChatRoom(chatRoomId, chatRoomInfoMap);
-
+              _dataController.listenForNewMessages(
+                  chatRoomId, data["username"], user_native_lans);
               await Get.to(
                   ChatPage(
                     userId: data['Id'],
@@ -930,10 +951,10 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
+    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
     name = "${querySnapshot.docs[0]["Name"]}";
     profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
-    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
     String key = widget.chatRoomId + widget.myUsername;
 

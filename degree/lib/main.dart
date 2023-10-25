@@ -1,7 +1,9 @@
-import 'package:degree/pages/select_languages.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/pages/home.dart';
+import 'package:degree/pages/register.dart';
 import 'package:degree/pages/splash_screen.dart';
+import 'package:degree/service/auth.dart';
 import 'package:degree/service/model/Customer.dart';
-import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -56,16 +58,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: FutureBuilder(
-      //     future: AuthMethods().getcurrentUser(),
-      //     builder: (context, AsyncSnapshot<dynamic> snapshot) {
-      //       if (snapshot.hasData) {
-      //         return Home();
-      //       } else {
-      //         return Register();
-      //       }
-      //     }),
-      home: SplashScreen(),
+      home: FutureBuilder(
+          future: AuthMethods().getcurrentUser(),
+          builder: (context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasData) {
+              return Home();
+            } else {
+              return Register();
+            }
+          }),
+      //home: SplashScreen(),
       //home: LogIn(),
     );
   }
