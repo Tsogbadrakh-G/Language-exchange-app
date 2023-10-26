@@ -27,14 +27,69 @@ class DataController extends GetxController {
       email = '';
 
   List<String> native_lans = List.empty(growable: true);
-
-  RxList<Chat> audioMessages = RxList.empty(growable: true);
-
+  RxInt unreadChats = 0.obs;
   // Customer? getUser() {
   //   // return userBox.get('owner');
   //   print(userBox.values);
   //   return userBox.values.toList()[0];
   // }
+  final firestoreInstance = FirebaseFirestore.instance;
+  RxList<Chat> audioMessages = RxList.empty(growable: true);
+  RxList<Chat> missedMessages = RxList.empty(growable: true);
+
+  void getChatRoomIds() async {
+    QuerySnapshot querySnapshot =
+        await firestoreInstance.collection('chatrooms').get();
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String username = doc.id.replaceAll(myusername, "");
+      username = username.replaceAll("_", "");
+      // log('user name: $username');
+      QuerySnapshot chatSnapshot = await firestoreInstance
+          .collection('chatrooms')
+          .doc(doc.id)
+          .collection('chats')
+          .get();
+
+      chatSnapshot.docs.forEach((chatDoc) {
+        Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
+
+        Chat ret;
+
+        if (val['type'] == 'request') {
+          String callStatus = '';
+          if (val['sendBy'] == myusername)
+            callStatus = 'outbound';
+          else if (val['rejected'] as bool == true)
+            callStatus = 'missed';
+          else if (val['accept'] as bool == true)
+            callStatus = 'inbound';
+          else
+            callStatus = 'missed';
+
+          int year = int.parse(val['ts'].toString().substring(14, 18));
+          int month = int.parse(val['ts'].toString().substring(8, 10));
+          int day = int.parse(val['ts'].toString().substring(11, 13));
+          int hour = int.parse(val['ts'].toString().substring(0, 2));
+          int min = int.parse(val['ts'].toString().substring(3, 5));
+          ret = Chat(
+              id: val['id'].toString(),
+              message: val['message'].toString(),
+              chatuserName: val['sendBy'].toString(),
+              callStatus: callStatus,
+              time: val['ts'].toString(),
+              channel: doc.id,
+              officialTime: DateTime(year, month, day, hour, min));
+          audioMessages.add(ret);
+          if (callStatus == 'missed') missedMessages.add(ret);
+        }
+
+        audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
+        missedMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
+      });
+
+      print('audio chats len : ${audioMessages.length}');
+    }
+  }
 
   Map<String, bool> exitedForEachChannel = Map();
   Map<String, bool> exitedForEachChannel_Voice = Map();
@@ -59,8 +114,7 @@ class DataController extends GetxController {
     //         email: email));
   }
 
-  StreamSubscription<Map<String, dynamic>>? lastMessageStream;
-  Map<String, dynamic>? lastMessageData;
+  //Map<String, dynamic>? lastMessageData;
 
   // updateChatReadState(String chatId, String channel) async {
   //   try {
@@ -75,6 +129,26 @@ class DataController extends GetxController {
   //   } catch (e) {
   //     print('Error updating chat pair: $e');
   //   }
+  // }
+  // Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  //   return firestore
+  //       .collection('chatrooms')
+  //       .doc(chatroomId)
+  //       .snapshots()
+  //       .map((chatroomSnapshot) {
+  //     if (chatroomSnapshot.exists) {
+  //       lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
+  //       print('listening a last message in Chat Page:$lastMessageData');
+  //       // Return the last message data as a stream
+  //       return lastMessageData ?? {};
+  //     } else {
+  //       print('none here');
+  //       // Return an empty map if the chatroom document doesn't exist
+  //       return {};
+  //     }
+  //   });
   // }
 
   void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap,
@@ -94,40 +168,17 @@ class DataController extends GetxController {
   }
 
 //Listening last chat
-  void startListeningToLastMessage(
-      String chatroomId, String myUserName, String ousername) {
-    lastMessageStream =
-        listenToLastMessage(chatroomId).listen((lastMessageData) {
-      print('exitedFromThisChannel ${exitedForEachChannel[ousername]}');
-      // Handle updates to the last message data here
-      if (lastMessageData['read'] == false &&
-          lastMessageData['lastMessageSendBy'] == ousername &&
-          exitedForEachChannel[ousername] == false) {
-        setLastMessage(
-            chatroomId, lastMessageData, true, this.myusername, ousername);
-      }
-    });
-  }
+  void CheckToLastMessage(String chatroomId, String myUserName,
+      String ousername, bool read, String sendBy, dynamic lastMessageData) {
+    print('check ${exitedForEachChannel[ousername]}');
 
-  Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    return firestore
-        .collection('chatrooms')
-        .doc(chatroomId)
-        .snapshots()
-        .map((chatroomSnapshot) {
-      if (chatroomSnapshot.exists) {
-        lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
-        print('listening a last message in Chat Page:$lastMessageData');
-        // Return the last message data as a stream
-        return lastMessageData ?? {};
-      } else {
-        print('none here');
-        // Return an empty map if the chatroom document doesn't exist
-        return {};
-      }
-    });
+    bool exited = exitedForEachChannel[ousername] ?? true;
+    // print('exited $exited, username: $ousername, sendBy: $sendBy');
+    if (!read && sendBy == ousername && !exited) {
+      setLastMessage(
+          chatroomId, lastMessageData, true, this.myusername, ousername);
+    }
+    // });
   }
 
   addMessage(String chatRoomId, String text, String from, String transto,
@@ -154,13 +205,20 @@ class DataController extends GetxController {
         "imgUrl": this.picUrl,
         //"missed": false
       };
+      print('room $chatRoomId');
 
+      DocumentSnapshot ds = await FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(chatRoomId)
+          .get();
+      Map<String, dynamic>? lastMessageData = ds.data() as Map<String, dynamic>;
+
+      print('lastmessage dta: $lastMessageData');
       int to = 0;
 
-      if (lastMessageData != null &&
-          lastMessageData!["lastMessage"] is String) {
+      if (lastMessageData != null && lastMessageData["lastMessage"] is String) {
         //log('$lastMessageData');
-        to = lastMessageData!['to_msg_${ousername}'] + 1;
+        to = lastMessageData['to_msg_${ousername}'] + 1;
       } else
         to = 1;
 
@@ -283,6 +341,12 @@ class DataController extends GetxController {
           //   audioMessages.add(ret);
           //   print('call history added');
           // }
+          if (messageData["type"] == 'request') {
+            audioMessages.clear();
+            missedMessages.clear();
+            getChatRoomIds();
+          }
+
           if (messageData["type"] == 'request' &&
               messageData["sendBy"] != myusername &&
               messageData["rejected"] as bool == false &&
@@ -381,7 +445,6 @@ class DataController extends GetxController {
                 }
               },
               button2: () async {
-                Get.back();
                 try {
                   final chatPairRef = FirebaseFirestore.instance
                       .collection('chatrooms')
@@ -394,6 +457,7 @@ class DataController extends GetxController {
                 } catch (e) {
                   print('Error updating chat pair: $e');
                 }
+                Get.back();
               },
               imgAsset: 'alert/alert_reminder',
               button1Text: 'Дуудлага авах 🤙',

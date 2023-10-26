@@ -27,9 +27,10 @@ class _HomeState extends State<Home> {
   DataController _dataController = Get.find();
   bool search = false;
   String? myName, myProfilePic, myUserName, myEmail, myId;
-  Stream? chatRoomsStream;
+  Stream<QuerySnapshot<Object?>>? chatRoomsStream;
   PageController controller = PageController();
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
+  StreamSubscription? chatRoomListSubscription;
   FocusNode _focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
 
@@ -75,6 +76,12 @@ class _HomeState extends State<Home> {
   ontheload() async {
     await getthesharedpref();
     chatRoomsStream = await DatabaseMethods().getChatRooms();
+    chatRoomListSubscription = chatRoomsStream!.asBroadcastStream().listen((e) {
+      _dataController.unreadChats.value = e.docs
+          .map((e) => e['to_msg_$myUserName'])
+          .toList()
+          .reduce((value, element) => value + element);
+    });
     setState(() {});
     [Permission.microphone, Permission.camera, Permission.photos].request();
     final firestoreInstance = FirebaseFirestore.instance;
@@ -91,7 +98,7 @@ class _HomeState extends State<Home> {
           List<String>.from(querySnapshot.docs[0]["native_lans"]);
       _dataController.listenForNewMessages(doc.id, username, user_native_lans);
     }
-    print('listening all');
+    // print('listening all');
   }
 
   getthesharedpref() async {
@@ -121,6 +128,7 @@ class _HomeState extends State<Home> {
     }
   }
 
+  int temp = 0;
   Widget ChatRoomList() {
     return StreamBuilder(
         stream: chatRoomsStream,
@@ -135,6 +143,20 @@ class _HomeState extends State<Home> {
                       physics: ClampingScrollPhysics(),
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data.docs[index];
+
+                        String username = ds.id
+                            .replaceAll("_", "")
+                            .replaceAll(myUserName!, "");
+                        _dataController.CheckToLastMessage(
+                            ds.id,
+                            myUserName!,
+                            username,
+                            ds["read"],
+                            ds["lastMessageSendBy"],
+                            ds.data() as Map<String, dynamic>);
+
+                        // print(
+                        //     'unread chats: ${_dataController.unreadChats.value}');
 
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
@@ -242,7 +264,7 @@ class _HomeState extends State<Home> {
   // }
 
   Widget DrawerBuilder(String name) {
-    print('my profile in drawer: $myProfilePic');
+    // print('my profile in drawer: $myProfilePic');
     return Drawer(
       width: 330,
       elevation: 30,
@@ -490,9 +512,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print('build home page');
+    print('build home page $search');
 
     return Scaffold(
+      backgroundColor: Colors.white,
       key: _globalKey,
       appBar: HomeAppbar(),
       drawer: DrawerBuilder(myName ?? _dataController.myname),
@@ -503,13 +526,13 @@ class _HomeState extends State<Home> {
           titleSpacing: 0,
           automaticallyImplyLeading: false,
           title: Container(
-            height: 30,
+            //  height: 20,
             decoration: BoxDecoration(
                 color: Color.fromARGB(255, 205, 205, 206),
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
-              // cursorHeight: 20,
+              // cursorHeight: 18,
               controller: textEditingController,
               focusNode: _focusNode,
               textAlign: search ? TextAlign.start : TextAlign.center,
@@ -626,15 +649,43 @@ class _HomeState extends State<Home> {
                 height: 80,
               ),
             ),
-            InkWell(
-              onTap: () {},
-              child: Image.asset(
-                'assets/images/ic_chat.png',
-                width: 80,
-                height: 80,
-                color: Color(0xff007AFF),
-              ),
-            ),
+            Obx(() {
+              // print(
+              //     'build unread chats app bar ${_dataController.unreadChats.value}');
+              return Stack(
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: Image.asset(
+                      'assets/images/ic_chat.png',
+                      width: 80,
+                      height: 80,
+                      color: Color(0xff007AFF),
+                    ),
+                  ),
+                  if (_dataController.unreadChats.value > 0) ...[
+                    Positioned(
+                        top: 5,
+                        //left: 10,
+                        right: 20,
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Text(
+                            '${_dataController.unreadChats.value}',
+                            style: TextStyle(
+                                fontSize: 8, color: Color(0xffFEFFFE)),
+                          ),
+                        )),
+                  ],
+                ],
+              );
+            }),
+
             // InkWell(
             //   onTap: () {},
             //   child: Image.asset(
@@ -663,12 +714,6 @@ class _HomeState extends State<Home> {
         },
         child: Column(children: [
           Container(
-            decoration: BoxDecoration(
-                // border: Border(
-                //     bottom: BorderSide(
-                //   color: Colors.black,
-                // )),
-                ),
             padding: const EdgeInsets.only(
                 left: 20.0, right: 20.0, top: 30.0, bottom: 10.0),
             child: Column(
@@ -824,11 +869,11 @@ class _HomeState extends State<Home> {
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
     String key = chatroomId + myUserName!;
 
-    if (usersBox.get(key) != null)
-      print(
-          'user  selected lans $usrId: ${usersBox.get(key)!.trans_from_voice}');
-    else {
-      print('user: $usrId is null');
+    // if (usersBox.get(key) != null)
+    // print(
+    //     'user  selected lans $usrId: ${usersBox.get(key)!.trans_from_voice}');
+    if (usersBox.get(key) == null) {
+      //   print('user: $usrId is null');
       usersBox.put(
           chatroomId,
           Customer(
@@ -923,6 +968,13 @@ class _HomeState extends State<Home> {
           );
         });
   }
+
+  @override
+  void dispose() {
+    chatRoomListSubscription?.cancel();
+    chatRoomListSubscription = null;
+    super.dispose();
+  }
 }
 
 class ChatRoomListTile extends StatefulWidget {
@@ -959,13 +1011,13 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     String key = widget.chatRoomId + widget.myUsername;
 
     if (usersBox.get(key) != null) {
-      print('user  selected lans ${widget.chatRoomId} ');
-      print(
-          'from msg: ${usersBox.get(key)!.trans_from_msg}, to msg:${usersBox.get(key)!.trans_to_msg},  ');
-      print(
-          'from voice: ${usersBox.get(key)!.trans_from_voice}, to voice:${usersBox.get(key)!.trans_to_voice}');
+      // print('user  selected lans ${widget.chatRoomId} ');
+      // print(
+      //     'from msg: ${usersBox.get(key)!.trans_from_msg}, to msg:${usersBox.get(key)!.trans_to_msg},  ');
+      // print(
+      //     'from voice: ${usersBox.get(key)!.trans_from_voice}, to voice:${usersBox.get(key)!.trans_to_voice}');
     } else {
-      print('user: ${widget.chatRoomId} is null');
+      //   print('user: ${widget.chatRoomId} is null');
       usersBox.put(
           key,
           Customer(
@@ -1008,8 +1060,13 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               decoration: BoxDecoration(
-                  //border: Border.all(),
-                  color: Color.fromARGB(255, 225, 222, 222),
+                  // border: Border(
+                  //   bottom: BorderSide(
+                  //     color: Color(0xffBEBEBE),
+                  //     width: 0.5,
+                  //   ),
+                  // ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(20))),
               width: double.infinity,
               child: Row(
@@ -1063,13 +1120,12 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 : widget.lastMessage,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              //  color: true ? Color(0xff848484) : Color(0xff2675EC),
                               color: widget.sendBy == widget.myUsername
                                   ? Color(0xff848484)
                                   : widget.read
                                       ? Color(0xff848484)
                                       : Color(0xff2675ec),
-                              fontFamily: "Gilroy",
+                              fontFamily: "Nunito",
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1105,7 +1161,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           child: Text(
                             '${widget.to_msg_num}',
                             style: const TextStyle(
-                              fontFamily: "Gilroy",
+                              fontFamily: "Nunito",
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,

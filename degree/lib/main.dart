@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/home.dart';
+import 'package:degree/pages/login.dart';
 import 'package:degree/pages/register.dart';
 import 'package:degree/pages/splash_screen.dart';
 import 'package:degree/service/auth.dart';
@@ -20,18 +21,6 @@ void main() async {
   Hive.init(appDir.path);
   Hive.registerAdapter(CustomerAdapter());
   usersBox = await Hive.openBox('testBox');
-  // Map<String, String> val = Map();
-  // val['ts'] = '12:20 , 10/24/2023';
-  // int year = int.parse(val['ts'].toString().substring(14, 18));
-  // int month = int.parse(val['ts'].toString().substring(8, 10));
-  // int day = int.parse(val['ts'].toString().substring(11, 13));
-  // int hour = int.parse(val['ts'].toString().substring(0, 2));
-  // int min = int.parse(val['ts'].toString().substring(3, 5));
-  // print('time: $year,');
-  // print('month: $month,');
-  // print('day: $day');
-  // print('hour: $hour');
-  // print('min: $min');
 
   // await Firebase.initializeApp(
   //     name: 'App', options: DefaultFirebaseOptions.currentPlatform);
@@ -40,7 +29,7 @@ void main() async {
 
   runApp(const MyApp());
 
-  Get.put(DataController());
+  Get.put(DataController()).getChatRoomIds();
 
   runApp(const MyApp());
 }
@@ -58,17 +47,17 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FutureBuilder(
-          future: AuthMethods().getcurrentUser(),
-          builder: (context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.hasData) {
-              return Home();
-            } else {
-              return Register();
-            }
-          }),
+      // home: FutureBuilder(
+      //     future: AuthMethods().getcurrentUser(),
+      //     builder: (context, AsyncSnapshot<dynamic> snapshot) {
+      //       if (snapshot.hasData) {
+      //         return Home();
+      //       } else {
+      //         return Register();
+      //       }
+      //     }),
       //home: SplashScreen(),
-      //home: LogIn(),
+      home: LogIn(),
     );
   }
 }

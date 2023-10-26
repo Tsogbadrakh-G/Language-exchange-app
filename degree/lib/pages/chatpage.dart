@@ -52,8 +52,11 @@ class _ChatPageState extends State<ChatPage> {
     await getAndSetMessages();
     _dataController.exitedForEachChannel[widget.username] = false;
 
-    _dataController.startListeningToLastMessage(
-        widget.channel, myUserName!, widget.username);
+    Map<String, dynamic> lastMessageInfoMap = {
+      "read": true,
+      "to_msg_$myUserName": 0,
+    };
+    DatabaseMethods().updateLastMessageSend(widget.channel, lastMessageInfoMap);
 
     setState(() {});
   }
@@ -130,11 +133,14 @@ class _ChatPageState extends State<ChatPage> {
                   reverse: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
-                    if (ds['type'] == 'text')
+                    if (ds['type'] == 'text') {
+                      print('text: ${ds['message']}');
                       return chatMessageTile(
                           ds["message"], myUserName == ds["sendBy"]);
-                    else
+                    } else {
+                      print('audio');
                       return Offstage();
+                    }
                   })
               : Center(
                   child: CircularProgressIndicator(),
@@ -146,8 +152,6 @@ class _ChatPageState extends State<ChatPage> {
     messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
     setState(() {});
   }
-
-  //List<String> voice_out_lans = [];
 
   List<String> chat_out_lans = [];
   List<String> out_lans = [];
