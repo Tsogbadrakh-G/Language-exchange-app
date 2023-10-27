@@ -67,6 +67,9 @@ abstract class FirebaseUtils {
     try {
       // final box = Hive.box(hiveBoxName);
       final fcmToken = await FirebaseMessaging.instance.getToken();
+      print(fcmToken);
+      // FirebaseMessaging.instance
+      //     .sendMessage(to: fcmToken, data: {'message': 'mnessage'});
 
       // Token? token = box.get('token') as Token?;
       // if (fcmToken != null) {

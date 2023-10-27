@@ -1,12 +1,10 @@
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/pages/home.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import '../models/Chat.dart';
+
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 
 class History_list_screen extends StatefulWidget {
@@ -75,12 +73,13 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
-    name = "${querySnapshot.docs[0]["Name"]}";
-    profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
-    id = "${querySnapshot.docs[0]["Id"]}";
-    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+    final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
+    name = "${user["Name"]}";
+    profilePicUrl = "${user["Photo"]}";
+    id = "${user["Id"]}";
+    user_native_lans = List<String>.from(user["native_lans"]);
 
-    print('user info: ${querySnapshot.docs[0]}');
+    print('user info: ${user}');
 
     //String key = widget.chatRoomId + widget.myUsername;
   }

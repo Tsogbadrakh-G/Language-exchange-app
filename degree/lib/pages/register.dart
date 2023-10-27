@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'package:degree/service/Controller.dart';
+import 'package:degree/service/model/somni_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'home.dart';
 import '../service/database.dart';
 import 'package:random_string/random_string.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -27,6 +29,11 @@ class _Register extends State<Register> {
   FocusNode focusNode3 = FocusNode();
   FocusNode focusNode4 = FocusNode();
 
+  bool _isValidMail = true;
+  bool _isEmptyName = false;
+  bool _isEmptyPass = false;
+  bool _isEmptyPassConfirm = false;
+
   final _formkey = GlobalKey<FormState>();
   var args;
 
@@ -37,8 +44,28 @@ class _Register extends State<Register> {
     super.initState();
   }
 
+  void Validation() {
+    _isValidMail = EmailValidator.validate(mailcontroller.text);
+    if (namecontroller.text.isEmpty)
+      _isEmptyName = true;
+    else
+      _isEmptyName = false;
+    if (passwordcontroller.text.isEmpty)
+      _isEmptyPass = true;
+    else
+      _isEmptyPass = false;
+    if (confirmPasswordcontroller.text.isEmpty)
+      _isEmptyPassConfirm = true;
+    else
+      _isEmptyPassConfirm = false;
+
+    print(
+        'validation name $_isEmptyName, pass: $_isEmptyPass, cpass: $_isEmptyPassConfirm, mail: $_isValidMail');
+  }
+
   registration() async {
-    if (password != "" && password == confirmPassword) {
+    if (password == confirmPassword) {
+      print('register');
       try {
         email = email.toLowerCase().trim();
 
@@ -102,10 +129,11 @@ class _Register extends State<Register> {
                 style: TextStyle(fontSize: 18.0),
               )));
         }
-        log('sign up exception: $e');
+        print('sign up exception: ${e.code}');
       }
-    }
-    log('diiferent pass');
+    } else
+      SomniAlerts.showMyDialog(context,
+          'Таны оруулсан нууц үг болон баталгаажуулсан нууц үг ижилхэн эсэхийг шалгана уу!');
   }
 
   @override
@@ -144,34 +172,39 @@ class _Register extends State<Register> {
           height: double.infinity,
           child: SingleChildScrollView(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          width: double.infinity,
-                          padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                          child: Text(
-                            "Бүртгүүлэх ✌️",
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 27,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff000000),
-                              height: 37 / 37,
-                            ),
-                            textAlign: TextAlign.left,
-                          )),
-                      SizedBox(
-                        height: 20,
-                      ),
-                    ],
-                  ),
+                // Container(
+                //   width: double.infinity,
+                //   child: Column(
+                //     children: [
+                //       SizedBox(
+                //         height: 10,
+                //       ),
+                //       Container(
+                //           margin: EdgeInsets.symmetric(horizontal: 20),
+                //           width: double.infinity,
+                //           padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                //           child: Text(
+                //             "Бүртгүүлэх ✌️",
+                //             style: const TextStyle(
+                //               fontFamily: "Outfit",
+                //               fontSize: 27,
+                //               fontWeight: FontWeight.w600,
+                //               color: Color(0xff000000),
+                //               height: 37 / 37,
+                //             ),
+                //             textAlign: TextAlign.left,
+                //           )),
+                //       SizedBox(
+                //         height: 20,
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                Image.asset(
+                  'assets/images/ic_splash.png',
+                  scale: 1.5,
                 ),
                 SizedBox(
                   height: 20,
@@ -184,201 +217,181 @@ class _Register extends State<Register> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Container(
-
-                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     'Нэр',
-                        //     style: TextStyle(fontWeight: FontWeight.w600),
-                        //   ),
-                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           child: TextFormField(
                             focusNode: focusNode1,
                             textAlignVertical: TextAlignVertical.center,
                             controller: namecontroller,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Enter Name';
-                              }
-                              return null;
-                            },
+                            // validator: (value) {
+                            //   if (value == null || value.isEmpty) {
+                            //     return 'Please Enter Name';
+                            //   }
+                            //   return null;
+                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide:
-                                    BorderSide(width: 2, color: Colors.black38),
+                                    BorderSide(width: 1, color: Colors.black38),
                               ),
                               focusedBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide: BorderSide(
-                                  width: 2,
-                                  color: Color(0xff2675EC),
+                                  width: 1.5,
+                                  color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нэр",
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               border: InputBorder.none,
-                              // prefixIcon: Icon(
-                              //   Icons.person_outline,
-                              //   color: Color(0xFF7f30fe),
-                              // ),
                             ),
                           ),
                         ),
+                        if (_isEmptyName)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            width: double.infinity,
+                            child: Text(
+                              'Нэрээ оруулна уу.',
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            ),
+                          ),
                         SizedBox(
                           height: 25,
                         ),
-                        // Container(
-                        //
-                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     'Имэйл',
-                        //     style: TextStyle(fontWeight: FontWeight.w600),
-                        //   ),
-                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         width: 1.0, color: Color(0xff8E8383)),
-                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode2,
                             textAlignVertical: TextAlignVertical.center,
                             controller: mailcontroller,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Enter E-mail';
-                              }
-                              return null;
-                            },
+                            // validator: (value) {
+                            //   if (value == null || value.isEmpty) {
+                            //     return 'Please Enter E-mail';
+                            //   }
+                            //   return null;
+                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide:
-                                    BorderSide(width: 2, color: Colors.black38),
+                                    BorderSide(width: 1, color: Colors.black38),
                               ),
                               focusedBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide: BorderSide(
-                                  width: 2,
-                                  color: Color(0xff2675EC),
+                                  width: 1.5,
+                                  color: Colors.black87,
                                 ),
                               ),
                               hintText: "Имэйл",
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               border: InputBorder.none,
-                              // prefixIcon: Icon(
-                              //   Icons.mail_outline,
-                              //   color: Color(0xFF7f30fe),
-                              // ),
                             ),
                           ),
                         ),
+                        if (!_isValidMail)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            width: double.infinity,
+                            child: Text(
+                              'Имэйлээ оруулна уу.',
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            ),
+                          ),
                         SizedBox(
                           height: 25.0,
                         ),
-                        // Container(
-
-                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     'Нууц үг',
-                        //     style: TextStyle(fontWeight: FontWeight.w600),
-                        //   ),
-                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         width: 1.0, color: Color(0xff8E8383)),
-                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode3,
                             textAlignVertical: TextAlignVertical.center,
                             controller: passwordcontroller,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Enter Password';
-                              }
-                              return null;
-                            },
+                            // validator: (value) {
+                            //   if (value == null || value.isEmpty) {
+                            //     return 'Please Enter Password';
+                            //   }
+                            //   return null;
+                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide:
-                                    BorderSide(width: 2, color: Colors.black38),
+                                    BorderSide(width: 1, color: Colors.black38),
                               ),
                               focusedBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide: BorderSide(
-                                  width: 2,
-                                  color: Color(0xff2675EC),
+                                  width: 1.5,
+                                  color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нууц үг",
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               border: InputBorder.none,
-                              // prefixIcon: Icon(
-                              //   Icons.password,
-                              //   color: Color(0xFF7f30fe),
-                              // )
                             ),
                             obscureText: true,
                           ),
                         ),
+                        if (_isEmptyPass)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            width: double.infinity,
+                            child: Text(
+                              'Нууц үгээ оруулна уу.',
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            ),
+                          ),
                         SizedBox(
                           height: 25.0,
                         ),
-                        // Container(
-
-                        //   padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                        //   width: double.infinity,
-                        //   child: Text(
-                        //     'Нууц үг баталгаажуулах',
-                        //     style: TextStyle(fontWeight: FontWeight.w600),
-                        //   ),
-                        // ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         width: 1.0, color: Color(0xff8E8383)),
-                          //     borderRadius: BorderRadius.circular(5)),
                           child: TextFormField(
                             focusNode: focusNode4,
                             textAlignVertical: TextAlignVertical.center,
                             controller: confirmPasswordcontroller,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Enter Confirm Password';
-                              }
-                              return null;
-                            },
+                            // validator: (value) {
+                            //   if (value == null || value.isEmpty) {
+                            //     return 'Please Enter Confirm Password';
+                            //   }
+                            //   return null;
+                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide:
-                                    BorderSide(width: 2, color: Colors.black38),
+                                    BorderSide(width: 1, color: Colors.black38),
                               ),
                               focusedBorder: UnderlineInputBorder(
-                                //<-- SEE HERE
                                 borderSide: BorderSide(
-                                  width: 2,
-                                  color: Color(0xff2675EC),
+                                  width: 1.5,
+                                  color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нууц үг баталгаажуулах",
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               border: InputBorder.none,
-                              // prefixIcon: Icon(
-                              //   Icons.password,
-                              //   color: Color(0xFF7f30fe),
-                              // ),
                             ),
                             obscureText: true,
                           ),
                         ),
+                        if (_isEmptyPassConfirm)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            width: double.infinity,
+                            child: Text(
+                              'Баталгаажуулах нууц үгээ оруулна уу.',
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            ),
+                          ),
                         SizedBox(
                           height: 30.0,
                         ),
@@ -387,49 +400,49 @@ class _Register extends State<Register> {
                   ),
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 10,
                 ),
-                Divider(),
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                   child: Container(
-                    decoration: BoxDecoration(
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.black38, // Shadow color
-                        //     offset: Offset(2, 2), // Shadow position (x, y)
-                        //     blurRadius: 4, // Spread of the shadow
-                        //     spreadRadius: 0, // How much the shadow should expand
-                        //   ),
-                        // ],
-                        ),
+                    decoration: BoxDecoration(),
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_formkey.currentState!.validate()) {
-                          setState(() {
-                            email = mailcontroller.text;
-                            name = namecontroller.text;
-                            password = passwordcontroller.text;
-                            confirmPassword = confirmPasswordcontroller.text;
-                          });
-                        }
+                        setState(() {
+                          Validation();
+                        });
 
-                        registration();
+                        if (!_isEmptyName &&
+                            !_isEmptyPass &&
+                            !_isEmptyPassConfirm &&
+                            _isValidMail) {
+                          if (_formkey.currentState!.validate()) {
+                            setState(() {
+                              email = mailcontroller.text;
+                              name = namecontroller.text;
+                              password = passwordcontroller.text;
+                              confirmPassword = confirmPasswordcontroller.text;
+                            });
+                          }
+                          print('object');
+                          registration();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        backgroundColor: Color(0xff2675EC),
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        backgroundColor: Color(0xff2675EC).withOpacity(0.8),
                       ),
                       child: const Text(
                         'Бүртгүүлэх',
                         style: TextStyle(
-                            decoration: TextDecoration.none,
                             color: Colors.white,
-                            fontSize: 17),
+                            fontFamily: 'Nunito',
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14),
                       ),
                     ),
                   ),

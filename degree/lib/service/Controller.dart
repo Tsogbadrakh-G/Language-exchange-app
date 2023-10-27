@@ -8,6 +8,7 @@ import 'package:degree/models/Chat.dart';
 import 'package:degree/service/database.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:degree/service/model/somni_alert.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -19,12 +20,8 @@ import 'package:dio/dio.dart';
 
 class DataController extends GetxController {
   final dio = Dio();
-  String id = '',
-      myname = '',
-      myusername = '',
-      picUrl = '',
-      key = '',
-      email = '';
+  String id = '', myname = '', myusername = '', key = '', email = '';
+  Rx<String> picUrl = ''.obs;
 
   List<String> native_lans = List.empty(growable: true);
   RxInt unreadChats = 0.obs;
@@ -36,6 +33,9 @@ class DataController extends GetxController {
   final firestoreInstance = FirebaseFirestore.instance;
   RxList<Chat> audioMessages = RxList.empty(growable: true);
   RxList<Chat> missedMessages = RxList.empty(growable: true);
+  List<String> activeChatroomListeners = [];
+
+  String fcmToken = '';
 
   void getChatRoomIds() async {
     QuerySnapshot querySnapshot =
@@ -94,12 +94,12 @@ class DataController extends GetxController {
   Map<String, bool> exitedForEachChannel = Map();
   Map<String, bool> exitedForEachChannel_Voice = Map();
 
-  void SaveUser(String id, String name, String username, String picUrl,
+  void SaveUser(String id, String name, String username, String url,
       String searchKey, String email) {
     this.id = id;
     this.myname = name;
     this.myusername = username;
-    this.picUrl = picUrl;
+    picUrl.value = url;
     this.key = searchKey;
     this.email = email;
 
@@ -202,7 +202,7 @@ class DataController extends GetxController {
         "sendBy": this.myusername,
         "ts": now,
         "time": FieldValue.serverTimestamp(),
-        "imgUrl": this.picUrl,
+        "imgUrl": this.picUrl.value,
         //"missed": false
       };
       print('room $chatRoomId');
@@ -238,9 +238,22 @@ class DataController extends GetxController {
         };
         DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
       });
+      String fcm_user = await getthisUserInfo(ousername, chatRoomId);
+      FirebaseMessaging.instance.sendMessage(
+          to: fcm_user,
+          data: {'Notification title': 'Somni', 'Notification text': message});
     }
   }
 
+  getthisUserInfo(String ousername, String chatroomID) async {
+    ousername = chatroomID.replaceAll("_", "").replaceAll(myusername, "");
+    QuerySnapshot querySnapshot =
+        await DatabaseMethods().getUserInfo(ousername.toUpperCase());
+    final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
+    String fcm = "${user["fcm_$ousername"]}";
+
+    return fcm;
+  }
   // final firestoreInstance = FirebaseFirestore.instance;
   // void getChatRoomIds() async {
   //   QuerySnapshot querySnapshot =
@@ -296,13 +309,16 @@ class DataController extends GetxController {
   //   //setState(() {}); // Notify Flutter to rebuild the UI with the chat room IDs.
   // }
 
+  Map<String, StreamSubscription> NewMessages = Map();
+
   final Set<String> processedMessageIds = Set<String>();
   void listenForNewMessages(
       String channel, String username, List<String> user_native_lans) {
     final CollectionReference messagesCollection =
         FirebaseFirestore.instance.collection('chatrooms/${channel}/chats');
 
-    messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
+    NewMessages[channel] =
+        messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
       snapshot.docChanges.forEach((change) async {
         final messageData = change.doc.data() as Map<String, dynamic>;
 
@@ -341,11 +357,12 @@ class DataController extends GetxController {
           //   audioMessages.add(ret);
           //   print('call history added');
           // }
-          if (messageData["type"] == 'request') {
-            audioMessages.clear();
-            missedMessages.clear();
-            getChatRoomIds();
-          }
+
+          // if (messageData["type"] == 'request') {
+          //   audioMessages.clear();
+          //   missedMessages.clear();
+          //   getChatRoomIds();
+          // }
 
           if (messageData["type"] == 'request' &&
               messageData["sendBy"] != myusername &&

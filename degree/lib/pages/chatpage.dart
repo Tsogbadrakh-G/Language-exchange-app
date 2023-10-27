@@ -38,7 +38,7 @@ class _ChatPageState extends State<ChatPage> {
   getthesharedpref() async {
     myUserName = _dataController.myusername;
     myName = _dataController.myname;
-    myProfilePic = _dataController.picUrl;
+    myProfilePic = _dataController.picUrl.value;
     myEmail = _dataController.email;
 
     // print(

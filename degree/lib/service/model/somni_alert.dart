@@ -2,6 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SomniAlerts {
+  static Future<void> showMyDialog(BuildContext context, String s1) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          actionsPadding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+          contentPadding: EdgeInsets.fromLTRB(20, 20, 10, 10),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('$s1'),
+                //Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Ok',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 114, 159, 226),
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   static Future<void> alertBoxVertical({
     required Widget textWidget,
     required Widget titleWidget,

@@ -1,5 +1,6 @@
 import 'package:degree/pages/register.dart';
 import 'package:degree/service/Controller.dart';
+import 'package:degree/service/model/somni_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -76,50 +77,47 @@ class _OnboardScreen extends State<Select_languages> {
           child: Column(
             children: [
               SizedBox(
-                height: 15,
+                height: 10,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Spacer(),
-                  Image.asset('assets/images/ic_somni.png',
-                      width: (MediaQuery.of(context).size.width - 40) * 2 / 7),
-                  // SizedBox(
-                  //   width: (MediaQuery.of(context).size.width - 40) * 1 / 5,
-                  // ),
-                  Spacer(),
-                  Container(
-                    width: (MediaQuery.of(context).size.width - 40) * 4 / 7,
-                    padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black12),
-                        color: const Color.fromARGB(31, 220, 216, 216),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Text(
-                      'Та ямар хэлээр ярьж чаддаг вэ?',
-                      style: TextStyle(
-                          decoration: TextDecoration.none,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                          height: 1.5),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  Spacer(
-                    flex: 2,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                decoration: BoxDecoration(color: Colors.black12),
-                width: double.infinity,
-                height: 3,
-              ),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     Spacer(),
+              //     Image.asset('assets/images/ic_somni.png',
+              //         width: (MediaQuery.of(context).size.width - 40) * 2 / 7),
+              //     // SizedBox(
+              //     //   width: (MediaQuery.of(context).size.width - 40) * 1 / 5,
+              //     // ),
+              //     Spacer(),
+              //     Container(
+              //       width: (MediaQuery.of(context).size.width - 40) * 4 / 7,
+              //       padding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+              //       margin: EdgeInsets.symmetric(horizontal: 10),
+              //       // decoration: BoxDecoration(
+              //       //     border: Border.all(color: Colors.black12),
+              //       //     color: const Color.fromARGB(31, 220, 216, 216),
+              //       //     borderRadius: BorderRadius.all(Radius.circular(20))),
+              //       child: Text(
+              //         'Та ямар хэлээр ярьж чаддаг вэ?',
+              //         style: TextStyle(
+              //             decoration: TextDecoration.none,
+              //             fontSize: 18,
+              //             fontWeight: FontWeight.w600,
+              //             fontFamily: 'Rubik',
+              //             color: Colors.black,
+              //             height: 1.5),
+              //         textAlign: TextAlign.start,
+              //       ),
+              //     ),
+              //     Spacer(
+              //       flex: 2,
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(
+              //   height: 20,
+              // ),
+
               Container(
                 // decoration: BoxDecoration(
                 //   border: Border(
@@ -130,10 +128,17 @@ class _OnboardScreen extends State<Select_languages> {
                 child: Text(
                   'Өөрийн ярьдаг хэлээ сонгоно уу:',
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500),
+                    color: Colors.black,
+                    fontSize: 17,
+                  ),
                 ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                //decoration: BoxDecoration(color: Colors.black12),
+                width: double.infinity,
+                child: Divider(),
+                // height: 3,
               ),
               Expanded(
                   child: ListView.builder(
@@ -150,7 +155,7 @@ class _OnboardScreen extends State<Select_languages> {
                                     vertical: 10, horizontal: 20),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        width: isSelected[index].value ? 3 : 1,
+                                        width: isSelected[index].value ? 1 : 1,
                                         color: isSelected[index].value
                                             ? Color(0xff2675EC)
                                             : Color(0xff8E8383)),
@@ -158,42 +163,52 @@ class _OnboardScreen extends State<Select_languages> {
                                         ? Color(0xff2675EC).withOpacity(0.3)
                                         : Colors.white,
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(20))),
+                                        BorderRadius.all(Radius.circular(10))),
                                 padding: EdgeInsets.symmetric(
                                     vertical: 18, horizontal: 15),
                                 child: Row(
                                   children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(5),
+                                      child: Image.asset(
+                                        'assets/images/flags/German.png',
+                                        width: 30,
+                                        height: 25,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 14,
+                                    ),
                                     Text(
                                       out_lans[index],
                                       style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    )
+                                          fontSize: 18,
+                                          fontFamily: 'Nunito',
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Spacer(),
+                                    isSelected[index].value
+                                        ? Icon(
+                                            Icons.check_circle_outline,
+                                            color: Color(0xff2675EC),
+                                            size: 23,
+                                          )
+                                        : Offstage()
                                   ],
                                 ),
                               ),
                             ));
                       })),
-              SizedBox(
-                height: 10,
-              ),
               Container(
                 decoration: BoxDecoration(
-                    border: Border(
-                        top: BorderSide(color: Color(0xff8E8383), width: 1))),
-                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                    // border: Border(
+                    //   top: BorderSide(color: Color(0xff8E8383), width: 1),
+                    // ),
+                    ),
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
                 width: double.infinity,
                 child: Container(
-                  decoration: BoxDecoration(
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black38, // Shadow color
-                      //     offset: Offset(2, 2), // Shadow position (x, y)
-                      //     blurRadius: 4, // Spread of the shadow
-                      //     spreadRadius: 0, // How much the shadow should expand
-                      //   ),
-                      // ],
-                      ),
+                  decoration: BoxDecoration(),
                   child: ElevatedButton(
                     onPressed: () {
                       for (var i = 0; i < out_lans.length; i++) {
@@ -201,11 +216,15 @@ class _OnboardScreen extends State<Select_languages> {
                           _dataController.native_lans.add(out_lans[i]);
                       }
 
-                      Get.to(Register());
+                      if (_dataController.native_lans.length == 0)
+                        SomniAlerts.showMyDialog(context,
+                            'Та өөрийн ярьж чаддаг хэлээ сонгоогүй байна.');
+                      else
+                        Get.to(Register());
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
+                          borderRadius: BorderRadius.circular(10)),
                       padding: EdgeInsets.symmetric(vertical: 15),
                       backgroundColor: Color(0xff2675EC),
                     ),
@@ -214,7 +233,8 @@ class _OnboardScreen extends State<Select_languages> {
                       style: TextStyle(
                           decoration: TextDecoration.none,
                           color: Colors.white,
-                          fontSize: 17),
+                          fontSize: 17,
+                          fontWeight: FontWeight.normal),
                     ),
                   ),
                 ),
@@ -236,9 +256,10 @@ class _OnboardScreen extends State<Select_languages> {
       title: Text(
         "Ярих хэлээ сонгох",
         style: TextStyle(
+            fontFamily: 'Rubik',
             color: Color(0Xff2675EC),
             fontSize: 22.0,
-            fontWeight: FontWeight.bold),
+            fontWeight: FontWeight.w600),
       ),
       centerTitle: true,
     );

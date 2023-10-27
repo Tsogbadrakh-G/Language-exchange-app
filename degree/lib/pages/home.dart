@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/pages/call_history_screen.dart';
@@ -8,6 +9,7 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -34,37 +36,6 @@ class _HomeState extends State<Home> {
   FocusNode _focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
 
-  // void startListeningToLastMessage(String chatroomId) {
-  //   lastMessageStream =
-  //       listenToLastMessage(chatroomId).listen((lastMessageData) {
-  //     setState(() {});
-  //     print('Last message data updated in home: $lastMessageData');
-  //   });
-  // }
-
-  // Map<String, dynamic>? lastMessageData;
-  // Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
-  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  //   return firestore
-  //       .collection('chatrooms')
-  //       .doc(chatroomId)
-  //       .snapshots()
-  //       .map((chatroomSnapshot) {
-  //     if (chatroomSnapshot.exists) {
-  //       lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
-
-  //       print('listening in home');
-  //       //print('last listen:$lastMessageData');
-  //       // Return the last message data as a stream
-  //       return lastMessageData ?? {};
-  //     } else {
-  //       // Return an empty map if the chatroom document doesn't exist
-  //       return {};
-  //     }
-  //   });
-  // }
-
   @override
   void initState() {
     ontheload();
@@ -75,38 +46,52 @@ class _HomeState extends State<Home> {
 
   ontheload() async {
     await getthesharedpref();
-    chatRoomsStream = await DatabaseMethods().getChatRooms();
-    chatRoomListSubscription = chatRoomsStream!.asBroadcastStream().listen((e) {
-      _dataController.unreadChats.value = e.docs
-          .map((e) => e['to_msg_$myUserName'])
-          .toList()
-          .reduce((value, element) => value + element);
-    });
+    if (chatRoomsStream != null)
+      chatRoomListSubscription =
+          chatRoomsStream!.asBroadcastStream().listen((e) {
+        _dataController.unreadChats.value = e.docs
+            .map((e) => e['to_msg_$myUserName'])
+            .toList()
+            .reduce((value, element) => value + element);
+      });
     setState(() {});
     [Permission.microphone, Permission.camera, Permission.photos].request();
-    final firestoreInstance = FirebaseFirestore.instance;
 
-    QuerySnapshot querySnapshot =
-        await firestoreInstance.collection('chatrooms').get();
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      String username =
-          doc.id.replaceAll(myUserName ?? _dataController.myusername, "");
-      username = username.replaceAll("_", "");
-      QuerySnapshot querySnapshot =
-          await DatabaseMethods().getUserInfo(username.toUpperCase());
-      user_native_lans =
-          List<String>.from(querySnapshot.docs[0]["native_lans"]);
-      _dataController.listenForNewMessages(doc.id, username, user_native_lans);
-    }
-    // print('listening all');
+    // final firestoreInstance = FirebaseFirestore.instance;
+
+    // QuerySnapshot querySnapshot =
+    //     await firestoreInstance.collection('chatrooms').get();
+    // for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    //   print('last message ids ${doc.id}');
+    //   String username =
+    //       doc.id.replaceAll(myUserName ?? _dataController.myusername, "");
+    //   username = username.replaceAll("_", "");
+    //   QuerySnapshot querySnapshot =
+    //       await DatabaseMethods().getUserInfo(username.toUpperCase());
+    //   user_native_lans =
+    //       List<String>.from(querySnapshot.docs[0]["native_lans"]);
+
+    //   if (!_dataController.activeChatroomListeners.contains(doc.id)) {
+    //     Map<String, dynamic> lastMessageInfoMap = {
+    //       "online": true,
+    //     };
+    //     DatabaseMethods().updateLastMessageSend(doc.id, lastMessageInfoMap);
+    //     print('update last message with ${doc.id}');
+    //     _dataController.activeChatroomListeners.add(doc.id);
+    //     _dataController.listenForNewMessages(
+    //         doc.id, username, user_native_lans);
+    //   }
+    // }
   }
 
   getthesharedpref() async {
     myUserName = _dataController.myusername;
     myName = _dataController.myname;
-    myProfilePic = _dataController.picUrl;
+    myProfilePic = _dataController.picUrl.value;
     myEmail = _dataController.email;
     myId = _dataController.id;
+    _dataController.fcmToken = (await FirebaseMessaging.instance.getToken())!;
+    updateUser();
 
     // print(
     //     'name ${me!.name}, usrname: ${me!.username}, pic: ${me!.picUrl}, id: ${me!.id}, box: ');
@@ -128,6 +113,33 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> updateUser() async {
+    final CollectionReference usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    await usersCollection
+        .doc(myId)
+        .update({'fcm_$myUserName': _dataController.fcmToken});
+  }
+
+  ListenRoom(String channel) async {
+    String username = channel.replaceAll("_", "").replaceAll(myUserName!, "");
+    username = username.replaceAll("_", "");
+    QuerySnapshot querySnapshot =
+        await DatabaseMethods().getUserInfo(username.toUpperCase());
+    user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+
+    if (!_dataController.activeChatroomListeners.contains(channel)) {
+      // Map<String, dynamic> lastMessageInfoMap = {
+      //   "fcm_$myUserName": _dataController.fcmToken,
+      // };
+      // DatabaseMethods().updateLastMessageSend(channel, lastMessageInfoMap);
+      print('update last message with ${channel}');
+      _dataController.activeChatroomListeners.add(channel);
+      _dataController.listenForNewMessages(channel, username, user_native_lans);
+    }
+  }
+
   int temp = 0;
   Widget ChatRoomList() {
     return StreamBuilder(
@@ -143,7 +155,6 @@ class _HomeState extends State<Home> {
                       physics: ClampingScrollPhysics(),
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data.docs[index];
-
                         String username = ds.id
                             .replaceAll("_", "")
                             .replaceAll(myUserName!, "");
@@ -154,9 +165,7 @@ class _HomeState extends State<Home> {
                             ds["read"],
                             ds["lastMessageSendBy"],
                             ds.data() as Map<String, dynamic>);
-
-                        // print(
-                        //     'unread chats: ${_dataController.unreadChats.value}');
+                        ListenRoom(ds.id);
 
                         return ChatRoomListTile(
                           chatRoomId: ds.id,
@@ -227,20 +236,22 @@ class _HomeState extends State<Home> {
     XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (_file == null) return;
+    String img_name = _file.path.split('/').last;
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
     Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
     File img = File(_file.path);
 
     try {
-      referenceImageToUpload.putFile(img);
+      referenceImageToUpload.putFile(
+          img, SettableMetadata(cacheControl: img_name));
       referenceImageToUpload.getDownloadURL();
     } catch (e) {
       print('upload image to firebase exception: $e');
     }
 
     myProfilePic = await referenceImageToUpload.getDownloadURL();
-    _dataController.picUrl = myProfilePic!;
+    _dataController.picUrl.value = myProfilePic!;
     // await DefaultCacheManager().emptyCache();
     print('uploaded its url :$myProfilePic, userid: $myId');
     await FirebaseFirestore.instance
@@ -250,18 +261,6 @@ class _HomeState extends State<Home> {
     setState(() {});
     // updateUser();
   }
-
-  // updateUser() async {
-  //   Map<String, dynamic> userInfoMap = {
-  //     "Name": myName,
-  //     "E-mail": myEmail,
-  //     "username": myUserName,
-  //     "SearchKey": myUserName!.substring(0, 1).toUpperCase(),
-  //     "Photo": myProfilePic,
-  //     "Id": myId,
-  //   };
-  //   await DatabaseMethods().addUserDetails(userInfoMap, myId!);
-  // }
 
   Widget DrawerBuilder(String name) {
     // print('my profile in drawer: $myProfilePic');
@@ -332,14 +331,15 @@ class _HomeState extends State<Home> {
                                       onDoubleTap: selectedImage,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
-                                        child: Image(
-                                          image: NetworkImage(
-                                            myProfilePic!,
-                                          ),
-                                          height: 100,
-                                          width: 100,
-                                          fit: BoxFit.cover,
-                                        ),
+                                        child: Obx(() {
+                                          return CachedNetworkImage(
+                                            imageUrl:
+                                                _dataController.picUrl.value,
+                                            height: 100,
+                                            width: 100,
+                                            fit: BoxFit.cover,
+                                          );
+                                        }),
                                       ),
                                     ),
                               // Positioned.fill(
@@ -435,6 +435,9 @@ class _HomeState extends State<Home> {
                   icon: Icons.logout,
                   myFunction: () async {
                     await FirebaseAuth.instance.signOut();
+                    // FirebaseAuth.instance.authStateChanges().listen((event) {
+                    //   //
+                    // });
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => LogIn()),
                         (Route<dynamic> route) => false);
@@ -902,8 +905,18 @@ class _HomeState extends State<Home> {
               print('created channel: $chatRoomId');
               await DatabaseMethods()
                   .createChatRoom(chatRoomId, chatRoomInfoMap);
-              _dataController.listenForNewMessages(
-                  chatRoomId, data["username"], user_native_lans);
+
+              if (!_dataController.activeChatroomListeners
+                  .contains(chatRoomId)) {
+                _dataController.listenForNewMessages(
+                    chatRoomId, data["username"], user_native_lans);
+              }
+              // Map<String, dynamic> lastMessageInfoMap = {
+              //   "fcm_$myUserName": _dataController.fcmToken,
+              // };
+              // DatabaseMethods()
+              //     .updateLastMessageSend(chatRoomId, lastMessageInfoMap);
+
               await Get.to(
                   ChatPage(
                     userId: data['Id'],
@@ -973,6 +986,16 @@ class _HomeState extends State<Home> {
   void dispose() {
     chatRoomListSubscription?.cancel();
     chatRoomListSubscription = null;
+
+    // _dataController.activeChatroomListeners.forEach((element) {
+    //   _dataController.NewMessages[element]!.cancel();
+
+    //   print('offline $element');
+    //   Map<String, dynamic> lastMessageInfoMap = {
+    //     "online": false,
+    //   };
+    //   DatabaseMethods().updateLastMessageSend(element, lastMessageInfoMap);
+    // });
     super.dispose();
   }
 }

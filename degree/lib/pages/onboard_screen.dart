@@ -26,18 +26,19 @@ class _OnboardScreen extends State<OnboardScreen> {
               height: 100,
             ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-              margin: EdgeInsets.symmetric(horizontal: 40),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black12),
-                  color: const Color.fromARGB(31, 220, 216, 216),
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              // decoration: BoxDecoration(
+              //     border: Border.all(color: Colors.black12),
+              //     color: const Color.fromARGB(31, 220, 216, 216),
+              //     borderRadius: BorderRadius.all(Radius.circular(15))),
               child: Text(
-                'Сайн байна уу! Би бол Эл!',
+                'Сайн байна уу! Би бол Jonsh!',
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.normal,
+                    fontFamily: 'Nunito',
                     color: Colors.black),
                 textAlign: TextAlign.center,
               ),
@@ -58,7 +59,9 @@ class _OnboardScreen extends State<OnboardScreen> {
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 30,
-                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.normal,
                     color: Color(0xff2675EC)),
                 textAlign: TextAlign.center,
               ),
@@ -67,14 +70,16 @@ class _OnboardScreen extends State<OnboardScreen> {
               height: 15,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'Хаана ч хэзээ ч өөрийн хүссэн нэгэнтэйгээ хэл хамаарахгүй харилц.',
                 style: TextStyle(
                     decoration: TextDecoration.none,
-                    fontSize: 16,
+                    color: Colors.black54,
+                    fontFamily: 'Nunito',
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87),
+                    height: 1.5,
+                    fontSize: 15),
                 textAlign: TextAlign.center,
               ),
             ),
