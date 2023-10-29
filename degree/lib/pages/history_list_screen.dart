@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 
 class History_list_screen extends StatefulWidget {
@@ -21,30 +22,51 @@ class _History_list_screen extends State<History_list_screen> {
   Widget build(BuildContext context) {
     return Obx(
       () => CustomRefreshIndicator(
-        builder: (context, child, controller) => child,
-        onRefresh: () async {
-          _dataController.audioMessages.clear();
-          _dataController.missedMessages.clear();
-          _dataController.getChatRoomIds();
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          //decoration: BoxDecoration(border: Border.all()),
-          width: double.infinity,
-          height: double.infinity,
-          child: ListView.builder(
-            itemCount: widget.calls.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ChatRoomListTile(
-                  chatRoomId: widget.calls[index].channel,
-                  myUsername: _dataController.myusername,
-                  read: false,
-                  time: widget.calls[index].time,
-                  callStatus: widget.calls[index].callStatus);
-            },
-          ),
-        ),
-      ),
+          builder: (context, child, controller) => child,
+          onRefresh: () async {
+            log('refrsh');
+            _dataController.audioMessages.clear();
+            _dataController.missedMessages.clear();
+            _dataController.getChatRoomIds();
+          },
+          child: widget.calls.length != 0
+              ? Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  //decoration: BoxDecoration(border: Border.all()),
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: ListView.builder(
+                    itemCount: widget.calls.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ChatRoomListTile(
+                          chatRoomId: widget.calls[index].channel,
+                          myUsername: _dataController.myusername,
+                          read: false,
+                          time: widget.calls[index].time,
+                          callStatus: widget.calls[index].callStatus);
+                    },
+                  ),
+                )
+              : Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('No Recents',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w500)),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      SvgPicture.asset(
+                        _getAssetPath(widget.isAll ? 'outbound' : 'missed'),
+                        height: 22,
+                        width: 22,
+                      ),
+                    ],
+                  ),
+                )),
     );
   }
 }
@@ -217,17 +239,17 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           );
         });
   }
+}
 
-  String _getAssetPath(String type) {
-    String ret = '';
-    switch (type) {
-      case 'missed':
-        ret = 'assets/svg/missed_call.svg';
-      case 'inbound':
-        ret = 'assets/svg/inbound_call.svg';
-      case 'outbound':
-        ret = 'assets/svg/outbound_call.svg';
-    }
-    return ret;
+String _getAssetPath(String type) {
+  String ret = '';
+  switch (type) {
+    case 'missed':
+      ret = 'assets/svg/missed_call.svg';
+    case 'inbound':
+      ret = 'assets/svg/inbound_call.svg';
+    case 'outbound':
+      ret = 'assets/svg/outbound_call.svg';
   }
+  return ret;
 }
