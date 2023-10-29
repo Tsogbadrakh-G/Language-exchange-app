@@ -33,37 +33,36 @@ class _Call_history_screen extends State<Call_history_screen> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            // title: Text('hi'),
-            // actions: [
-            //   const TabBar(
-            //     tabs: [
-            //       Tab(
-            //         text: "Бүгд",
-            //       ),
-            //       Tab(
-            //         text: "Алдсан",
-            //       ),
-            //     ],
-            //     unselectedLabelStyle:
-            //         TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            //     indicatorColor: Color(0xff79D6FB),
-            //     labelColor: Color(0xff79D6FB),
-            //   ),
-            // ],
-            title: const TabBar(
-              tabs: [
-                Tab(
-                  text: "Бүгд",
-                  
+            title: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50),
+              child: Container(
+                width: 200,
+                height: 45,
+                padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                decoration: BoxDecoration(
+                    color: Color(0xff767680).withOpacity(0.12),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: const TabBar(
+                  tabs: [
+                    Tab(
+                      text: "Бүгд",
+                    ),
+                    Tab(
+                      text: "Алдсан",
+                    ),
+                  ],
+                  unselectedLabelStyle: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Nunito'),
+                  indicatorColor: Colors.black,
+                  labelColor: Colors.black,
+                  indicator: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(10)), // Creates border
+                      color: Colors.white),
                 ),
-                Tab(
-                  text: "Алдсан",
-                ),
-              ],
-              unselectedLabelStyle:
-                  TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              indicatorColor: Color(0xff2675EC),
-              labelColor: Color(0xff2675EC),
+              ),
             ),
             centerTitle: true,
           ),
@@ -74,9 +73,7 @@ class _Call_history_screen extends State<Call_history_screen> {
                 isAll: true,
               ),
               History_list_screen(
-                calls: _dataController.missedMessages,
-                isAll: true,
-              ),
+                  calls: _dataController.missedMessages, isAll: false),
               // Center(
               //   child: Text("Calls"),
               // ),
