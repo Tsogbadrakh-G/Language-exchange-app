@@ -1,6 +1,7 @@
 import 'package:degree/pages/onboard_screen.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/model/somni_alert.dart';
+import 'package:degree/util/firebase.dart';
 import 'package:flutter/material.dart';
 import '../service/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -79,6 +80,7 @@ class _LogInState extends State<LogIn> {
       print('name $name, usrname: $username, pic: $pic, id: $id');
 
       Get.to(Home());
+      //FirebaseUtils.main();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         SomniAlerts.showMyDialog(
