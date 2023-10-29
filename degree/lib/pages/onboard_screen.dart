@@ -2,6 +2,7 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/pages/select_languages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 
 class OnboardScreen extends StatefulWidget {
   const OnboardScreen({Key? key}) : super(key: key);
@@ -20,31 +21,35 @@ class _OnboardScreen extends State<OnboardScreen> {
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               height: 100,
             ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              // decoration: BoxDecoration(
-              //     border: Border.all(color: Colors.black12),
-              //     color: const Color.fromARGB(31, 220, 216, 216),
-              //     borderRadius: BorderRadius.all(Radius.circular(15))),
-              child: Text(
-                'Сайн байна уу! Би бол Jonsh!',
-                style: TextStyle(
-                    decoration: TextDecoration.none,
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: 'Nunito',
-                    color: Colors.black),
-                textAlign: TextAlign.center,
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 80),
+              width: double.infinity,
+              child: ClipPath(
+                clipper: MessageClipper(borderRadius: 16),
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 22),
+                  decoration: BoxDecoration(
+                      color: Color.fromARGB(31, 168, 166, 166),
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: Text(
+                    'Сайн байна уу! Би бол Цог!',
+                    style: TextStyle(
+                        decoration: TextDecoration.none,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Agbalumo',
+                        color: Colors.black),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
             ),
             SizedBox(
-              height: 30,
+              height: 20,
             ),
             Image.asset(
               'assets/images/ic_splash.png',
@@ -59,7 +64,7 @@ class _OnboardScreen extends State<OnboardScreen> {
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 30,
-                    fontFamily: 'Nunito',
+                    fontFamily: 'Manrope',
                     fontWeight: FontWeight.w500,
                     fontStyle: FontStyle.normal,
                     color: Color(0xff2675EC)),
@@ -77,7 +82,7 @@ class _OnboardScreen extends State<OnboardScreen> {
                     decoration: TextDecoration.none,
                     color: Colors.black54,
                     fontFamily: 'Nunito',
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                     height: 1.5,
                     fontSize: 15),
                 textAlign: TextAlign.center,
@@ -102,6 +107,8 @@ class _OnboardScreen extends State<OnboardScreen> {
                 child: const Text(
                   'ЭХЛҮҮЛЭХ',
                   style: TextStyle(
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w500,
                       decoration: TextDecoration.none,
                       color: Colors.white,
                       fontSize: 15),
@@ -128,6 +135,8 @@ class _OnboardScreen extends State<OnboardScreen> {
                   'ШУУД НЭВТРЭХ',
                   style: TextStyle(
                       decoration: TextDecoration.none,
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w500,
                       color: Color(0xff2675EC),
                       fontSize: 15),
                 ),
