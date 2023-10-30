@@ -20,14 +20,14 @@ import 'DataAPI.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
+  await Firebase.initializeApp();
+  //FirebaseUtils.main();
   var appDir = await getApplicationSupportDirectory();
   Hive.init(appDir.path);
   Hive.registerAdapter(CustomerAdapter());
   usersBox = await Hive.openBox('testBox');
 
-  //FirebaseUtils.main();
   // await Firebase.initializeApp(
   //     name: 'App', options: DefaultFirebaseOptions.currentPlatform);
 
@@ -37,7 +37,8 @@ void main() async {
 
   Get.put(DataController()).getChatRoomIds();
   await FirebaseMessaging.instance.requestPermission();
-  String? token = await FirebaseMessaging.instance.getAPNSToken();
+  await FirebaseMessaging.instance.setAutoInitEnabled(true);
+  // String? token = await FirebaseMessaging.instance.getAPNSToken();
 
   runApp(const MyApp());
 }
@@ -52,7 +53,8 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'Nunito',
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
       // home: FutureBuilder(
@@ -65,8 +67,9 @@ class MyApp extends StatelessWidget {
       //       }
       //     }),
       //home: Select_languages(),
-      home: SplashScreen(),
-      //home: LogIn(),
+      //home: SplashScreen(),
+
+      home: LogIn(),
     );
   }
 }

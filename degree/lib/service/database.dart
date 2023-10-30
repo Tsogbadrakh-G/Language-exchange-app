@@ -87,4 +87,18 @@ class DatabaseMethods {
         .where("users", arrayContains: myUsername)
         .snapshots();
   }
+
+  void deleteChatroom(String chatroomId) async {
+    try {
+      // Reference to your Firestore collection (replace 'chatrooms' with your collection name).
+      CollectionReference chatrooms =
+          FirebaseFirestore.instance.collection('chatrooms');
+
+      // Use the document ID to delete the chatroom.
+      await chatrooms.doc(chatroomId).delete();
+      print('Chatroom deleted successfully.');
+    } catch (e) {
+      print('Error deleting chatroom: $e');
+    }
+  }
 }

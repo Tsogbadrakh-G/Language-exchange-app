@@ -1,9 +1,11 @@
 import 'dart:developer';
 
+import 'package:degree/service/Controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 
 import '../firebase_options.dart';
 // import '../models/token/token.dart';
@@ -18,6 +20,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
   FirebaseUtils.onFirebaseBackgroundMsg(message);
 }
+
+DataController _dataController = Get.find();
 
 abstract class FirebaseUtils {
   static main() async {
@@ -66,7 +70,9 @@ abstract class FirebaseUtils {
 
     try {
       // final box = Hive.box(hiveBoxName);
-      final fcmToken = await FirebaseMessaging.instance.getToken();
+      var fcmToken = await FirebaseMessaging.instance.getToken();
+      _dataController.fcmToken = fcmToken ?? 'empty';
+      _dataController.updateUserFCMtoken();
       print(fcmToken);
       // FirebaseMessaging.instance
       //     .sendMessage(to: fcmToken, data: {'message': 'mnessage'});

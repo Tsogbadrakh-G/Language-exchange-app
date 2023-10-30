@@ -34,8 +34,28 @@ class DataController extends GetxController {
   RxList<Chat> audioMessages = RxList.empty(growable: true);
   RxList<Chat> missedMessages = RxList.empty(growable: true);
   List<String> activeChatroomListeners = [];
+  RxInt roomsLen = 0.obs;
 
   String fcmToken = '';
+  Future<void> updateUserFCMtoken() async {
+    final CollectionReference usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    await usersCollection.doc(id).update({'fcm_$myusername': fcmToken});
+  }
+
+  Future<void> chatroomsLength() async {
+    int len = 0;
+    QuerySnapshot querySnapshot =
+        await firestoreInstance.collection('chatrooms').get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String username = doc.id.replaceAll(myusername, "");
+      username = username.replaceAll("_", "");
+      len++;
+    }
+    roomsLen.value = len;
+  }
 
   void getChatRoomIds() async {
     QuerySnapshot querySnapshot =
@@ -238,14 +258,18 @@ class DataController extends GetxController {
         };
         DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
       });
-      String fcm_user = await getthisUserInfo(ousername, chatRoomId);
+      String fcm_user = await getthisUserFCM(ousername, chatRoomId);
+      print('send msg');
+      print('user token: $fcm_user');
       FirebaseMessaging.instance.sendMessage(
           to: fcm_user,
+          messageId: 'TESt',
+          messageType: 'text',
           data: {'Notification title': 'Somni', 'Notification text': message});
     }
   }
 
-  getthisUserInfo(String ousername, String chatroomID) async {
+  getthisUserFCM(String ousername, String chatroomID) async {
     ousername = chatroomID.replaceAll("_", "").replaceAll(myusername, "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(ousername.toUpperCase());

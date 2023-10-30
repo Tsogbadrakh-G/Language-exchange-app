@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/model/somni_alert.dart';
+import 'package:degree/util/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -84,7 +85,7 @@ class _Register extends State<Register> {
           "username": updateusername.toUpperCase(),
           "SearchKey": firstletter,
           "Photo":
-              "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a",
+              "https://firebasestorage.googleapis.com/v0/b/language-exchange-app-cf264.appspot.com/o/images%2Fimg_profile.png?alt=media&token=82d48d53-f2d7-4c3c-8daa-930ce1253b72&_gl=1*1c3e9ai*_ga*MTAwMzU1OTkzMi4xNjc4OTc2OTE3*_ga_CW55HF8NVT*MTY5ODQ1ODE1OS41MC4xLjE2OTg0NjM0MTEuMjAuMC4w",
           "Id": Id,
           "native_lans": _dataController.native_lans
         };
@@ -113,6 +114,7 @@ class _Register extends State<Register> {
         )));
 
         Get.to(Home());
+        FirebaseUtils.main();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

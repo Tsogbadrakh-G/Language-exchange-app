@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/pages/call_history_screen.dart';
@@ -9,7 +8,7 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +16,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -35,53 +36,34 @@ class _HomeState extends State<Home> {
   StreamSubscription? chatRoomListSubscription;
   FocusNode _focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
+  RxBool menu = true.obs;
+  //CalendarController _calendarController = CalendarController();
 
   @override
   void initState() {
     ontheload();
     _focusNode.addListener(_handleFocusChange);
-
+    _dataController.chatroomsLength();
     super.initState();
   }
 
   ontheload() async {
     await getthesharedpref();
+    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    log('chat room $chatRoomsStream');
     if (chatRoomsStream != null)
       chatRoomListSubscription =
           chatRoomsStream!.asBroadcastStream().listen((e) {
-        _dataController.unreadChats.value = e.docs
-            .map((e) => e['to_msg_$myUserName'])
-            .toList()
-            .reduce((value, element) => value + element);
+        _dataController.chatroomsLength();
+        var list = e.docs.map((e) {
+          return e['to_msg_$myUserName'];
+        }).toList();
+        if (!list.isEmpty || !(list.length == 0))
+          _dataController.unreadChats.value =
+              list.reduce((value, element) => value + element);
       });
     setState(() {});
     [Permission.microphone, Permission.camera, Permission.photos].request();
-
-    // final firestoreInstance = FirebaseFirestore.instance;
-
-    // QuerySnapshot querySnapshot =
-    //     await firestoreInstance.collection('chatrooms').get();
-    // for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    //   print('last message ids ${doc.id}');
-    //   String username =
-    //       doc.id.replaceAll(myUserName ?? _dataController.myusername, "");
-    //   username = username.replaceAll("_", "");
-    //   QuerySnapshot querySnapshot =
-    //       await DatabaseMethods().getUserInfo(username.toUpperCase());
-    //   user_native_lans =
-    //       List<String>.from(querySnapshot.docs[0]["native_lans"]);
-
-    //   if (!_dataController.activeChatroomListeners.contains(doc.id)) {
-    //     Map<String, dynamic> lastMessageInfoMap = {
-    //       "online": true,
-    //     };
-    //     DatabaseMethods().updateLastMessageSend(doc.id, lastMessageInfoMap);
-    //     print('update last message with ${doc.id}');
-    //     _dataController.activeChatroomListeners.add(doc.id);
-    //     _dataController.listenForNewMessages(
-    //         doc.id, username, user_native_lans);
-    //   }
-    // }
   }
 
   getthesharedpref() async {
@@ -90,36 +72,8 @@ class _HomeState extends State<Home> {
     myProfilePic = _dataController.picUrl.value;
     myEmail = _dataController.email;
     myId = _dataController.id;
-    _dataController.fcmToken = (await FirebaseMessaging.instance.getToken())!;
-    updateUser();
 
-    // print(
-    //     'name ${me!.name}, usrname: ${me!.username}, pic: ${me!.picUrl}, id: ${me!.id}, box: ');
     setState(() {});
-  }
-
-  void _handleFocusChange() {
-    if (_focusNode.hasFocus) {
-      // TextField is currently active (has focus)
-
-      search = true;
-      //print('active textfield search: $search');
-      setState(() {});
-    } else {
-      search = false;
-      //print('inactive textfield search: $search');
-      setState(() {});
-      // TextField is currently inactive (doesn't have focus)
-    }
-  }
-
-  Future<void> updateUser() async {
-    final CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('users');
-
-    await usersCollection
-        .doc(myId)
-        .update({'fcm_$myUserName': _dataController.fcmToken});
   }
 
   ListenRoom(String channel) async {
@@ -129,7 +83,7 @@ class _HomeState extends State<Home> {
         await DatabaseMethods().getUserInfo(username.toUpperCase());
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
-    if (!_dataController.activeChatroomListeners.contains(channel)) { 
+    if (!_dataController.activeChatroomListeners.contains(channel)) {
       // Map<String, dynamic> lastMessageInfoMap = {
       //   "fcm_$myUserName": _dataController.fcmToken,
       // };
@@ -140,49 +94,59 @@ class _HomeState extends State<Home> {
     }
   }
 
-  int temp = 0;
   Widget ChatRoomList() {
     return StreamBuilder(
         stream: chatRoomsStream,
         builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
-              ? Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: snapshot.data.docs.length,
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot ds = snapshot.data.docs[index];
-                        String username = ds.id
-                            .replaceAll("_", "")
-                            .replaceAll(myUserName!, "");
-                        _dataController.CheckToLastMessage(
-                            ds.id,
-                            myUserName!,
-                            username,
-                            ds["read"],
-                            ds["lastMessageSendBy"],
-                            ds.data() as Map<String, dynamic>);
-                        ListenRoom(ds.id);
+          log('snapsot: ${snapshot.hasData}');
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            log('connection waiting');
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (!snapshot.hasData) {
+            return Text('No Data Available');
+          } else {
+            return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: snapshot.data.docs.length,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot ds = snapshot.data.docs[index];
+                      String username =
+                          ds.id.replaceAll("_", "").replaceAll(myUserName!, "");
+                      _dataController.CheckToLastMessage(
+                          ds.id,
+                          myUserName!,
+                          username,
+                          ds["read"],
+                          ds["lastMessageSendBy"],
+                          ds.data() as Map<String, dynamic>);
+                      ListenRoom(ds.id);
 
-                        return ChatRoomListTile(
-                          chatRoomId: ds.id,
-                          lastMessage: ds["lastMessage"],
-                          myUsername: myUserName!,
-                          sendBy: ds["lastMessageSendBy"],
-                          time: ds["lastMessageSendTs"],
-                          read: ds["read"],
-                          to_msg_num: ds['to_msg_$myUserName'],
-                          name: ds['sendByNameFrom'] == myName
-                              ? ds['sendByNameTo']
-                              : ds['sendByNameFrom'],
-                        );
-                      }))
-              : Center(
-                  child: CircularProgressIndicator(),
-                );
+                      log('room id ${ds.id}');
+
+                      return ChatRoomListTile(
+                        chatRoomId: ds.id,
+                        lastMessage: ds["lastMessage"],
+                        myUsername: myUserName!,
+                        sendBy: ds["lastMessageSendBy"],
+                        time: ds["lastMessageSendTs"],
+                        read: ds["read"],
+                        to_msg_num: ds['to_msg_$myUserName'],
+                        name: ds['sendByNameFrom'] == myName
+                            ? ds['sendByNameTo']
+                            : ds['sendByNameFrom'],
+                      );
+                    }));
+          }
+          // return snapshot.hasData
+          //     ?
+
+          //     : Center(child: CircularProgressIndicator());
         });
   }
 
@@ -240,6 +204,7 @@ class _HomeState extends State<Home> {
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
     Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
+
     File img = File(_file.path);
 
     try {
@@ -259,18 +224,33 @@ class _HomeState extends State<Home> {
         .doc(myId ?? _dataController.id)
         .update({"Photo": myProfilePic});
     setState(() {});
-    // updateUser();
+  }
+
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      // TextField is currently active (has focus)
+
+      search = true;
+      //print('active textfield search: $search');
+      setState(() {});
+    } else {
+      search = false;
+      //print('inactive textfield search: $search');
+      setState(() {});
+      // TextField is currently inactive (doesn't have focus)
+    }
   }
 
   Widget DrawerBuilder(String name) {
     // print('my profile in drawer: $myProfilePic');
     return Drawer(
-      width: 330,
+      width: 350,
       elevation: 30,
       backgroundColor: Color(0xFfFFFFFF),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.horizontal(right: Radius.circular(35))),
       child: Container(
+        height: double.infinity,
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.horizontal(right: Radius.circular(35)),
             boxShadow: [
@@ -280,6 +260,7 @@ class _HomeState extends State<Home> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
           child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -317,62 +298,57 @@ class _HomeState extends State<Home> {
                     Row(
                       children: [
                         Container(
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.5))),
+                          width: 100,
+                          height: 80,
                           padding: EdgeInsets.symmetric(horizontal: 5),
                           child: Stack(
                             children: [
                               myProfilePic == null
                                   ? CircularProgressIndicator()
                                   : GestureDetector(
-                                      onDoubleTap: selectedImage,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Obx(() {
-                                          return CachedNetworkImage(
-                                            imageUrl:
-                                                _dataController.picUrl.value,
-                                            height: 100,
-                                            width: 100,
-                                            fit: BoxFit.cover,
-                                          );
-                                        }),
+                                      onLongPress: selectedImage,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20)),
+                                            border: Border.all(
+                                                color: Colors.black
+                                                    .withOpacity(0.5))),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: Obx(() {
+                                            return Image.network(
+                                              _dataController.picUrl.value,
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                            );
+                                          }),
+                                        ),
                                       ),
                                     ),
-                              // Positioned.fill(
-                              //   bottom: -80,
-                              //   right: -90,
-                              //   child: IconButton(
-                              //       onPressed: () {},
-                              //       icon: Icon(
-                              //         Icons.add_a_photo,
-                              //         size: 40,
-                              //       )),
+                              // Positioned(
+                              //   bottom: -10,
+                              //   right: 0,
+                              //   child: Container(
+                              //     padding: EdgeInsets.all(0),
+                              //     decoration: BoxDecoration(
+                              //         borderRadius:
+                              //             BorderRadius.all(Radius.circular(20)),
+                              //         color: Colors.black.withOpacity(1)),
+                              //     child: IconButton(
+                              //         iconSize: 10,
+                              //         onPressed: selectedImage,
+                              //         icon: Icon(
+                              //           Icons.camera_alt,
+                              //           size: 30,
+                              //         )),
+                              //   ),
                               // ),
                             ],
                           ),
                         ),
-
-                        // if (myProfilePic != null) ...[
-                        //   GestureDetector(
-                        //     onDoubleTap: selectedImage,
-                        //     child: CircleAvatar(
-                        //       radius: 64,
-                        //       backgroundImage: MemoryImage(myProfilePic!),
-                        //     ),
-                        //   ),
-                        // ] else ...[
-                        //   GestureDetector(
-                        //     onDoubleTap: selectedImage,
-                        //     child: CircleAvatar(
-                        //       radius: 64,
-                        //       backgroundImage: NetworkImage(myProfilePic!),
-                        //     ),
-                        //   ),
-                        // ],
                         SizedBox(
                           width: 12,
                         ),
@@ -380,7 +356,7 @@ class _HomeState extends State<Home> {
                           child: Text(
                             name,
                             style: const TextStyle(
-                              fontFamily: "Gilroy",
+                              fontFamily: "Manrope",
                               fontSize: 23,
                               fontWeight: FontWeight.w700,
                               color: Color(0xff2675ec),
@@ -395,49 +371,56 @@ class _HomeState extends State<Home> {
                       height: 35,
                     ),
                     DrawerItem(
-                      title: 'Account',
+                      title: 'Хэрэглэгчийн булан',
                       icon: Icons.key,
                       myFunction: () {},
                     ),
                     DrawerItem(
-                      title: 'Chats',
-                      icon: Icons.chat_bubble_outline_outlined,
-                      myFunction: () {},
-                    ),
-                    DrawerItem(
-                      title: 'Notifications',
-                      icon: Icons.notifications_none_outlined,
-                      myFunction: () {},
-                    ),
-                    DrawerItem(
-                      title: 'Data and Storage',
-                      icon: Icons.storage,
-                      myFunction: () {},
-                    ),
-                    DrawerItem(
-                      title: 'Help',
+                      title: 'Тусламж',
                       icon: Icons.help_outline,
                       myFunction: () {},
                     ),
-                    const Divider(
-                      height: 35,
-                      color: Colors.green,
-                    ),
                     DrawerItem(
-                      title: 'Invite a friend',
+                      title: 'Найзаа урих',
                       icon: Icons.people_outline,
                       myFunction: () {},
                     ),
                   ],
+                ),
+                TableCalendar(
+                  headerVisible: true,
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleTextStyle: TextStyle(
+                        fontSize: 18,
+                        color: Color(0xff2675ec),
+                        fontFamily: 'Manrope',
+                        fontWeight: FontWeight.w500),
+                  ),
+                  daysOfWeekHeight: 20,
+                  firstDay: DateTime.utc(2010, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: DateTime.now(),
+                  calendarStyle: CalendarStyle(
+                      weekendTextStyle: TextStyle(
+                          color: Color(0xff2675ec),
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w400),
+                      defaultTextStyle: TextStyle(
+                          color: Color(0xff2675ec),
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w400)),
+                ),
+                Divider(),
+                SizedBox(
+                  height: 10,
                 ),
                 DrawerItem(
                   title: 'Log out',
                   icon: Icons.logout,
                   myFunction: () async {
                     await FirebaseAuth.instance.signOut();
-                    // FirebaseAuth.instance.authStateChanges().listen((event) {
-                    //   //
-                    // });
+
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => LogIn()),
                         (Route<dynamic> route) => false);
@@ -477,10 +460,10 @@ class _HomeState extends State<Home> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        color: Color.fromARGB(255, 218, 216, 215)
-                            .withOpacity(0.3)),
+                    // decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.all(Radius.circular(30)),
+                    //     color: Color.fromARGB(255, 218, 216, 215)
+                    //         .withOpacity(0.3)),
                     child: IconButton(
                         onPressed: () {
                           _globalKey.currentState!.openDrawer();
@@ -490,6 +473,18 @@ class _HomeState extends State<Home> {
                           size: 40,
                           color: Colors.black.withOpacity(0.8),
                         )),
+                    // child: Obx(
+                    //   () => IconButton(
+                    //       onPressed: () {
+                    //         menu.value = !menu.value;
+                    //         _globalKey.currentState!.openDrawer();
+                    //       },
+                    //       icon: Icon(
+                    //         menu.value ? Icons.menu : Icons.cancel_outlined,
+                    //         size: 40,
+                    //         color: Colors.black.withOpacity(0.8),
+                    //       )),
+                    // ),
                   ),
                   Text(
                     "ChatUp",
@@ -504,8 +499,6 @@ class _HomeState extends State<Home> {
                   )
                 ],
               ),
-
-              //Expanded(child: SingleChildScrollView(child: Column(ch),))
             ],
           ),
         ),
@@ -515,7 +508,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print('build home page $search');
+    print('build home page');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -529,11 +522,12 @@ class _HomeState extends State<Home> {
           titleSpacing: 0,
           automaticallyImplyLeading: false,
           title: Container(
-            //  height: 20,
+            //  height: 35,
             decoration: BoxDecoration(
-                color: Color.fromARGB(255, 205, 205, 206),
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            margin: EdgeInsets.symmetric(horizontal: 20),
+              color: Color.fromARGB(255, 205, 205, 206),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: TextField(
               // cursorHeight: 18,
               controller: textEditingController,
@@ -589,8 +583,7 @@ class _HomeState extends State<Home> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 205, 205,
-                        206), // Set the border color when not focused
+                    color: Color.fromARGB(255, 205, 205, 206),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -616,26 +609,37 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        SliverPadding(
-          padding: EdgeInsets.only(top: 10),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                // Build the list of items
-                return search
-                    ? ListView(
-                        padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                        primary: false,
-                        shrinkWrap: true,
-                        children: [...tempSearchStore].map((element) {
-                          return buildResultCard(element);
-                        }).toList())
-                    : ChatRoomList();
-              },
-              childCount: 1, // Number of items in the list
-            ),
-          ),
-        ),
+        Obx(() {
+          if (_dataController.roomsLen == 0)
+            return SliverToBoxAdapter(
+              child: Container(
+                  height: MediaQuery.sizeOf(context).height * 2 / 3,
+                  decoration: BoxDecoration(border: Border.all()),
+                  child: Center(child: Text('no item'))),
+            );
+          else
+            return SliverPadding(
+              padding: EdgeInsets.only(top: 10),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    // Build the list of items
+
+                    return search
+                        ? ListView(
+                            padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                            primary: false,
+                            shrinkWrap: true,
+                            children: [...tempSearchStore].map((element) {
+                              return buildResultCard(element);
+                            }).toList())
+                        : ChatRoomList();
+                  },
+                  childCount: 1, // Number of items in the list
+                ),
+              ),
+            );
+        }),
       ]),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
@@ -911,11 +915,6 @@ class _HomeState extends State<Home> {
                 _dataController.listenForNewMessages(
                     chatRoomId, data["username"], user_native_lans);
               }
-              // Map<String, dynamic> lastMessageInfoMap = {
-              //   "fcm_$myUserName": _dataController.fcmToken,
-              // };
-              // DatabaseMethods()
-              //     .updateLastMessageSend(chatRoomId, lastMessageInfoMap);
 
               await Get.to(
                   ChatPage(
@@ -1064,144 +1063,174 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
-          return GestureDetector(
-            onTap: () async {
-              print('click to ${widget.chatRoomId}');
-              await Get.to(
-                  ChatPage(
-                    userId: id,
-                    name: name,
-                    profileurl: profilePicUrl,
-                    username: username,
-                    channel: widget.chatRoomId,
-                  ),
-                  arguments: user_native_lans);
+          return Slidable(
+            key: Key(widget.chatRoomId),
+            useTextDirection: false,
+            // reminders.remove(reminders[index]);
 
-              setState(() {});
-            },
-            child: Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              decoration: BoxDecoration(
-                  // border: Border(
-                  //   bottom: BorderSide(
-                  //     color: Color(0xffBEBEBE),
-                  //     width: 0.5,
-                  //   ),
-                  // ),
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              width: double.infinity,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+            endActionPane: ActionPane(
+                motion: const ScrollMotion(),
+                extentRatio: 0.3,
                 children: [
-                  profilePicUrl == ""
-                      ? CircularProgressIndicator()
-                      : Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.5)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            // child: CachedNetworkImage(imageUrl: profilePicUrl,width: 70,height: 70,
-                            // errorWidget: (context, url, error) => const CircularProgressIndicator(),
-                            // ),
-                            child: Image.network(
-                              profilePicUrl,
-                              height: 70,
-                              width: 70,
-                              fit: BoxFit.cover,
+                  SlidableAction(
+                    onPressed: (context) {
+                      DatabaseMethods().deleteChatroom(widget.chatRoomId);
+                      // LimeAlerts.alertBox(
+                      //   imgAsset: 'alert/alert_default_info',
+                      //   text: 'alert_del'.tr,
+                      //   onOkTitle: 'delete'.tr,
+                      //   onNoTitle: 'cancel'.tr,
+                      //   onOk: () {
+                      //     Reminders.removeReminder(reminders[index]);
+                      //     Get.back();
+                      //     setState(() {});
+                      //   },
+                      //   onNo: Get.back,
+                      // );
+                    },
+                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    backgroundColor: Color(0xFFFE4A49),
+                    foregroundColor: Colors.white,
+                    icon: CupertinoIcons.delete,
+                    label: 'delete'.tr,
+                  ),
+                ]),
+            child: GestureDetector(
+              onTap: () async {
+                print('click to ${widget.chatRoomId}');
+                await Get.to(
+                    ChatPage(
+                      userId: id,
+                      name: name,
+                      profileurl: profilePicUrl,
+                      username: username,
+                      channel: widget.chatRoomId,
+                    ),
+                    arguments: user_native_lans);
+
+                setState(() {});
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                decoration: BoxDecoration(
+                    // border: Border(
+                    //   bottom: BorderSide(
+                    //     color: Color(0xffBEBEBE),
+                    //     width: 0.5,
+                    //   ),
+                    // ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                width: double.infinity,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    profilePicUrl == ""
+                        ? CircularProgressIndicator()
+                        : Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.black.withOpacity(0.5)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                profilePicUrl,
+                                height: 70,
+                                width: 70,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 5.0,
+                          ),
+                          Text(
+                            widget.name,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          // const SizedBox(
+                          //   height: 5,
+                          // ),
+                          Container(
+                            child: Text(
+                              widget.sendBy == widget.myUsername
+                                  ? "you: " + widget.lastMessage
+                                  : widget.lastMessage,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: widget.sendBy == widget.myUsername
+                                    ? Color(0xff848484)
+                                    : widget.read
+                                        ? Color(0xff848484)
+                                        : Color(0xff2675ec),
+                                fontFamily: "Nunito",
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const SizedBox(
-                          height: 5.0,
-                        ),
                         Text(
-                          widget.name,
+                          widget.time,
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 17.0,
+                              color: Colors.black45,
+                              fontSize: 14.0,
                               fontWeight: FontWeight.w500),
                         ),
-                        // const SizedBox(
-                        //   height: 5,
-                        // ),
-                        Container(
-                          child: Text(
-                            widget.sendBy == widget.myUsername
-                                ? "you: " + widget.lastMessage
-                                : widget.lastMessage,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: widget.sendBy == widget.myUsername
-                                  ? Color(0xff848484)
-                                  : widget.read
-                                      ? Color(0xff848484)
-                                      : Color(0xff2675ec),
-                              fontFamily: "Nunito",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        if (widget.to_msg_num != 0) ...[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 5),
+                            decoration: BoxDecoration(
+                                color: Color(0xff2675EC),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30))),
+                            child: Text(
+                              '${widget.to_msg_num}',
+                              style: const TextStyle(
+                                fontFamily: "Nunito",
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                                height: 13 / 15,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
+                        ] else if (widget.read &&
+                            widget.sendBy == widget.myUsername)
+                          Image.asset(
+                            'assets/images/img_viewed.png',
+                            scale: 1.9,
+                          ),
                       ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.time,
-                        style: TextStyle(
-                            color: Colors.black45,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      if (widget.to_msg_num != 0) ...[
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-                          decoration: BoxDecoration(
-                              color: Color(0xff2675EC),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30))),
-                          child: Text(
-                            '${widget.to_msg_num}',
-                            style: const TextStyle(
-                              fontFamily: "Nunito",
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                              height: 13 / 15,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ] else if (widget.read &&
-                          widget.sendBy == widget.myUsername)
-                        Image.asset(
-                          'assets/images/img_viewed.png',
-                          scale: 1.9,
-                        ),
-                    ],
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           );
@@ -1224,22 +1253,22 @@ class DrawerItem extends StatelessWidget {
     return InkWell(
       onTap: myFunction,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 25),
+        padding: const EdgeInsets.only(bottom: 25, left: 10),
         child: Row(
           children: [
             Icon(
               icon,
               color: Color(0xff2675ec),
-              size: 40,
+              size: 30,
             ),
             const SizedBox(
-              width: 40,
+              width: 20,
             ),
             Expanded(
               child: Text(title,
                   style: const TextStyle(
-                    fontFamily: "Gilroy",
-                    fontSize: 19,
+                    fontFamily: "Manrope",
+                    fontSize: 15,
                     fontWeight: FontWeight.w400,
                     color: Color(0xff2675ec),
                     height: 23 / 19,
