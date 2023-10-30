@@ -129,7 +129,7 @@ class _HomeState extends State<Home> {
         await DatabaseMethods().getUserInfo(username.toUpperCase());
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
-    if (!_dataController.activeChatroomListeners.contains(channel)) {
+    if (!_dataController.activeChatroomListeners.contains(channel)) { 
       // Map<String, dynamic> lastMessageInfoMap = {
       //   "fcm_$myUserName": _dataController.fcmToken,
       // };
