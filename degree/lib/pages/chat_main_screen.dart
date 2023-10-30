@@ -2,6 +2,7 @@ import 'package:degree/pages/chat_room.dart';
 import 'package:degree/pages/history_list_screen.dart' hide ChatRoomListTile;
 
 import 'package:degree/service/Controller.dart';
+import 'package:degree/util/Default_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
@@ -93,7 +94,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
       // DatabaseMethods().updateLastMessageSend(channel, lastMessageInfoMap);
       print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
-      _dataController.listenForNewMessages(channel, username, user_native_lans);
+      _dataController.listenForNewMessages(
+          channel, username, user_native_lans, context);
     }
   }
 
@@ -203,22 +205,25 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (_file == null) return;
-    String img_name = _file.path.split('/').last;
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = referenceRoot.child('images');
-    Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
+    // String img_name = _file.path.split('/').last;
+    // Reference referenceRoot = FirebaseStorage.instance.ref();
+    // Reference referenceDirImages = referenceRoot.child('images');
+    // Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
 
     File img = File(_file.path);
-
+    var time = DateTime.now().millisecondsSinceEpoch.toString();
     try {
-      referenceImageToUpload.putFile(
-          img, SettableMetadata(cacheControl: img_name));
-      referenceImageToUpload.getDownloadURL();
+      await FirebaseStorage.instance.ref('$myUserName/$time.png').putFile(img);
+      // referenceImageToUpload.putFile(
+      //     img, SettableMetadata(cacheControl: img_name));
+      // referenceImageToUpload.getDownloadURL();
     } catch (e) {
       print('upload image to firebase exception: $e');
     }
 
-    myProfilePic = await referenceImageToUpload.getDownloadURL();
+    myProfilePic = await FirebaseStorage.instance
+        .ref('$myUserName/$time.png')
+        .getDownloadURL();
     _dataController.picUrl.value = myProfilePic!;
     // await DefaultCacheManager().emptyCache();
     print('uploaded its url :$myProfilePic, userid: $myId');
@@ -253,161 +258,158 @@ class _Chat_main_screen extends State<Chat_main_screen> {
       shadowColor: Colors.white,
       surfaceTintColor: Colors.white,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(20))),
-      child: Expanded(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
-          child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Settings",
-                          style: const TextStyle(
-                            fontFamily: "Gilroy",
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xff2675ec),
-                            height: 27 / 22,
-                          ),
-                          textAlign: TextAlign.center,
+          borderRadius: BorderRadius.horizontal(right: Radius.circular(0))),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
+        child: SingleChildScrollView(
+          //  physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Settings",
+                        style: const TextStyle(
+                          fontFamily: "Gilroy",
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xff2675ec),
+                          height: 27 / 22,
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            color: Color(0xff2675ec),
-                            size: 25,
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 80,
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Stack(
-                            children: [
-                              myProfilePic == null
-                                  ? CircularProgressIndicator()
-                                  : GestureDetector(
-                                      onLongPress: selectedImage,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20)),
-                                            border: Border.all(
-                                                color: Colors.black
-                                                    .withOpacity(0.5))),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          child: Obx(() {
-                                            return Image.network(
-                                              _dataController.picUrl.value,
-                                              height: 80,
-                                              width: 80,
-                                              fit: BoxFit.cover,
-                                            );
-                                          }),
-                                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Color(0xff2675ec),
+                          size: 25,
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 70,
+                        height: 60,
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Stack(
+                          children: [
+                            myProfilePic == null
+                                ? CircularProgressIndicator()
+                                : GestureDetector(
+                                    onLongPress: selectedImage,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          border: Border.all(
+                                              color: Colors.black
+                                                  .withOpacity(0.5))),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Obx(() {
+                                          return Image.network(
+                                            _dataController.picUrl.value,
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                          );
+                                        }),
                                       ),
                                     ),
-                            ],
+                                  ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontFamily: "Manrope",
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff2675ec),
+                            height: 30 / 23,
                           ),
+                          textAlign: TextAlign.left,
                         ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: const TextStyle(
-                              fontFamily: "Manrope",
-                              fontSize: 23,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xff2675ec),
-                              height: 30 / 23,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 35,
-                    ),
-                    DrawerItem(
-                      title: 'Хэрэглэгчийн булан',
-                      icon: Icons.key,
-                      myFunction: () {},
-                    ),
-                    DrawerItem(
-                      title: 'Тусламж',
-                      icon: Icons.help_outline,
-                      myFunction: () {},
-                    ),
-                    DrawerItem(
-                      title: 'Найзаа урих',
-                      icon: Icons.people_outline,
-                      myFunction: () {},
-                    ),
-                  ],
-                ),
-                TableCalendar(
-                  headerVisible: true,
-                  headerStyle: HeaderStyle(
-                    formatButtonVisible: false,
-                    titleTextStyle: TextStyle(
-                        fontSize: 18,
-                        color: Color(0xff2675ec),
-                        fontFamily: 'Manrope',
-                        fontWeight: FontWeight.w500),
+                      ),
+                    ],
                   ),
-                  daysOfWeekHeight: 20,
-                  firstDay: DateTime.utc(2010, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
-                  focusedDay: DateTime.now(),
-                  calendarStyle: CalendarStyle(
-                      weekendTextStyle: TextStyle(
-                          color: Color(0xff2675ec),
-                          fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400),
-                      defaultTextStyle: TextStyle(
-                          color: Color(0xff2675ec),
-                          fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400)),
+                  const SizedBox(
+                    height: 35,
+                  ),
+                  DrawerItem(
+                    title: 'Хэрэглэгчийн булан',
+                    icon: Icons.key,
+                    myFunction: () {},
+                  ),
+                  DrawerItem(
+                    title: 'Тусламж',
+                    icon: Icons.help_outline,
+                    myFunction: () {},
+                  ),
+                  DrawerItem(
+                    title: 'Найзаа урих',
+                    icon: Icons.people_outline,
+                    myFunction: () {},
+                  ),
+                ],
+              ),
+              TableCalendar(
+                headerVisible: true,
+                headerStyle: HeaderStyle(
+                  formatButtonVisible: false,
+                  titleTextStyle: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xff2675ec),
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w500),
                 ),
-                Divider(),
-                SizedBox(
-                  height: 10,
-                ),
-                DrawerItem(
-                  title: 'Log out',
-                  icon: Icons.logout,
-                  myFunction: () async {
-                    await FirebaseAuth.instance.signOut();
+                daysOfWeekHeight: 20,
+                firstDay: DateTime.utc(2010, 10, 16),
+                lastDay: DateTime.utc(2030, 3, 14),
+                focusedDay: DateTime.now(),
+                calendarStyle: CalendarStyle(
+                    weekendTextStyle: TextStyle(
+                        color: Color(0xff2675ec),
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w400),
+                    defaultTextStyle: TextStyle(
+                        color: Color(0xff2675ec),
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w400)),
+              ),
+              Divider(),
+              SizedBox(
+                height: 10,
+              ),
+              DrawerItem(
+                title: 'Log out',
+                icon: Icons.logout,
+                myFunction: () async {
+                  await FirebaseAuth.instance.signOut();
 
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => LogIn()),
-                        (Route<dynamic> route) => false);
-                  },
-                )
-              ],
-            ),
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => LogIn()),
+                      (Route<dynamic> route) => false);
+                },
+              )
+            ],
           ),
         ),
       ),
@@ -415,6 +417,130 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   }
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+
+  PreferredSizeWidget HomeSearchAppbar() {
+    return AppBar(
+      elevation: 0.5,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 70,
+      backgroundColor: Colors.white,
+      flexibleSpace: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          child: Container(
+            height: 36,
+            // child: SearchBarAnimation(
+            //   textEditingController: textEditingController,
+            //   isOriginalAnimation: false,
+            //   buttonBorderColour: Colors.black45,
+            //   trailingWidget: const Icon(
+            //     Icons.search,
+            //     size: 20,
+            //     color: Colors.black,
+            //   ),
+            //   secondaryButtonWidget: const Icon(
+            //     Icons.close,
+            //     size: 20,
+            //     color: Colors.black,
+            //   ),
+            //   buttonWidget: const Icon(
+            //     Icons.search,
+            //     size: 20,
+            //     color: Colors.black,
+            //   ),
+            //   //  buttonIcon: Icons.search,
+            //   onFieldSubmitted: (String value) {
+            //     debugPrint('onFieldSubmitted value $value');
+            //   },
+            // ),
+            child: TextField(
+              cursorHeight: 25,
+              controller: textEditingController,
+              textAlignVertical: TextAlignVertical.center,
+              focusNode: _focusNode,
+              textAlign: search ? TextAlign.start : TextAlign.center,
+              autocorrect: true,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (value) {
+                initiateSearch(value.toUpperCase());
+              },
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color.fromARGB(255, 205, 205, 206),
+                contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 5),
+                suffixIcon: IconButton(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                  icon: search
+                      ? GestureDetector(
+                          onTap: () {
+                            textEditingController.clear();
+                            FocusScope.of(context).requestFocus(FocusNode());
+
+                            search = false;
+
+                            tempSearchStore = [];
+                            print('search');
+
+                            setState(() {});
+                          },
+                          child: Icon(
+                            size: 25,
+                            Icons.close,
+                            color: Color(0Xff2675EC),
+                          ))
+                      : GestureDetector(
+                          onTap: () {
+                            search = true;
+                            _focusNode.requestFocus();
+                            print('not search');
+                            setState(() {});
+                          },
+                          child: Icon(
+                            size: 30,
+                            Icons.search,
+                            color: Color(0Xff2675EC),
+                          ),
+                        ),
+                  onPressed: () {
+                    search = true;
+                    setState(() {});
+                  },
+                ),
+                border: OutlineInputBorder(borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 205, 205, 206),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 205, 205,
+                        206), // Set the border color when focused
+                  ),
+                ),
+                hintText: 'Хайх',
+                hintStyle: const TextStyle(
+                  fontFamily: "SF Pro Text",
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xff3c3c43),
+                  //height: 22 / 17,
+                ),
+              ),
+              style: TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.black,
+                  fontFamily: 'Nunito',
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w400),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   PreferredSizeWidget HomeAppbar() {
     return AppBar(
@@ -449,14 +575,22 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     "ChatUp",
                     style: TextStyle(
                         color: Color(0Xff2675EC),
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold),
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w400),
                   ),
-                  Image.asset(
-                    'assets/images/img_new_chat.png',
-                    width: 35,
-                    height: 35,
-                  )
+                  GestureDetector(
+                    onTap: () {
+                      search = true;
+                      _focusNode.requestFocus();
+                      print('not search');
+                      setState(() {});
+                    },
+                    child: Icon(
+                      size: 30,
+                      Icons.search,
+                      color: Color(0xff7C7C82A6).withOpacity(0.8),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -468,112 +602,116 @@ class _Chat_main_screen extends State<Chat_main_screen> {
 
   @override
   Widget build(BuildContext context) {
+    textEditingController.value = textEditingController.value.copyWith(
+      // Set the cursor position at the end
+      selection:
+          TextSelection.collapsed(offset: textEditingController.text.length),
+    );
     return Scaffold(
         backgroundColor: Colors.white,
         key: _globalKey,
-        appBar: HomeAppbar(),
+        appBar: search ? HomeSearchAppbar() : HomeAppbar(),
+        // appBar: HomeAppbar(),
         drawer: DrawerBuilder(myName ?? _dataController.myname),
         body: CustomScrollView(slivers: [
-          SliverAppBar(
-            elevation: 0,
-            floating: true,
-            titleSpacing: 0,
-            automaticallyImplyLeading: false,
-            title: Container(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 205, 205, 206),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Container(
-                decoration: BoxDecoration(border: Border.all()),
-                height: 36,
-                child: TextField(
-                  controller: textEditingController,
-                  textAlignVertical: TextAlignVertical.center,
-                  focusNode: _focusNode,
-                  textAlign: search ? TextAlign.start : TextAlign.center,
-                  autocorrect: true,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (value) {
-                    initiateSearch(value.toUpperCase());
-                  },
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Color.fromARGB(255, 205, 205, 206),
-                    contentPadding: EdgeInsets.fromLTRB(10, 5, 0, 5),
-                    suffixIcon: IconButton(
-                      //   padding: EdgeInsets.fromLTRB(0, 0, 0, 1),
-                      icon: search
-                          ? GestureDetector(
-                              onTap: () {
-                                textEditingController.clear();
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
+          // SliverAppBar(
+          //   elevation: 0,
+          //   floating: true,
+          //   titleSpacing: 0,
+          //   automaticallyImplyLeading: false,
+          //   title: Container(
+          //     //  padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+          //     height: 36,
+          //     decoration: BoxDecoration(
+          //       color: Color.fromARGB(255, 205, 205, 206),
+          //       borderRadius: BorderRadius.all(Radius.circular(10)),
+          //     ),
+          //     margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          //     child: TextField(
+          //       cursorHeight: 25,
+          //       controller: textEditingController,
+          //       textAlignVertical: TextAlignVertical.center,
+          //       focusNode: _focusNode,
+          //       textAlign: search ? TextAlign.start : TextAlign.center,
+          //       autocorrect: true,
+          //       textCapitalization: TextCapitalization.words,
+          //       onChanged: (value) {
+          //         initiateSearch(value.toUpperCase());
+          //       },
+          //       decoration: InputDecoration(
+          //         filled: true,
+          //         fillColor: Color.fromARGB(255, 205, 205, 206),
+          //         contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 5),
+          //         suffixIcon: IconButton(
+          //           padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+          //           icon: search
+          //               ? GestureDetector(
+          //                   onTap: () {
+          //                     textEditingController.clear();
+          //                     FocusScope.of(context).requestFocus(FocusNode());
 
-                                search = false;
+          //                     search = false;
 
-                                tempSearchStore = [];
-                                print('search');
+          //                     tempSearchStore = [];
+          //                     print('search');
 
-                                setState(() {});
-                              },
-                              child: Icon(
-                                size: 25,
-                                Icons.close,
-                                color: Color(0Xff2675EC),
-                              ))
-                          : GestureDetector(
-                              onTap: () {
-                                search = true;
-                                _focusNode.requestFocus();
-                                print('not search');
-                                setState(() {});
-                              },
-                              child: Icon(
-                                size: 30,
-                                Icons.search,
-                                color: Color(0Xff2675EC),
-                              ),
-                            ),
-                      onPressed: () {
-                        search = true;
-                        setState(() {});
-                      },
-                    ),
-                    suffixIconConstraints:
-                        const BoxConstraints.expand(height: 12, width: 36),
-                    border: OutlineInputBorder(borderSide: BorderSide.none),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Color.fromARGB(255, 205, 205, 206),
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Color.fromARGB(255, 205, 205,
-                            206), // Set the border color when focused
-                      ),
-                    ),
-                    hintText: 'Хайх',
-                    hintStyle: const TextStyle(
-                      fontFamily: "SF Pro Text",
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff3c3c43),
-                      //height: 22 / 17,
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-            ),
-          ),
+          //                     setState(() {});
+          //                   },
+          //                   child: Icon(
+          //                     size: 25,
+          //                     Icons.close,
+          //                     color: Color(0Xff2675EC),
+          //                   ))
+          //               : GestureDetector(
+          //                   onTap: () {
+          //                     search = true;
+          //                     _focusNode.requestFocus();
+          //                     print('not search');
+          //                     setState(() {});
+          //                   },
+          //                   child: Icon(
+          //                     size: 30,
+          //                     Icons.search,
+          //                     color: Color(0Xff2675EC),
+          //                   ),
+          //                 ),
+          //           onPressed: () {
+          //             search = true;
+          //             setState(() {});
+          //           },
+          //         ),
+          //         border: OutlineInputBorder(borderSide: BorderSide.none),
+          //         enabledBorder: OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(10.0),
+          //           borderSide: BorderSide(
+          //             color: Color.fromARGB(255, 205, 205, 206),
+          //           ),
+          //         ),
+          //         focusedBorder: OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(10.0),
+          //           borderSide: BorderSide(
+          //             color: Color.fromARGB(255, 205, 205,
+          //                 206), // Set the border color when focused
+          //           ),
+          //         ),
+          //         hintText: 'Хайх',
+          //         hintStyle: const TextStyle(
+          //           fontFamily: "SF Pro Text",
+          //           fontSize: 15,
+          //           fontWeight: FontWeight.w400,
+          //           color: Color(0xff3c3c43),
+          //           //height: 22 / 17,
+          //         ),
+          //       ),
+          //       style: TextStyle(
+          //           decoration: TextDecoration.none,
+          //           color: Colors.black,
+          //           fontFamily: 'Nunito',
+          //           fontSize: 15.0,
+          //           fontWeight: FontWeight.w400),
+          //     ),
+          //   ),
+          // ),
           Obx(() {
             if (_dataController.roomsLen == 0)
               return SliverToBoxAdapter(
@@ -653,7 +791,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               if (!_dataController.activeChatroomListeners
                   .contains(chatRoomId)) {
                 _dataController.listenForNewMessages(
-                    chatRoomId, data["username"], user_native_lans);
+                    chatRoomId, data["username"], user_native_lans, context);
               }
 
               await Get.to(
