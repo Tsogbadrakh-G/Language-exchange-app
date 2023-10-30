@@ -1,9 +1,6 @@
 import 'package:degree/pages/history_list_screen.dart';
-import 'package:degree/pages/home.dart';
 import 'package:degree/service/Controller.dart';
-
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 
 class Call_history_screen extends StatefulWidget {
@@ -79,34 +76,38 @@ class _Call_history_screen extends State<Call_history_screen> {
               // ),
             ],
           ),
-          bottomNavigationBar: BottomAppBar(
-            color: Colors.white,
-            child: Container(
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Get.to(Call_history_screen());
-                    },
-                    child: Image.asset('assets/images/ic_call.png',
-                        width: 80, height: 80, color: Color(0xff007AFF)),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Get.to(Home());
-                    },
-                    child: Image.asset(
-                      'assets/images/ic_chat.png',
-                      width: 80,
-                      height: 80,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // bottomNavigationBar: BottomAppBar(
+          //   height: 50,
+          //   color: Colors.white,
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //       border: Border(top: BorderSide(color: Colors.black, width: 1)),
+          //     ),
+          //     width: double.infinity,
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //       children: [
+          //         InkWell(
+          //           onTap: () {
+          //             Get.to(Call_history_screen());
+          //           },
+          //           child: Image.asset('assets/images/ic_call.png',
+          //               width: 80, height: 80, color: Color(0xff007AFF)),
+          //         ),
+          //         InkWell(
+          //           onTap: () {
+          //             Get.to(Home());
+          //           },
+          //           child: Image.asset(
+          //             'assets/images/ic_chat.png',
+          //             width: 80,
+          //             height: 80,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ),
       ),
     );

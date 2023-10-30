@@ -236,7 +236,7 @@ class DataController extends GetxController {
       print('lastmessage dta: $lastMessageData');
       int to = 0;
 
-      if (lastMessageData != null && lastMessageData["lastMessage"] is String) {
+      if (lastMessageData["lastMessage"] is String) {
         //log('$lastMessageData');
         to = lastMessageData['to_msg_${ousername}'] + 1;
       } else
