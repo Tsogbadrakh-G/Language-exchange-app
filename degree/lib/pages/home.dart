@@ -85,7 +85,37 @@ class _HomeState extends State<Home> {
       // BottomNavigationBarItem(
       //     icon: new Icon(Icons.missed_video_call), label: 'Calls'),
       BottomNavigationBarItem(
-          icon: new Icon(Icons.missed_video_call), label: 'Calls'),
+          icon: Stack(
+            children: [
+              InkWell(
+                // onTap: () {},
+                child: Image.asset(
+                  'assets/images/img_video.png',
+                  width: 50,
+                  height: 30,
+                  color: bottomSelectedIndex != 1
+                      ? Color(0xff7C7C82A6).withOpacity(0.65)
+                      : Color(0xff2675EC),
+                ),
+              ),
+              if (_dataController.unreadChats.value > 0) ...[
+                Positioned(
+                    top: 0,
+                    right: 5,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Text(
+                        '${_dataController.unreadChats.value}',
+                        style: TextStyle(fontSize: 8, color: Color(0xffFEFFFE)),
+                      ),
+                    )),
+              ],
+            ],
+          ),
+          label: 'Calls'),
     ];
   }
 
