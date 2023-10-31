@@ -131,32 +131,6 @@ class _LogInState extends State<LogIn> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Container(
-              //   width: double.infinity,
-              //   child: Column(
-              //     children: [
-              //       Container(
-              //           margin: EdgeInsets.symmetric(horizontal: 20),
-              //           width: double.infinity,
-              //           padding: EdgeInsets.fromLTRB(18, 0, 20, 0),
-              //           child: Text(
-              //             "Сайн уу 👋",
-              //             style: const TextStyle(
-              //               fontFamily: "Rubik",
-              //               fontSize: 37,
-              //               fontWeight: FontWeight.w500,
-              //               color: Color(0xff000000),
-              //               height: 37 / 37,
-              //             ),
-              //             textAlign: TextAlign.left,
-              //           )),
-              //       SizedBox(
-              //         height: 20,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
               Image.asset(
                 'assets/images/ic_splash.png',
                 scale: 1.5,
@@ -197,22 +171,20 @@ class _LogInState extends State<LogIn> {
                                 : Image.asset(
                                     'assets/images/img_login_exclamation.png',
                                     scale: 1.9,
-                                    // width: 18,
-                                    // height: 18,
                                   ),
-                            // errorText: 'hi',
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
                                   BorderSide(width: 1, color: Colors.black38),
                             ),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
-                                width: 1.5,
-                                color: Colors.black87,
+                                width: 1,
+                                color: Color(0xff434347),
                               ),
                             ),
                             hintText: 'Имэйл',
                             hintStyle: TextStyle(
+                                color: Color(0xff434347),
                                 fontFamily: 'Nunito',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
@@ -223,34 +195,14 @@ class _LogInState extends State<LogIn> {
                       SizedBox(
                         height: 5.0,
                       ),
-                      // if (!_isValidMail)
-                      //   Container(
-                      //     margin: EdgeInsets.symmetric(horizontal: 20),
-                      //     padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
-                      //     width: double.infinity,
-                      //     child: Text(
-                      //       'Имэйлээ оруулна уу.',
-                      //       style: TextStyle(color: Colors.red, fontSize: 10),
-                      //     ),
-                      //   ),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 20),
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: TextFormField(
-                          onChanged: (value) {
-                            // setState(() {
-                            //   Validator();
-                            // });
-                          },
+                          onChanged: (value) {},
                           focusNode: focusNode2,
                           textAlignVertical: TextAlignVertical.center,
                           controller: userpasswordcontroller,
-                          // validator: (value) {
-                          //   if (value == null || value.isEmpty) {
-                          //     return 'Нууц үгээ оруулна уу.';
-                          //   }
-                          //   return null;
-                          // },
                           decoration: InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
@@ -259,12 +211,13 @@ class _LogInState extends State<LogIn> {
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
                                 width: 1.5,
-                                color: Colors.black87,
+                                color: Color(0xff434347),
                               ),
                             ),
                             border: InputBorder.none,
                             hintText: 'Нууц үг',
                             hintStyle: TextStyle(
+                                color: Color(0xff434347),
                                 fontFamily: 'Nunito',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
@@ -275,16 +228,6 @@ class _LogInState extends State<LogIn> {
                       SizedBox(
                         height: 5.0,
                       ),
-                      // if (!_isValidPass)
-                      //   Container(
-                      //     margin: EdgeInsets.symmetric(horizontal: 20),
-                      //     padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
-                      //     width: double.infinity,
-                      //     child: Text(
-                      //       'Нууц үгээ оруулна уу.',
-                      //       style: TextStyle(color: Colors.red, fontSize: 10),
-                      //     ),
-                      //   ),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 35),
                         width: double.infinity,
@@ -307,7 +250,7 @@ class _LogInState extends State<LogIn> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5)),
                             padding: EdgeInsets.symmetric(vertical: 10),
-                            backgroundColor: Color(0xff2675EC).withOpacity(0.8),
+                            backgroundColor: Color(0xff0057ff),
                           ),
                           child: const Text(
                             'Нэвтрэх',
@@ -335,7 +278,7 @@ class _LogInState extends State<LogIn> {
                               child: Text(
                                 "Forgot Password?",
                                 style: TextStyle(
-                                    color: Colors.black54,
+                                    color: Color(0xff434347),
                                     fontFamily: 'Nunito',
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
