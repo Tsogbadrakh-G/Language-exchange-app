@@ -228,7 +228,6 @@ class _ChatPageState extends State<ChatPage> {
             SizedBox(
               height: 70,
               child: Row(
-                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   IconButton(
@@ -244,17 +243,19 @@ class _ChatPageState extends State<ChatPage> {
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        //shape: BoxShape.circle,
                         border:
                             Border.all(color: Colors.black.withOpacity(0.5))),
-                    width: 55,
-                    height: 55,
+                    width: 60,
+                    height: 60,
                     child: myProfilePic != null
-                        ? ClipOval(
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
                             child: Image.network(
-                            widget.profileurl,
-                            fit: BoxFit.cover,
-                          ))
+                              widget.profileurl,
+                              fit: BoxFit.fill,
+                            ))
                         : Offstage(),
                   ),
                   SizedBox(

@@ -73,7 +73,7 @@ abstract class FirebaseUtils {
       var fcmToken = await FirebaseMessaging.instance.getToken();
       _dataController.fcmToken = fcmToken ?? 'empty';
       _dataController.updateUserFCMtoken();
-      print(fcmToken);
+      print('my token: $fcmToken');
       // FirebaseMessaging.instance
       //     .sendMessage(to: fcmToken, data: {'message': 'mnessage'});
 

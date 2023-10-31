@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:degree/DataAPI.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -140,40 +142,42 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30),
                       padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Color(0xffF9F9F9F0),
-                        //  border: Border.all(),
+                        color: Color(0xffF9F9F9),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.black.withOpacity(0.5),
-                                    ),
+                              // Expanded(
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  //shape: BoxShape.circle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
+                                  border: Border.all(
+                                    color: Colors.black.withOpacity(0.5),
                                   ),
-                                  width: 70,
-                                  height: 70,
-                                  child: widget.profileUrl != null
-                                      ? ClipOval(
-                                          child: Image.network(
+                                ),
+                                width: 70,
+                                height: 70,
+                                child: widget.profileUrl != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        child: Image.network(
                                           widget.profileUrl,
                                           fit: BoxFit.fill,
-                                          width: 40,
                                         ))
-                                      : Offstage(),
-                                ),
+                                    : Offstage(),
                               ),
+                              //   ),
                               const SizedBox(
-                                width: 5,
+                                width: 15,
                               ),
                               Expanded(
                                 child: Column(
@@ -190,14 +194,17 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                       ),
                                       textAlign: TextAlign.left,
                                     ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
                                     Text(
-                                      "America",
+                                      widget.native_lans[0],
                                       style: const TextStyle(
-                                        fontFamily: "Inter",
+                                        fontFamily: "Nunito",
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xff000000),
-                                        height: 22 / 14,
+                                        height: 15 / 14,
                                       ),
                                       textAlign: TextAlign.left,
                                     )
@@ -221,8 +228,9 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                       Text(
                                         "Speaks: ",
                                         style: const TextStyle(
+                                          fontFamily: 'Manrope',
                                           fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
                                           color: Color(0xff000000),
                                           height: 22 / 14,
                                         ),
@@ -234,20 +242,22 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                         Text(
                                           "${widget.native_lans[i]}, ",
                                           style: const TextStyle(
+                                            fontFamily: 'Nunito',
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.w400,
                                             color: Color(0xff000000),
-                                            height: 22 / 14,
+                                            height: 17 / 14,
                                           ),
                                           textAlign: TextAlign.left,
                                         ),
                                       Text(
                                         "${widget.native_lans[(widget.native_lans).length - 1]}",
                                         style: const TextStyle(
+                                          fontFamily: 'Nunito',
                                           fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w400,
                                           color: Color(0xff000000),
-                                          height: 22 / 14,
+                                          height: 17 / 14,
                                         ),
                                         textAlign: TextAlign.left,
                                       )
@@ -362,12 +372,12 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                 });
                               },
                               buttonStyleData: ButtonStyleData(
-                                height: 50,
+                                height: 60,
                                 width: double.infinity,
                                 padding:
                                     const EdgeInsets.only(left: 14, right: 14),
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(30),
                                     border: Border.all(
                                       color: Colors.black26,
                                     ),
@@ -717,54 +727,37 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
                   ],
                 ),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: Colors.black26))),
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 30),
-                decoration: BoxDecoration(),
-                child: ElevatedButton(
-                  onPressed: () {
-                    print('key: $key');
-                    Data.addUser(
-                        key,
-                        selectedValueFrom1 ?? 'Halh Mongolian', //voice from
-                        selectedValueTo1 ??
-                            List<String>.from(widget.native_lans)[0], //voice to
-                        selectedValueFrom2 ?? 'Halh Mongolian', // msg from
-                        selectedValueTo2 ??
-                            List<String>.from(widget.native_lans)[0]); //msg to
 
-                    Get.back();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Color(0xff2675EC),
-                  ),
-                  child: const Text(
-                    'Хадгалах',
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        color: Colors.white,
-                        fontSize: 17),
-                  ),
-                ),
-              ),
-            ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //       border: Border(top: BorderSide(color: Colors.black26))),
+            //   width: double.infinity,
+            //   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            //   child: Container(
+            //     margin: EdgeInsets.symmetric(horizontal: 30),
+            //     decoration: BoxDecoration(),
+            //     child: ElevatedButton(
+            //       onPressed: () {},
+            //       style: ElevatedButton.styleFrom(
+            //         shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(30)),
+            //         padding: EdgeInsets.symmetric(vertical: 15),
+            //         backgroundColor: Color(0xff2675EC),
+            //       ),
+            //       child: const Text(
+            //         'Хадгалах',
+            //         style: TextStyle(
+            //             decoration: TextDecoration.none,
+            //             color: Colors.white,
+            //             fontSize: 17),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -776,15 +769,26 @@ class _Chat_more_screen extends State<Chat_more_screen> {
       backgroundColor: Colors.white,
       leading: IconButton(
           onPressed: () {
+            print('key: $key');
+            Data.addUser(
+                key,
+                selectedValueFrom1 ?? 'Halh Mongolian', //voice from
+                selectedValueTo1 ??
+                    List<String>.from(widget.native_lans)[0], //voice to
+                selectedValueFrom2 ?? 'Halh Mongolian', // msg from
+                selectedValueTo2 ??
+                    List<String>.from(widget.native_lans)[0]); //msg to
+
             Get.back();
           },
           icon: Icon(Icons.arrow_back_ios)),
       title: Text(
         "МЭДЭЭЛЭЛ",
         style: TextStyle(
+            fontFamily: 'Nunito',
             color: Color(0Xff2675EC),
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold),
+            fontSize: 17.0,
+            fontWeight: FontWeight.w500),
       ),
       centerTitle: true,
     );

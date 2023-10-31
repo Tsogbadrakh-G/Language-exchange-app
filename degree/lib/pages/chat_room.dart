@@ -121,7 +121,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                 decoration: BoxDecoration(
                     // border: Border(
                     //   bottom: BorderSide(
@@ -142,9 +142,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 border: Border.all(
                                     color: Colors.black.withOpacity(0.5)),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
+                                    BorderRadius.all(Radius.circular(30))),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(30),
                               child: Image.network(
                                 profilePicUrl,
                                 height: 70,

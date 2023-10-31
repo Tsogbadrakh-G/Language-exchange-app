@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:degree/service/model/Customer.dart';
 import 'package:dio/dio.dart';
@@ -15,11 +16,11 @@ class Data {
   String app_certificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
 
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  static final url = 'http://51.20.44.63:5000/todo';
+  //static final url = 'http://192.168.1.101:5000/todo';
 
   static Future<dynamic> sendAudio(String path, String from, String to,
       String tranlsation, String chatroomId, String myUsername) async {
-    final url = 'http://51.20.44.63:5000/todo';
-    //final url = 'http://192.168.1.74:5000/todo';
     final dio = Dio();
 
     FormData formData = FormData.fromMap({
@@ -51,8 +52,6 @@ class Data {
   }
 
   static Future<String> sendText(String text, String from, String to) async {
-    final url = 'http://51.20.44.63:5000/todo';
-    //final url = 'http://192.168.1.101:5000/todo';
     final dio = Dio();
 
     FormData formData = FormData.fromMap({
@@ -78,6 +77,31 @@ class Data {
     } else {
       log('unsuccessfull req');
       return 'error';
+    }
+  }
+
+  static Future<void> sendNotifcation(
+      String toToken, String name, String content) async {
+    final dio = Dio();
+    //String localUrl = 'http://192.168.1.98:5000/sendChat';
+    String localUrl = 'http://51.20.44.63:5000/sendChat';
+
+    FormData formData =
+        FormData.fromMap({'fcm': toToken, 'name': name, 'content': content});
+
+    print('pre response for notification $formData');
+
+    final response = await dio.get(
+      localUrl,
+      data: formData,
+      options: Options(headers: {"Content-Type": "multipart/form-data"}),
+    );
+    log('response: ${response}');
+
+    if (response.statusCode == 200) {
+      print('download: ${response}');
+    } else {
+      print('unsuccessfull req');
     }
   }
 

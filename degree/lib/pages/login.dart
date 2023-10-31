@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'home.dart';
-import 'dart:developer';
 import 'package:degree/pages/forgotpassword.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -33,13 +32,12 @@ class _LogInState extends State<LogIn> {
   final _formkey = GlobalKey<FormState>();
 
   Validator() {
-    if (usermailcontroller.text == null || usermailcontroller.text.isEmpty) {
+    if (usermailcontroller.text.isEmpty) {
       _isEmptyMail = true;
       setState(() {});
     } else
       _isEmptyMail = false;
-    if (userpasswordcontroller.text == null ||
-        userpasswordcontroller.text.isEmpty) {
+    if (userpasswordcontroller.text.isEmpty) {
       _isEmptyPass = true;
       setState(() {});
     } else
@@ -80,7 +78,7 @@ class _LogInState extends State<LogIn> {
       print('name $name, usrname: $username, pic: $pic, id: $id');
 
       Get.to(Home());
-      //FirebaseUtils.main();
+      FirebaseUtils.main();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         SomniAlerts.showMyDialog(

@@ -16,7 +16,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   DataController _dataController = Get.find();
 
   StreamSubscription? chatRoomListSubscription;
@@ -26,6 +26,24 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     load();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  Future<void> setStatus(String status) async {
+    final CollectionReference usersCollection =
+        FirebaseFirestore.instance.collection('users');
+
+    await usersCollection.doc(_dataController.id).update({'status': 'online'});
+    print('user status: $status');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus('online');
+    } else {
+      setStatus('offline');
+    }
   }
 
   Future<void> load() async {
@@ -90,7 +108,7 @@ class _HomeState extends State<Home> {
               InkWell(
                 // onTap: () {},
                 child: Image.asset(
-                  'assets/images/img_video.png',
+                  'assets/images/ic_video.png',
                   width: 50,
                   height: 30,
                   color: bottomSelectedIndex != 1

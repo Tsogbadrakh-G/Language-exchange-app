@@ -1,8 +1,5 @@
 import 'package:degree/pages/chat_room.dart';
-import 'package:degree/pages/history_list_screen.dart' hide ChatRoomListTile;
-
 import 'package:degree/service/Controller.dart';
-import 'package:degree/util/Default_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
@@ -94,8 +91,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
       // DatabaseMethods().updateLastMessageSend(channel, lastMessageInfoMap);
       print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
-      _dataController.listenForNewMessages(
-          channel, username, user_native_lans, context);
+      _dataController.listenForNewMessages(channel, username, user_native_lans);
     }
   }
 
@@ -105,7 +101,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
         builder: (context, AsyncSnapshot snapshot) {
           print('snapsot: ${snapshot.hasData}');
           if (snapshot.connectionState == ConnectionState.waiting) {
-            log('connection waiting');
+            print('connection waiting');
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -120,7 +116,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     shrinkWrap: true,
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      DocumentSnapshot ds = snapshot.data.docs[index];
+                      DocumentSnapshot ds = snapshot.data.docs[0];
                       String username =
                           ds.id.replaceAll("_", "").replaceAll(myUserName!, "");
                       _dataController.CheckToLastMessage(
@@ -418,141 +414,18 @@ class _Chat_main_screen extends State<Chat_main_screen> {
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
-  PreferredSizeWidget HomeSearchAppbar() {
-    return AppBar(
-      elevation: 0.5,
-      automaticallyImplyLeading: false,
-      toolbarHeight: 70,
-      backgroundColor: Colors.white,
-      flexibleSpace: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-          child: Container(
-            height: 36,
-            // child: SearchBarAnimation(
-            //   textEditingController: textEditingController,
-            //   isOriginalAnimation: false,
-            //   buttonBorderColour: Colors.black45,
-            //   trailingWidget: const Icon(
-            //     Icons.search,
-            //     size: 20,
-            //     color: Colors.black,
-            //   ),
-            //   secondaryButtonWidget: const Icon(
-            //     Icons.close,
-            //     size: 20,
-            //     color: Colors.black,
-            //   ),
-            //   buttonWidget: const Icon(
-            //     Icons.search,
-            //     size: 20,
-            //     color: Colors.black,
-            //   ),
-            //   //  buttonIcon: Icons.search,
-            //   onFieldSubmitted: (String value) {
-            //     debugPrint('onFieldSubmitted value $value');
-            //   },
-            // ),
-            child: TextField(
-              cursorHeight: 25,
-              controller: textEditingController,
-              textAlignVertical: TextAlignVertical.center,
-              focusNode: _focusNode,
-              textAlign: search ? TextAlign.start : TextAlign.center,
-              autocorrect: true,
-              textCapitalization: TextCapitalization.words,
-              onChanged: (value) {
-                initiateSearch(value.toUpperCase());
-              },
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Color.fromARGB(255, 205, 205, 206),
-                contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 5),
-                suffixIcon: IconButton(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                  icon: search
-                      ? GestureDetector(
-                          onTap: () {
-                            textEditingController.clear();
-                            FocusScope.of(context).requestFocus(FocusNode());
-
-                            search = false;
-
-                            tempSearchStore = [];
-                            print('search');
-
-                            setState(() {});
-                          },
-                          child: Icon(
-                            size: 25,
-                            Icons.close,
-                            color: Color(0Xff2675EC),
-                          ))
-                      : GestureDetector(
-                          onTap: () {
-                            search = true;
-                            _focusNode.requestFocus();
-                            print('not search');
-                            setState(() {});
-                          },
-                          child: Icon(
-                            size: 30,
-                            Icons.search,
-                            color: Color(0Xff2675EC),
-                          ),
-                        ),
-                  onPressed: () {
-                    search = true;
-                    setState(() {});
-                  },
-                ),
-                border: OutlineInputBorder(borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 205, 205, 206),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 205, 205,
-                        206), // Set the border color when focused
-                  ),
-                ),
-                hintText: 'Хайх',
-                hintStyle: const TextStyle(
-                  fontFamily: "SF Pro Text",
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff3c3c43),
-                  //height: 22 / 17,
-                ),
-              ),
-              style: TextStyle(
-                  decoration: TextDecoration.none,
-                  color: Colors.black,
-                  fontFamily: 'Nunito',
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w400),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   PreferredSizeWidget HomeAppbar() {
     return AppBar(
       elevation: 0.5,
       automaticallyImplyLeading: false,
-      toolbarHeight: 70,
+      toolbarHeight: 52,
       backgroundColor: Colors.white,
       flexibleSpace: SafeArea(
         child: Container(
+          // width: double.infinity,
           decoration: BoxDecoration(),
           padding: const EdgeInsets.only(
-              left: 20.0, right: 20.0, top: 10.0, bottom: 5.0),
+              left: 20.0, right: 20.0, top: 0.0, bottom: 0.0),
           child: Column(
             children: [
               Row(
@@ -575,22 +448,22 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     "ChatUp",
                     style: TextStyle(
                         color: Color(0Xff2675EC),
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w400),
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w500),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      search = true;
-                      _focusNode.requestFocus();
-                      print('not search');
-                      setState(() {});
-                    },
-                    child: Icon(
-                      size: 30,
-                      Icons.search,
-                      color: Color(0xff7C7C82A6).withOpacity(0.8),
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     search = true;
+                  //     _focusNode.requestFocus();
+                  //     print('not search');
+                  //     setState(() {});
+                  //   },
+                  //   child: Icon(
+                  //     size: 30,
+                  //     Icons.search,
+                  //     color: Color(0xff7C7C82A6).withOpacity(0.8),
+                  //   ),
+                  // ),
                 ],
               ),
             ],
@@ -610,108 +483,106 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     return Scaffold(
         backgroundColor: Colors.white,
         key: _globalKey,
-        appBar: search ? HomeSearchAppbar() : HomeAppbar(),
-        // appBar: HomeAppbar(),
+        appBar: HomeAppbar(),
         drawer: DrawerBuilder(myName ?? _dataController.myname),
         body: CustomScrollView(slivers: [
-          // SliverAppBar(
-          //   elevation: 0,
-          //   floating: true,
-          //   titleSpacing: 0,
-          //   automaticallyImplyLeading: false,
-          //   title: Container(
-          //     //  padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-          //     height: 36,
-          //     decoration: BoxDecoration(
-          //       color: Color.fromARGB(255, 205, 205, 206),
-          //       borderRadius: BorderRadius.all(Radius.circular(10)),
-          //     ),
-          //     margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-          //     child: TextField(
-          //       cursorHeight: 25,
-          //       controller: textEditingController,
-          //       textAlignVertical: TextAlignVertical.center,
-          //       focusNode: _focusNode,
-          //       textAlign: search ? TextAlign.start : TextAlign.center,
-          //       autocorrect: true,
-          //       textCapitalization: TextCapitalization.words,
-          //       onChanged: (value) {
-          //         initiateSearch(value.toUpperCase());
-          //       },
-          //       decoration: InputDecoration(
-          //         filled: true,
-          //         fillColor: Color.fromARGB(255, 205, 205, 206),
-          //         contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 5),
-          //         suffixIcon: IconButton(
-          //           padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-          //           icon: search
-          //               ? GestureDetector(
-          //                   onTap: () {
-          //                     textEditingController.clear();
-          //                     FocusScope.of(context).requestFocus(FocusNode());
+          SliverAppBar(
+            elevation: 0,
+            floating: true,
+            titleSpacing: 0,
+            automaticallyImplyLeading: false,
+            title: Container(
+              height: 35,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: TextField(
+                cursorHeight: 25,
+                controller: textEditingController,
+                textAlignVertical: TextAlignVertical.center,
+                focusNode: _focusNode,
+                textAlign: search ? TextAlign.start : TextAlign.center,
+                autocorrect: true,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (value) {
+                  initiateSearch(value.toUpperCase());
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color.fromARGB(255, 205, 205, 206),
+                  contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 5),
+                  suffixIcon: IconButton(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    icon: search
+                        ? GestureDetector(
+                            onTap: () {
+                              textEditingController.clear();
+                              FocusScope.of(context).requestFocus(FocusNode());
 
-          //                     search = false;
+                              search = false;
 
-          //                     tempSearchStore = [];
-          //                     print('search');
+                              tempSearchStore = [];
+                              print('search');
 
-          //                     setState(() {});
-          //                   },
-          //                   child: Icon(
-          //                     size: 25,
-          //                     Icons.close,
-          //                     color: Color(0Xff2675EC),
-          //                   ))
-          //               : GestureDetector(
-          //                   onTap: () {
-          //                     search = true;
-          //                     _focusNode.requestFocus();
-          //                     print('not search');
-          //                     setState(() {});
-          //                   },
-          //                   child: Icon(
-          //                     size: 30,
-          //                     Icons.search,
-          //                     color: Color(0Xff2675EC),
-          //                   ),
-          //                 ),
-          //           onPressed: () {
-          //             search = true;
-          //             setState(() {});
-          //           },
-          //         ),
-          //         border: OutlineInputBorder(borderSide: BorderSide.none),
-          //         enabledBorder: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(10.0),
-          //           borderSide: BorderSide(
-          //             color: Color.fromARGB(255, 205, 205, 206),
-          //           ),
-          //         ),
-          //         focusedBorder: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(10.0),
-          //           borderSide: BorderSide(
-          //             color: Color.fromARGB(255, 205, 205,
-          //                 206), // Set the border color when focused
-          //           ),
-          //         ),
-          //         hintText: 'Хайх',
-          //         hintStyle: const TextStyle(
-          //           fontFamily: "SF Pro Text",
-          //           fontSize: 15,
-          //           fontWeight: FontWeight.w400,
-          //           color: Color(0xff3c3c43),
-          //           //height: 22 / 17,
-          //         ),
-          //       ),
-          //       style: TextStyle(
-          //           decoration: TextDecoration.none,
-          //           color: Colors.black,
-          //           fontFamily: 'Nunito',
-          //           fontSize: 15.0,
-          //           fontWeight: FontWeight.w400),
-          //     ),
-          //   ),
-          // ),
+                              setState(() {});
+                            },
+                            child: Icon(
+                              size: 25,
+                              Icons.close,
+                              color: Color(0Xff2675EC),
+                            ))
+                        : GestureDetector(
+                            onTap: () {
+                              search = true;
+                              _focusNode.requestFocus();
+                              print('not search');
+                              setState(() {});
+                            },
+                            child: Icon(
+                              size: 25,
+                              Icons.search,
+                              color: Color(0Xff2675EC),
+                            ),
+                          ),
+                    onPressed: () {
+                      search = true;
+                      setState(() {});
+                    },
+                  ),
+                  border: OutlineInputBorder(borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 205, 205, 206),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 205, 205,
+                          206), // Set the border color when focused
+                    ),
+                  ),
+                  hintText: 'Хайх',
+                  hintStyle: const TextStyle(
+                    fontFamily: "SF Pro Text",
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff3c3c43),
+                    //height: 22 / 17,
+                  ),
+                ),
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    color: Colors.black,
+                    fontFamily: 'Nunito',
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w400),
+              ),
+            ),
+          ),
           Obx(() {
             if (_dataController.roomsLen == 0)
               return SliverToBoxAdapter(
@@ -722,7 +593,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               );
             else
               return SliverPadding(
-                padding: EdgeInsets.only(top: 10),
+                padding: EdgeInsets.only(top: 5),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
@@ -730,7 +601,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
 
                       return search
                           ? ListView(
-                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                              padding: EdgeInsets.only(left: 5.0, right: 5.0),
                               primary: false,
                               shrinkWrap: true,
                               children: [...tempSearchStore].map((element) {
@@ -791,7 +662,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               if (!_dataController.activeChatroomListeners
                   .contains(chatRoomId)) {
                 _dataController.listenForNewMessages(
-                    chatRoomId, data["username"], user_native_lans, context);
+                    chatRoomId, data["username"], user_native_lans);
               }
 
               await Get.to(

@@ -36,6 +36,7 @@ void main() async {
   runApp(const MyApp());
 
   Get.put(DataController()).getChatRoomIds();
+  //FirebaseUtils.main();
   await FirebaseMessaging.instance.requestPermission();
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
   // String? token = await FirebaseMessaging.instance.getAPNSToken();
