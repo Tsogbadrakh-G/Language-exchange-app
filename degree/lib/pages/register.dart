@@ -225,16 +225,11 @@ class _Register extends State<Register> {
                             focusNode: focusNode1,
                             textAlignVertical: TextAlignVertical.center,
                             controller: namecontroller,
-                            // validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return 'Please Enter Name';
-                            //   }
-                            //   return null;
-                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(width: 1, color: Colors.black38),
+                                borderSide: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -244,6 +239,7 @@ class _Register extends State<Register> {
                               ),
                               hintText: "Нэр",
                               hintStyle: TextStyle(
+                                  color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
@@ -269,16 +265,11 @@ class _Register extends State<Register> {
                             focusNode: focusNode2,
                             textAlignVertical: TextAlignVertical.center,
                             controller: mailcontroller,
-                            // validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return 'Please Enter E-mail';
-                            //   }
-                            //   return null;
-                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(width: 1, color: Colors.black38),
+                                borderSide: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -288,6 +279,7 @@ class _Register extends State<Register> {
                               ),
                               hintText: "Имэйл",
                               hintStyle: TextStyle(
+                                  color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
@@ -321,8 +313,9 @@ class _Register extends State<Register> {
                             // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(width: 1, color: Colors.black38),
+                                borderSide: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -332,6 +325,7 @@ class _Register extends State<Register> {
                               ),
                               hintText: "Нууц үг",
                               hintStyle: TextStyle(
+                                  color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
@@ -358,16 +352,11 @@ class _Register extends State<Register> {
                             focusNode: focusNode4,
                             textAlignVertical: TextAlignVertical.center,
                             controller: confirmPasswordcontroller,
-                            // validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return 'Please Enter Confirm Password';
-                            //   }
-                            //   return null;
-                            // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(width: 1, color: Colors.black38),
+                                borderSide: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -377,6 +366,7 @@ class _Register extends State<Register> {
                               ),
                               hintText: "Нууц үг баталгаажуулах",
                               hintStyle: TextStyle(
+                                  color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
@@ -436,7 +426,7 @@ class _Register extends State<Register> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.symmetric(vertical: 10),
-                        backgroundColor: Color(0xff2675EC).withOpacity(0.8),
+                        backgroundColor: Color(0xff0057ff),
                       ),
                       child: const Text(
                         'Бүртгүүлэх',
