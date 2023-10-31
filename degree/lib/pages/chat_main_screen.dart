@@ -85,10 +85,6 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
     if (!_dataController.activeChatroomListeners.contains(channel)) {
-      // Map<String, dynamic> lastMessageInfoMap = {
-      //   "fcm_$myUserName": _dataController.fcmToken,
-      // };
-      // DatabaseMethods().updateLastMessageSend(channel, lastMessageInfoMap);
       print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
       _dataController.listenForNewMessages(channel, username, user_native_lans);
@@ -116,7 +112,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     shrinkWrap: true,
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      DocumentSnapshot ds = snapshot.data.docs[0];
+                      DocumentSnapshot ds = snapshot.data.docs[index];
                       String username =
                           ds.id.replaceAll("_", "").replaceAll(myUserName!, "");
                       _dataController.CheckToLastMessage(
@@ -144,10 +140,6 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                       );
                     }));
           }
-          // return snapshot.hasData
-          //     ?
-
-          //     : Center(child: CircularProgressIndicator());
         });
   }
 
@@ -201,18 +193,11 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (_file == null) return;
-    // String img_name = _file.path.split('/').last;
-    // Reference referenceRoot = FirebaseStorage.instance.ref();
-    // Reference referenceDirImages = referenceRoot.child('images');
-    // Reference referenceImageToUpload = referenceDirImages.child(myUserName!);
 
     File img = File(_file.path);
     var time = DateTime.now().millisecondsSinceEpoch.toString();
     try {
       await FirebaseStorage.instance.ref('$myUserName/$time.png').putFile(img);
-      // referenceImageToUpload.putFile(
-      //     img, SettableMetadata(cacheControl: img_name));
-      // referenceImageToUpload.getDownloadURL();
     } catch (e) {
       print('upload image to firebase exception: $e');
     }
@@ -248,7 +233,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   Widget DrawerBuilder(String name) {
     // print('my profile in drawer: $myProfilePic');
     return Drawer(
-      width: 320,
+      width: 300,
       elevation: 30,
       backgroundColor: Color(0xFfFFFFFF),
       shadowColor: Colors.white,
@@ -256,9 +241,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.horizontal(right: Radius.circular(0))),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
+        padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
         child: SingleChildScrollView(
-          //  physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -291,7 +275,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     ],
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Row(
                     children: [
@@ -317,9 +301,9 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                                         child: Obx(() {
                                           return Image.network(
                                             _dataController.picUrl.value,
-                                            height: 80,
-                                            width: 80,
                                             fit: BoxFit.cover,
+                                            height: 100,
+                                            width: 100,
                                           );
                                         }),
                                       ),
@@ -347,11 +331,11 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     ],
                   ),
                   const SizedBox(
-                    height: 35,
+                    height: 30,
                   ),
                   DrawerItem(
                     title: 'Хэрэглэгчийн булан',
-                    icon: Icons.key,
+                    icon: Icons.supervised_user_circle_outlined,
                     myFunction: () {},
                   ),
                   DrawerItem(
@@ -364,32 +348,37 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     icon: Icons.people_outline,
                     myFunction: () {},
                   ),
+                  DrawerItem(
+                    title: 'Утасны жагсаалт',
+                    icon: Icons.contact_mail_outlined,
+                    myFunction: () {},
+                  ),
                 ],
               ),
-              TableCalendar(
-                headerVisible: true,
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  titleTextStyle: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xff2675ec),
-                      fontFamily: 'Manrope',
-                      fontWeight: FontWeight.w500),
-                ),
-                daysOfWeekHeight: 20,
-                firstDay: DateTime.utc(2010, 10, 16),
-                lastDay: DateTime.utc(2030, 3, 14),
-                focusedDay: DateTime.now(),
-                calendarStyle: CalendarStyle(
-                    weekendTextStyle: TextStyle(
-                        color: Color(0xff2675ec),
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w400),
-                    defaultTextStyle: TextStyle(
-                        color: Color(0xff2675ec),
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w400)),
-              ),
+              // TableCalendar(
+              //   headerVisible: true,
+              //   headerStyle: HeaderStyle(
+              //     formatButtonVisible: false,
+              //     titleTextStyle: TextStyle(
+              //         fontSize: 18,
+              //         color: Color(0xff2675ec),
+              //         fontFamily: 'Manrope',
+              //         fontWeight: FontWeight.w500),
+              //   ),
+              //   daysOfWeekHeight: 20,
+              //   firstDay: DateTime.utc(2010, 10, 16),
+              //   lastDay: DateTime.utc(2030, 3, 14),
+              //   focusedDay: DateTime.now(),
+              //   calendarStyle: CalendarStyle(
+              //       weekendTextStyle: TextStyle(
+              //           color: Color(0xff2675ec),
+              //           fontFamily: 'Nunito',
+              //           fontWeight: FontWeight.w400),
+              //       defaultTextStyle: TextStyle(
+              //           color: Color(0xff2675ec),
+              //           fontFamily: 'Nunito',
+              //           fontWeight: FontWeight.w400)),
+              // ),
               Divider(),
               SizedBox(
                 height: 10,
@@ -425,7 +414,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
           // width: double.infinity,
           decoration: BoxDecoration(),
           padding: const EdgeInsets.only(
-              left: 20.0, right: 20.0, top: 0.0, bottom: 0.0),
+              left: 10.0, right: 20.0, top: 0.0, bottom: 0.0),
           child: Column(
             children: [
               Row(
@@ -440,7 +429,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                         },
                         icon: Icon(
                           Icons.menu,
-                          size: 30,
+                          size: 32,
                           color: Colors.black.withOpacity(0.8),
                         )),
                   ),
@@ -448,7 +437,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     "ChatUp",
                     style: TextStyle(
                         color: Color(0Xff2675EC),
-                        fontSize: 15.0,
+                        fontFamily: 'Nunito',
+                        fontSize: 20.0,
                         fontWeight: FontWeight.w500),
                   ),
                   // GestureDetector(
@@ -568,7 +558,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                   hintText: 'Хайх',
                   hintStyle: const TextStyle(
                     fontFamily: "SF Pro Text",
-                    fontSize: 15,
+                    fontSize: 18,
                     fontWeight: FontWeight.w400,
                     color: Color(0xff3c3c43),
                     //height: 22 / 17,
