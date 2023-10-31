@@ -21,75 +21,55 @@ class _OnboardScreen extends State<OnboardScreen> {
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             SizedBox(
-              height: 100,
+              height: MediaQuery.of(context).size.height * 1 / 8,
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 80),
               width: double.infinity,
-              child: ClipPath(
-                clipper: MessageClipper(borderRadius: 16),
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 22),
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(31, 168, 166, 166),
-                      borderRadius: BorderRadius.all(Radius.circular(15))),
-                  child: Text(
-                    'Сайн байна уу! Би бол Цог!',
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Agbalumo',
-                        color: Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+              child: Text(
+                'Санаа амар харилц!',
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Nunito',
+                    color: Color(0xff434347)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 1 / 10,
+            ),
+            Container(
+              child: Image.asset(
+                'assets/images/ic_splash.png',
+                scale: 1.5,
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            Image.asset(
-              'assets/images/ic_splash.png',
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'Сомни',
-                style: TextStyle(
-                    decoration: TextDecoration.none,
-                    fontSize: 30,
-                    fontFamily: 'Manrope',
-                    fontWeight: FontWeight.w500,
-                    fontStyle: FontStyle.normal,
-                    color: Color(0xff2675EC)),
-                textAlign: TextAlign.center,
+            Container(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  'Сомни',
+                  style: TextStyle(
+                      decoration: TextDecoration.none,
+                      fontSize: 25,
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.normal,
+                      color: Color(0xff0057ff)),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
             SizedBox(
-              height: 15,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'Хаана ч хэзээ ч өөрийн хүссэн нэгэнтэйгээ хэл хамаарахгүй харилц.',
-                style: TextStyle(
-                    decoration: TextDecoration.none,
-                    color: Colors.black54,
-                    fontFamily: 'Nunito',
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    fontSize: 15),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              height: 50,
+              height: MediaQuery.of(context).size.height * 1 / 6,
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 40),
@@ -100,23 +80,23 @@ class _OnboardScreen extends State<OnboardScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  backgroundColor: Color(0xff2675EC),
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: Color(0xff0057ff),
                 ),
                 child: const Text(
                   'ЭХЛҮҮЛЭХ',
                   style: TextStyle(
-                      fontFamily: 'Manrope',
+                      fontFamily: 'Nunito',
                       fontWeight: FontWeight.w500,
                       decoration: TextDecoration.none,
                       color: Colors.white,
-                      fontSize: 15),
+                      fontSize: 14),
                 ),
               ),
             ),
             const SizedBox(
-              height: 15,
+              height: 10,
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 40),
@@ -127,18 +107,18 @@ class _OnboardScreen extends State<OnboardScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  backgroundColor: Color.fromARGB(255, 223, 212, 227),
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: Color(0xfff1eff6),
                 ),
                 child: const Text(
                   'ШУУД НЭВТРЭХ',
                   style: TextStyle(
                       decoration: TextDecoration.none,
-                      fontFamily: 'Manrope',
+                      fontFamily: 'Nunito',
                       fontWeight: FontWeight.w500,
-                      color: Color(0xff2675EC),
-                      fontSize: 15),
+                      color: Color(0xff0057ff),
+                      fontSize: 14),
                 ),
               ),
             ),
