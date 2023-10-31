@@ -261,11 +261,8 @@ class DataController extends GetxController {
       String fcm_user = await getthisUserFCM(ousername, chatRoomId);
       print('send msg');
       print('user token: $fcm_user');
-      FirebaseMessaging.instance.sendMessage(
-          to: fcm_user,
-          messageId: 'TESt',
-          messageType: 'text',
-          data: {'Notification title': 'Somni', 'Notification text': message});
+
+      Data.sendNotifcation(fcm_user, myusername, message);
     }
   }
 
