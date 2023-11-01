@@ -98,8 +98,6 @@ class _Video_call_screen extends State<Video_call_screen> {
     await _engine.enableAudio();
     await _engine.muteLocalAudioStream(true);
     try {
-      // print('token ${widget.channelToken}');
-      // print('token ${widget.channel}');
       await _engine.joinChannel(
         token: widget.channelToken,
         channelId: widget.channel,
@@ -114,112 +112,148 @@ class _Video_call_screen extends State<Video_call_screen> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    //  print('from ${widget.from}, to: ${widget.to} in Video call screen');
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              _dataController.exitedForEachChannel_Voice[widget.username] =
-                  true;
-              Get.back();
-            },
-            icon: Icon(Icons.arrow_back_ios)),
-        title: const Text('Agora Video Call'),
-      ),
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //       onPressed: () {
+      //         _dataController.exitedForEachChannel_Voice[widget.username] =
+      //             true;
+      //         Get.back();
+      //       },
+      //       icon: Icon(Icons.arrow_back_ios)),
+      //   title: const Text('Agora Video Call'),
+      // ),
       body: Stack(
         children: [
-          Center(
-            child: _remoteVideo(),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(),
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/ic_splash.png'),
+                      fit: BoxFit.fitWidth)),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration:
+                  BoxDecoration(color: Color(0xff000000).withOpacity(0.9)),
+              child: _remoteVideo(),
+            ),
           ),
           Align(
             alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 100,
-              height: 150,
-              child: Center(
-                  child: !isRecording
-                      ? _localUserJoined
-                          ? AgoraVideoView(
-                              controller: VideoViewController(
-                                rtcEngine: _engine,
-                                canvas: const VideoCanvas(uid: 0),
-                              ),
-                            )
-                          : const CircularProgressIndicator()
-                      : Text(
-                          'Recording in Progress',
-                          style: TextStyle(fontSize: 20),
-                        )),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 120, 0, 0),
+              child: Container(
+                width: 120,
+                height: 200,
+                child: Center(
+                    child: !isRecording
+                        ? _localUserJoined
+                            ? AgoraVideoView(
+                                controller: VideoViewController(
+                                  rtcEngine: _engine,
+                                  canvas: const VideoCanvas(uid: 0),
+                                ),
+                              )
+                            : const CircularProgressIndicator()
+                        : Text(
+                            'Recording in Progress',
+                            style: TextStyle(fontSize: 20),
+                          )),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 100,
+            child: Transform.scale(
+              scale: 1.2,
+              child: FloatingActionButton(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                child: Icon(Icons.call_end),
+                onPressed: () async {
+                  _dataController.exitedForEachChannel_Voice[widget.username] =
+                      true;
+                  Get.back();
+                },
+              ),
             ),
           ),
           Positioned(
             bottom: 20,
             right: 20,
-            child: FloatingActionButton(
-              child: Icon(Icons.music_note),
-              foregroundColor: mute % 2 == 1 ? Colors.red : Colors.white,
-              onPressed: () async {
-                mute++;
-                print('click $mute');
-                if (mute % 2 == 0) {
-                  await _engine.muteLocalAudioStream(true);
+            child: Transform.scale(
+              scale: 1.2,
+              child: FloatingActionButton(
+                backgroundColor: Colors.white70,
+                child: Icon(Icons.music_note),
+                foregroundColor: mute % 2 == 1 ? Colors.red : Colors.black,
+                onPressed: () async {
+                  mute++;
+                  print('click $mute');
+                  if (mute % 2 == 0) {
+                    await _engine.muteLocalAudioStream(true);
 
-                  if (widget.from != widget.to) {
-                    await _engine.stopAudioRecording();
+                    if (widget.from != widget.to) {
+                      await _engine.stopAudioRecording();
 
-                    Directory tempDir = await getTemporaryDirectory();
-                    String record = '${tempDir.absolute.path}/record.wav';
+                      Directory tempDir = await getTemporaryDirectory();
+                      String record = '${tempDir.absolute.path}/record.wav';
 
-                    print('recorded file: $record');
-                    setState(() {});
-                    String val;
-                    if (widget.to == "Halh Mongolian") {
-                      val = await Data.sendAudio(
-                          record,
-                          widget.from,
-                          "Halh Mongolian",
-                          "S2TT (Speech to Text translation)",
-                          widget.channel,
-                          widget.myUserName);
-                    } else {
-                      val = await Data.sendAudio(
-                          record,
-                          widget.from,
-                          widget.to,
-                          "S2ST (Speech to Speech translation)",
-                          widget.channel,
-                          widget.myUserName);
+                      print('recorded file: $record');
+                      setState(() {});
+                      String val;
+                      if (widget.to == "Halh Mongolian") {
+                        val = await Data.sendAudio(
+                            record,
+                            widget.from,
+                            "Halh Mongolian",
+                            "S2TT (Speech to Text translation)",
+                            widget.channel,
+                            widget.myUserName);
+                      } else {
+                        val = await Data.sendAudio(
+                            record,
+                            widget.from,
+                            widget.to,
+                            "S2ST (Speech to Speech translation)",
+                            widget.channel,
+                            widget.myUserName);
+                      }
+
+                      sendAudioLink(val);
+                    } else
+                      setState(() {});
+                  } else {
+                    await _engine.muteLocalAudioStream(false);
+
+                    if (widget.from != widget.to) {
+                      Directory tempDir = await getTemporaryDirectory();
+                      String record = '${tempDir.absolute.path}/record.wav';
+                      await File(record)
+                          .create(exclusive: false, recursive: false);
+
+                      _engine.startAudioRecording(
+                        AudioRecordingConfiguration(
+                          sampleRate: 32000,
+                          filePath: record,
+                          fileRecordingType:
+                              AudioFileRecordingType.audioFileRecordingMic,
+                          recordingChannel: 1,
+                          quality: AudioRecordingQualityType
+                              .audioRecordingQualityMedium,
+                          encode: true,
+                        ),
+                      );
                     }
 
-                    sendAudioLink(val);
-                  } else
                     setState(() {});
-                } else {
-                  await _engine.muteLocalAudioStream(false);
-
-                  if (widget.from != widget.to) {
-                    Directory tempDir = await getTemporaryDirectory();
-                    String record = '${tempDir.absolute.path}/record.wav';
-                    await File(record)
-                        .create(exclusive: false, recursive: false);
-
-                    _engine.startAudioRecording(
-                      AudioRecordingConfiguration(
-                        sampleRate: 32000,
-                        filePath: record,
-                        fileRecordingType:
-                            AudioFileRecordingType.audioFileRecordingMic,
-                        recordingChannel: 1,
-                        quality: AudioRecordingQualityType
-                            .audioRecordingQualityMedium,
-                        encode: true,
-                      ),
-                    );
                   }
-
-                  setState(() {});
-                }
-              },
+                },
+              ),
             ),
           )
         ],
@@ -259,10 +293,25 @@ class _Video_call_screen extends State<Video_call_screen> {
             connection: RtcConnection(channelId: widget.channel)),
       );
     } else {
-      return const Text(
-        'Please wait for remote user to join',
-        textAlign: TextAlign.center,
-      );
+      return Padding(
+          padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+          child: Column(
+            children: [
+              Text(
+                widget.username,
+                style: TextStyle(
+                    color: Colors.white, fontFamily: 'Nunito', fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                'Холбогдож байна...',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 143, 143, 150),
+                    fontFamily: 'Nunito'),
+                textAlign: TextAlign.center,
+              )
+            ],
+          ));
     }
   }
 

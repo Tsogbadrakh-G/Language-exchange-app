@@ -80,7 +80,7 @@ class DatabaseMethods {
 
   Future<Stream<QuerySnapshot>> getChatRooms() async {
     String? myUsername = _dataController.myusername;
-    log('my username: $myUsername');
+
     return FirebaseFirestore.instance
         .collection("chatrooms")
         .orderBy("time", descending: true)

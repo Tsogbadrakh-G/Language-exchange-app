@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:degree/service/model/Customer.dart';
 import 'package:dio/dio.dart';
@@ -17,7 +16,7 @@ class Data {
 
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   static final url = 'http://51.20.44.63:5000/todo';
-  //static final url = 'http://192.168.1.101:5000/todo';
+  //static final url = 'http://192.168.1.98:5000/todo';
 
   static Future<dynamic> sendAudio(String path, String from, String to,
       String tranlsation, String chatroomId, String myUsername) async {
@@ -61,7 +60,7 @@ class Data {
       'output': to,
     });
 
-    log('pre response for text ');
+    print('pre response for text $text |$from| {$to}');
 
     final response = await dio.post(
       url,
@@ -71,7 +70,7 @@ class Data {
     log('response: ${response}');
 
     if (response.statusCode == 200) {
-      print('download: ${response.data['message']}');
+      print('translated: ${response.data['message']}');
 
       return response.data['message'];
     } else {
@@ -106,8 +105,8 @@ class Data {
   }
 
   static Future<String> generate_token(String roomid, int uid) async {
-    final url = 'http://51.20.44.63:5000/generate_agora_token/' + roomid;
-    //final url = 'http://192.168.1.98:5000/generate_agora_token/' + roomid;
+    final localUrl = 'http://51.20.44.63:5000/generate_agora_token/' + roomid;
+    //final localUrl = 'http://192.168.1.98:5000/generate_agora_token/' + roomid;
 
     final dio = Dio();
 
@@ -118,7 +117,7 @@ class Data {
     print('pre response for generate token $url');
 
     final response = await dio.post(
-      url,
+      localUrl,
       data: formData,
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
@@ -147,12 +146,12 @@ class Data {
         ));
   }
 
-  static Future<void> getFirebaseMessagingToken() async {
-    await firebaseMessaging.requestPermission();
-    await firebaseMessaging.getToken().then((value) {
-      if (value != null) String token = value;
-    });
-  }
+  // static Future<void> getFirebaseMessagingToken() async {
+  //   await firebaseMessaging.requestPermission();
+  //   await firebaseMessaging.getToken().then((value) {
+  //     if (value != null) String token = value;
+  //   });
+  // }
   //   void selectedImage( String myUserName) async {
   //   final ImagePicker _imagePicker = ImagePicker();
   //   XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);

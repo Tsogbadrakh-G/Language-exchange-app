@@ -21,21 +21,21 @@ import 'DataAPI.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+      name: 'App', options: DefaultFirebaseOptions.currentPlatform);
+
+  //await Firebase.initializeApp();
   //FirebaseUtils.main();
   var appDir = await getApplicationSupportDirectory();
   Hive.init(appDir.path);
   Hive.registerAdapter(CustomerAdapter());
   usersBox = await Hive.openBox('testBox');
 
-  // await Firebase.initializeApp(
-  //     name: 'App', options: DefaultFirebaseOptions.currentPlatform);
-
   print(DateTime.now());
 
   runApp(const MyApp());
 
-  Get.put(DataController()).getChatRoomIds();
+  Get.put(DataController());
   //FirebaseUtils.main();
   await FirebaseMessaging.instance.requestPermission();
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
@@ -69,8 +69,8 @@ class MyApp extends StatelessWidget {
       //     }),
       //home: Select_languages(),
       //home: SplashScreen(),
-
-      home: LogIn(),
+      home: OnboardScreen(),
+      // home: LogIn(),
     );
   }
 }

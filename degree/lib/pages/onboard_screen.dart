@@ -24,7 +24,7 @@ class _OnboardScreen extends State<OnboardScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * 1 / 8,
+              height: MediaQuery.of(context).size.height * 1 / 5,
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 80),
@@ -41,7 +41,7 @@ class _OnboardScreen extends State<OnboardScreen> {
               ),
             ),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 1 / 10,
+              height: 20,
             ),
             Container(
               child: Image.asset(
@@ -68,8 +68,11 @@ class _OnboardScreen extends State<OnboardScreen> {
                 ),
               ),
             ),
+            // SizedBox(
+            //   height: MediaQuery.of(context).size.height * 1 / 5,
+            // ),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 1 / 6,
+              height: 80,
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 40),

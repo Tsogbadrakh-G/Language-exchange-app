@@ -205,7 +205,9 @@ class _ChatPageState extends State<ChatPage> {
 
                               messagecontroller.clear();
                             },
-                            child: Icon(Icons.send_rounded))),
+                            child: Icon(
+                              Icons.send_rounded,
+                            ))),
                   ),
                 ),
               ),

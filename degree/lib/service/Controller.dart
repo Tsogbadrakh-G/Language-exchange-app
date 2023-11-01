@@ -8,8 +8,6 @@ import 'package:degree/models/Chat.dart';
 import 'package:degree/service/database.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:degree/service/model/somni_alert.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
@@ -333,8 +331,8 @@ class DataController extends GetxController {
   Map<String, StreamSubscription> NewMessages = Map();
 
   final Set<String> processedMessageIds = Set<String>();
-  void listenForNewMessages(
-      String channel, String username, List<String> user_native_lans) {
+  void listenForNewMessages(String channel, String username,
+      List<String> user_native_lans, BuildContext context) {
     final CollectionReference messagesCollection =
         FirebaseFirestore.instance.collection('chatrooms/${channel}/chats');
 
@@ -481,6 +479,7 @@ class DataController extends GetxController {
                 } catch (e) {
                   print('Error updating chat pair: $e');
                 }
+                Navigator.of(context).pop();
               },
               button2: () async {
                 try {

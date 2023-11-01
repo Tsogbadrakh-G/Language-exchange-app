@@ -19,8 +19,6 @@ import 'chatpage.dart';
 import '../service/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import 'package:table_calendar/table_calendar.dart';
-
 class Chat_main_screen extends StatefulWidget {
   const Chat_main_screen({Key? key}) : super(key: key);
 
@@ -51,7 +49,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   ontheload() async {
     await getthesharedpref();
     chatRoomsStream = await DatabaseMethods().getChatRooms();
-    log('chat room $chatRoomsStream');
+    setState(() {});
+    print('chat room $chatRoomsStream');
     if (chatRoomsStream != null)
       chatRoomListSubscription =
           chatRoomsStream!.asBroadcastStream().listen((e) {
@@ -63,7 +62,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
           _dataController.unreadChats.value =
               list.reduce((value, element) => value + element);
       });
-    setState(() {});
+
     [Permission.microphone, Permission.camera, Permission.photos].request();
   }
 
@@ -87,7 +86,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     if (!_dataController.activeChatroomListeners.contains(channel)) {
       print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
-      _dataController.listenForNewMessages(channel, username, user_native_lans);
+      _dataController.listenForNewMessages(
+          channel, username, user_native_lans, context);
     }
   }
 
@@ -280,8 +280,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                   Row(
                     children: [
                       Container(
-                        width: 70,
-                        height: 60,
+                        width: 90,
+                        height: 80,
                         padding: EdgeInsets.symmetric(horizontal: 5),
                         child: Stack(
                           children: [
@@ -292,12 +292,12 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(20)),
+                                              Radius.circular(30)),
                                           border: Border.all(
                                               color: Colors.black
                                                   .withOpacity(0.5))),
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(30),
                                         child: Obx(() {
                                           return Image.network(
                                             _dataController.picUrl.value,
@@ -482,7 +482,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
             titleSpacing: 0,
             automaticallyImplyLeading: false,
             title: Container(
-              height: 35,
+              // height: 35,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -531,7 +531,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                               setState(() {});
                             },
                             child: Icon(
-                              size: 25,
+                              size: 30,
                               Icons.search,
                               color: Color(0Xff2675EC),
                             ),
@@ -543,13 +543,13 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                   ),
                   border: OutlineInputBorder(borderSide: BorderSide.none),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(15.0),
                     borderSide: BorderSide(
                       color: Color.fromARGB(255, 205, 205, 206),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(15.0),
                     borderSide: BorderSide(
                       color: Color.fromARGB(255, 205, 205,
                           206), // Set the border color when focused
@@ -558,7 +558,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                   hintText: 'Хайх',
                   hintStyle: const TextStyle(
                     fontFamily: "SF Pro Text",
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: Color(0xff3c3c43),
                     //height: 22 / 17,
@@ -652,7 +652,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               if (!_dataController.activeChatroomListeners
                   .contains(chatRoomId)) {
                 _dataController.listenForNewMessages(
-                    chatRoomId, data["username"], user_native_lans);
+                    chatRoomId, data["username"], user_native_lans, context);
               }
 
               await Get.to(
@@ -667,23 +667,24 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               setState(() {});
             },
             child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
               margin: EdgeInsets.symmetric(vertical: 8),
               child: Material(
                 elevation: 5.0,
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: EdgeInsets.all(18),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     children: [
                       ClipRRect(
-                          borderRadius: BorderRadius.circular(60),
+                          borderRadius: BorderRadius.circular(30),
                           child: Image.network(
                             data["Photo"],
-                            height: 70,
-                            width: 70,
+                            height: 60,
+                            width: 60,
                             fit: BoxFit.cover,
                           )),
                       SizedBox(
@@ -695,19 +696,21 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                           Text(
                             data["Name"],
                             style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                                color: Color(0xff434347),
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Nunito',
                                 fontSize: 18.0),
                           ),
                           SizedBox(
-                            height: 8.0,
+                            height: 5.0,
                           ),
                           Text(
                             data["username"],
                             style: TextStyle(
-                                color: Colors.black,
+                                color: Color(0xff434347),
                                 fontSize: 15.0,
-                                fontWeight: FontWeight.w500),
+                                fontFamily: 'Nunito',
+                                fontWeight: FontWeight.w400),
                           )
                         ],
                       )
