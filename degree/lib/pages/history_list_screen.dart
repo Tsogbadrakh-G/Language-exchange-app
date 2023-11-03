@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
@@ -24,10 +22,9 @@ class _History_list_screen extends State<History_list_screen> {
       () => CustomRefreshIndicator(
           builder: (context, child, controller) => child,
           onRefresh: () async {
-            log('refrsh');
             _dataController.audioMessages.clear();
             _dataController.missedMessages.clear();
-            _dataController.getChatRoomIds();
+            _dataController.getCallHistories();
           },
           child: widget.calls.length != 0
               ? Container(
@@ -101,9 +98,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     id = "${user["Id"]}";
     user_native_lans = List<String>.from(user["native_lans"]);
 
-    print('user info: ${user}');
-
-    //String key = widget.chatRoomId + widget.myUsername;
+//    print('user info: ${user}');
   }
 
   @override
@@ -131,8 +126,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     width: 0.5,
                   ),
                 ),
-                //   color: Color.fromARGB(255, 225, 222, 222),
-                // borderRadius: BorderRadius.all(Radius.circular(20))
               ),
               width: double.infinity,
               child: Row(
@@ -151,24 +144,22 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                         SizedBox(
                           width: 15,
                         ),
-                        profilePicUrl == ""
-                            ? CircularProgressIndicator()
-                            : Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.black.withOpacity(0.5)),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30))),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.network(
-                                    profilePicUrl,
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
+                        Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Colors.black.withOpacity(0.5)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30))),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              profilePicUrl,
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                         SizedBox(
                           width: 10.0,
                         ),
@@ -204,9 +195,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                       ],
                     ),
                   ),
-                  // SizedBox(
-                  //   width: 30,
-                  // ),
                   Expanded(
                     flex: 1,
                     child: Column(
@@ -227,9 +215,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500),
                         ),
-                        // const SizedBox(
-                        //   height: 10,
-                        // ),
                       ],
                     ),
                   ),

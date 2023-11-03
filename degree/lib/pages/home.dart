@@ -259,15 +259,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    // _dataController.activeChatroomListeners.forEach((element) {
-    //   _dataController.NewMessages[element]!.cancel();
-
-    //   print('offline $element');
-    //   Map<String, dynamic> lastMessageInfoMap = {
-    //     "online": false,
-    //   };
-    //   DatabaseMethods().updateLastMessageSend(element, lastMessageInfoMap);
-    // });
+    print('disposing home screen');
     super.dispose();
   }
 }

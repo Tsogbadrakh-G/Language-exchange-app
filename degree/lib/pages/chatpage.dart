@@ -49,7 +49,8 @@ class _ChatPageState extends State<ChatPage> {
 
   ontheload() async {
     await getthesharedpref();
-    await getAndSetMessages();
+    messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
+    setState(() {});
     _dataController.exitedForEachChannel[widget.username] = false;
 
     Map<String, dynamic> lastMessageInfoMap = {
@@ -146,11 +147,6 @@ class _ChatPageState extends State<ChatPage> {
                   child: CircularProgressIndicator(),
                 );
         });
-  }
-
-  getAndSetMessages() async {
-    messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
-    setState(() {});
   }
 
   List<String> chat_out_lans = [];

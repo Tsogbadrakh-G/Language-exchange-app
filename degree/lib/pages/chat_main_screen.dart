@@ -1,23 +1,16 @@
 import 'package:degree/pages/chat_room.dart';
 import 'package:degree/service/Controller.dart';
+import 'package:degree/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
-
-import 'package:degree/pages/login.dart';
-
 import 'package:degree/service/model/Customer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'chatpage.dart';
 import '../service/database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class Chat_main_screen extends StatefulWidget {
   const Chat_main_screen({Key? key}) : super(key: key);
@@ -28,6 +21,7 @@ class Chat_main_screen extends StatefulWidget {
 
 class _Chat_main_screen extends State<Chat_main_screen> {
   DataController _dataController = Get.find();
+  Helper _helperController = Get.find();
   bool search = false;
   String? myName, myProfilePic, myUserName, myEmail, myId;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
@@ -43,14 +37,53 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     ontheload();
     _focusNode.addListener(_handleFocusChange);
     _dataController.chatroomsLength();
+    print('init chat main screen');
     super.initState();
+  }
+
+  initiateSearch(value) {
+    if (value.length == 0) {
+      setState(() {
+        log('null');
+        queryResultSet = [];
+        tempSearchStore = [];
+      });
+      return;
+    }
+    setState(() {
+      search = true;
+    });
+    print('qset: $queryResultSet');
+    var capitalizedValue = value.substring(0, 1).toUpperCase();
+    if (queryResultSet.isEmpty && value.length == 1) {
+      print('search in DataStore');
+      DatabaseMethods().Search(value).then((QuerySnapshot docs) {
+        for (int i = 0; i < docs.docs.length; ++i) {
+          queryResultSet.add(docs.docs[i].data());
+        }
+      });
+    } else {
+      tempSearchStore = [];
+      queryResultSet.forEach((element) {
+        if (element['username'].startsWith(capitalizedValue)) {
+          setState(() {
+            tempSearchStore.add(element);
+          });
+        }
+      });
+    }
+  }
+
+  getChannels() async {
+    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    setState(() {});
   }
 
   ontheload() async {
     await getthesharedpref();
-    chatRoomsStream = await DatabaseMethods().getChatRooms();
-    setState(() {});
-    print('chat room $chatRoomsStream');
+    getChannels();
+
+    print('chat room ${chatRoomsStream}');
     if (chatRoomsStream != null)
       chatRoomListSubscription =
           chatRoomsStream!.asBroadcastStream().listen((e) {
@@ -65,6 +98,17 @@ class _Chat_main_screen extends State<Chat_main_screen> {
 
     [Permission.microphone, Permission.camera, Permission.photos].request();
   }
+
+  getChatRoomIdbyUsername(String a, String b) {
+    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
+
+  var queryResultSet = [];
+  var tempSearchStore = [];
 
   getthesharedpref() async {
     myUserName = _dataController.myusername;
@@ -98,7 +142,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
           print('snapsot: ${snapshot.hasData}');
           if (snapshot.connectionState == ConnectionState.waiting) {
             print('connection waiting');
-            return Center(child: CircularProgressIndicator());
+            return Text("Loading");
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData) {
@@ -115,7 +159,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                       DocumentSnapshot ds = snapshot.data.docs[index];
                       String username =
                           ds.id.replaceAll("_", "").replaceAll(myUserName!, "");
-                      _dataController.CheckToLastMessage(
+                      _dataController.checkToLastMessage(
                           ds.id,
                           myUserName!,
                           username,
@@ -143,262 +187,13 @@ class _Chat_main_screen extends State<Chat_main_screen> {
         });
   }
 
-  getChatRoomIdbyUsername(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
-    } else {
-      return "$a\_$b";
-    }
-  }
-
-  var queryResultSet = [];
-  var tempSearchStore = [];
-//should search via mail
-  initiateSearch(value) {
-    if (value.length == 0) {
-      setState(() {
-        log('null');
-        queryResultSet = [];
-        tempSearchStore = [];
-      });
-      return;
-    }
-    setState(() {
-      search = true;
-    });
-    print('qset: $queryResultSet');
-    var capitalizedValue = value.substring(0, 1).toUpperCase();
-    if (queryResultSet.isEmpty && value.length == 1) {
-      print('search in DataStore');
-      DatabaseMethods().Search(value).then((QuerySnapshot docs) {
-        for (int i = 0; i < docs.docs.length; ++i) {
-          queryResultSet.add(docs.docs[i].data());
-        }
-      });
-    } else {
-      tempSearchStore = [];
-      queryResultSet.forEach((element) {
-        print('search in local');
-        if (element['username'].startsWith(capitalizedValue)) {
-          setState(() {
-            tempSearchStore.add(element);
-          });
-        }
-      });
-    }
-  }
-
-  void selectedImage() async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (_file == null) return;
-
-    File img = File(_file.path);
-    var time = DateTime.now().millisecondsSinceEpoch.toString();
-    try {
-      await FirebaseStorage.instance.ref('$myUserName/$time.png').putFile(img);
-    } catch (e) {
-      print('upload image to firebase exception: $e');
-    }
-
-    myProfilePic = await FirebaseStorage.instance
-        .ref('$myUserName/$time.png')
-        .getDownloadURL();
-    _dataController.picUrl.value = myProfilePic!;
-    // await DefaultCacheManager().emptyCache();
-    print('uploaded its url :$myProfilePic, userid: $myId');
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(myId ?? _dataController.id)
-        .update({"Photo": myProfilePic});
-    setState(() {});
-  }
-
   void _handleFocusChange() {
     if (_focusNode.hasFocus) {
-      // TextField is currently active (has focus)
-
       search = true;
-      //print('active textfield search: $search');
-      setState(() {});
     } else {
       search = false;
-      //print('inactive textfield search: $search');
-      setState(() {});
-      // TextField is currently inactive (doesn't have focus)
     }
-  }
-
-  Widget DrawerBuilder(String name) {
-    // print('my profile in drawer: $myProfilePic');
-    return Drawer(
-      width: 300,
-      elevation: 30,
-      backgroundColor: Color(0xFfFFFFFF),
-      shadowColor: Colors.white,
-      surfaceTintColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(0))),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Settings",
-                        style: const TextStyle(
-                          fontFamily: "Gilroy",
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xff2675ec),
-                          height: 27 / 22,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios,
-                          color: Color(0xff2675ec),
-                          size: 25,
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 80,
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Stack(
-                          children: [
-                            myProfilePic == null
-                                ? CircularProgressIndicator()
-                                : GestureDetector(
-                                    onLongPress: selectedImage,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(30)),
-                                          border: Border.all(
-                                              color: Colors.black
-                                                  .withOpacity(0.5))),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(30),
-                                        child: Obx(() {
-                                          return Image.network(
-                                            _dataController.picUrl.value,
-                                            fit: BoxFit.cover,
-                                            height: 100,
-                                            width: 100,
-                                          );
-                                        }),
-                                      ),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontFamily: "Manrope",
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff2675ec),
-                            height: 30 / 23,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  DrawerItem(
-                    title: 'Хэрэглэгчийн булан',
-                    icon: Icons.supervised_user_circle_outlined,
-                    myFunction: () {},
-                  ),
-                  DrawerItem(
-                    title: 'Тусламж',
-                    icon: Icons.help_outline,
-                    myFunction: () {},
-                  ),
-                  DrawerItem(
-                    title: 'Найзаа урих',
-                    icon: Icons.people_outline,
-                    myFunction: () {},
-                  ),
-                  DrawerItem(
-                    title: 'Утасны жагсаалт',
-                    icon: Icons.contact_mail_outlined,
-                    myFunction: () {},
-                  ),
-                ],
-              ),
-              // TableCalendar(
-              //   headerVisible: true,
-              //   headerStyle: HeaderStyle(
-              //     formatButtonVisible: false,
-              //     titleTextStyle: TextStyle(
-              //         fontSize: 18,
-              //         color: Color(0xff2675ec),
-              //         fontFamily: 'Manrope',
-              //         fontWeight: FontWeight.w500),
-              //   ),
-              //   daysOfWeekHeight: 20,
-              //   firstDay: DateTime.utc(2010, 10, 16),
-              //   lastDay: DateTime.utc(2030, 3, 14),
-              //   focusedDay: DateTime.now(),
-              //   calendarStyle: CalendarStyle(
-              //       weekendTextStyle: TextStyle(
-              //           color: Color(0xff2675ec),
-              //           fontFamily: 'Nunito',
-              //           fontWeight: FontWeight.w400),
-              //       defaultTextStyle: TextStyle(
-              //           color: Color(0xff2675ec),
-              //           fontFamily: 'Nunito',
-              //           fontWeight: FontWeight.w400)),
-              // ),
-              Divider(),
-              SizedBox(
-                height: 10,
-              ),
-              DrawerItem(
-                title: 'Log out',
-                icon: Icons.logout,
-                myFunction: () async {
-                  await FirebaseAuth.instance.signOut();
-
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => LogIn()),
-                      (Route<dynamic> route) => false);
-                },
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+    setState(() {});
   }
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
@@ -411,49 +206,48 @@ class _Chat_main_screen extends State<Chat_main_screen> {
       backgroundColor: Colors.white,
       flexibleSpace: SafeArea(
         child: Container(
-          // width: double.infinity,
-          decoration: BoxDecoration(),
+//          decoration: BoxDecoration(border: Border.all()),
           padding: const EdgeInsets.only(
-              left: 10.0, right: 20.0, top: 0.0, bottom: 0.0),
+              left: 20.0, right: 20.0, top: 18.0, bottom: 0.0),
           child: Column(
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(2),
-                    child: IconButton(
-                        onPressed: () {
+                      padding: EdgeInsets.all(2),
+                      // child: IconButton(
+                      //     onPressed: () {
+                      //       _globalKey.currentState!.openDrawer();
+                      //     },
+                      //     icon: Icon(
+                      //       Icons.menu,
+                      //       size: 32,
+                      //       // color: Colors.black.withOpacity(0.8),
+                      //       color: Color(0xff2675ec),
+                      //     )),
+                      child: GestureDetector(
+                        onTap: () {
                           _globalKey.currentState!.openDrawer();
                         },
-                        icon: Icon(
-                          Icons.menu,
-                          size: 32,
-                          color: Colors.black.withOpacity(0.8),
-                        )),
-                  ),
+                        child: Image.asset(
+                          'assets/images/img_menu.png',
+                          width: 30,
+                          height: 20,
+                        ),
+                      )),
                   Text(
                     "ChatUp",
-                    style: TextStyle(
-                        color: Color(0Xff2675EC),
-                        fontFamily: 'Nunito',
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     search = true;
-                  //     _focusNode.requestFocus();
-                  //     print('not search');
-                  //     setState(() {});
-                  //   },
-                  //   child: Icon(
-                  //     size: 30,
-                  //     Icons.search,
-                  //     color: Color(0xff7C7C82A6).withOpacity(0.8),
-                  //   ),
-                  // ),
+                    style: const TextStyle(
+                      fontFamily: "Nunito",
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff2675ec),
+                      height: 1,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
                 ],
               ),
             ],
@@ -474,7 +268,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
         backgroundColor: Colors.white,
         key: _globalKey,
         appBar: HomeAppbar(),
-        drawer: DrawerBuilder(myName ?? _dataController.myname),
+        drawer:
+            _helperController.drawerBuilder(_dataController.myname, context),
         body: CustomScrollView(slivers: [
           SliverAppBar(
             elevation: 0,
@@ -484,9 +279,9 @@ class _Chat_main_screen extends State<Chat_main_screen> {
             title: Container(
               // height: 35,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
+                  //color: Colors.white,
+                  // borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: TextField(
                 cursorHeight: 25,
@@ -501,8 +296,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                 },
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Color.fromARGB(255, 205, 205, 206),
-                  contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 5),
+                  fillColor: Color(0xff0000000D).withOpacity(0.05),
+                  contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                   suffixIcon: IconButton(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     icon: search
@@ -515,8 +310,9 @@ class _Chat_main_screen extends State<Chat_main_screen> {
 
                               tempSearchStore = [];
                               print('search');
+                              getChannels();
 
-                              setState(() {});
+                              //setState(() {});
                             },
                             child: Icon(
                               size: 25,
@@ -556,11 +352,11 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     ),
                   ),
                   hintText: 'Хайх',
-                  hintStyle: const TextStyle(
-                    fontFamily: "SF Pro Text",
-                    fontSize: 16,
+                  hintStyle: TextStyle(
+                    fontFamily: "Manrope",
+                    fontSize: 18,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xff3c3c43),
+                    color: Color(0xff3c3c43).withOpacity(0.5),
                     //height: 22 / 17,
                   ),
                 ),

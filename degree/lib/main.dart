@@ -10,6 +10,7 @@ import 'package:degree/service/auth.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/util/firebase.dart';
+import 'package:degree/util/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,6 +37,7 @@ void main() async {
   runApp(const MyApp());
 
   Get.put(DataController());
+  Get.put(Helper());
   //FirebaseUtils.main();
   await FirebaseMessaging.instance.requestPermission();
   await FirebaseMessaging.instance.setAutoInitEnabled(true);

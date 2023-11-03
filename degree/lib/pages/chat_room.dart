@@ -42,13 +42,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     String key = widget.chatRoomId + widget.myUsername;
 
     if (usersBox.get(key) != null) {
-      // print('user  selected lans ${widget.chatRoomId} ');
-      // print(
-      //     'from msg: ${usersBox.get(key)!.trans_from_msg}, to msg:${usersBox.get(key)!.trans_to_msg},  ');
-      // print(
-      //     'from voice: ${usersBox.get(key)!.trans_from_voice}, to voice:${usersBox.get(key)!.trans_to_voice}');
     } else {
-      //   print('user: ${widget.chatRoomId} is null');
       usersBox.put(
           key,
           Customer(
@@ -75,8 +69,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           return Slidable(
             key: Key(widget.chatRoomId),
             useTextDirection: false,
-            // reminders.remove(reminders[index]);
-
             endActionPane: ActionPane(
                 motion: const ScrollMotion(),
                 extentRatio: 0.3,
@@ -84,18 +76,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                   SlidableAction(
                     onPressed: (context) {
                       DatabaseMethods().deleteChatroom(widget.chatRoomId);
-                      // LimeAlerts.alertBox(
-                      //   imgAsset: 'alert/alert_default_info',
-                      //   text: 'alert_del'.tr,
-                      //   onOkTitle: 'delete'.tr,
-                      //   onNoTitle: 'cancel'.tr,
-                      //   onOk: () {
-                      //     Reminders.removeReminder(reminders[index]);
-                      //     Get.back();
-                      //     setState(() {});
-                      //   },
-                      //   onNo: Get.back,
-                      // );
                     },
                     padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                     backgroundColor: Color(0xFFFE4A49),
@@ -123,12 +103,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                 padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                 decoration: BoxDecoration(
-                    // border: Border(
-                    //   bottom: BorderSide(
-                    //     color: Color(0xffBEBEBE),
-                    //     width: 0.5,
-                    //   ),
-                    // ),
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20))),
                 width: double.infinity,
@@ -147,8 +121,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                               borderRadius: BorderRadius.circular(30),
                               child: Image.network(
                                 profilePicUrl,
-                                height: 70,
-                                width: 70,
+                                height: 60,
+                                width: 60,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -244,50 +218,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
             ),
           );
         });
-  }
-}
-
-class DrawerItem extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final void Function() myFunction;
-  DrawerItem(
-      {super.key,
-      required this.title,
-      required this.icon,
-      required this.myFunction});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: myFunction,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 25, left: 10),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Color(0xff2675ec),
-              size: 30,
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            Expanded(
-              child: Text(title,
-                  style: const TextStyle(
-                    fontFamily: "Manrope",
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff2675ec),
-                    height: 23 / 19,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

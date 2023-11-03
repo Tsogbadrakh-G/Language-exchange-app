@@ -39,6 +39,89 @@ class SomniAlerts {
     );
   }
 
+  static Future<void> alertCall(
+    BuildContext context,
+    String s1,
+    Function() button1,
+    Function() button2,
+  ) async {
+    return await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          contentPadding: EdgeInsets.all(0),
+          content: Container(
+            //  decoration: BoxDecoration(border: Border.all()),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            width: 320,
+            // height: 160,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        child: Image.asset(
+                          'assets/images/call.png',
+                          fit: BoxFit.cover,
+                          width: 50,
+                          height: 50,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Танд $s1 хэрэглэгчээс видео дуудлага ирж байна.',
+                        style: TextStyle(fontFamily: 'Nunito', height: 1.2),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Transform.scale(
+                      scale: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        child: FloatingActionButton(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            child: Icon(Icons.call_end),
+                            onPressed: button1),
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        child: FloatingActionButton(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            child: Icon(Icons.call_end),
+                            onPressed: button2),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   static Future<void> alertBoxVertical({
     required Widget textWidget,
     required Widget titleWidget,
@@ -64,12 +147,12 @@ class SomniAlerts {
             children: [
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      'assets/images/$imgAsset.png',
-                    ),
-                  ),
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(10),
+                  //   child: Image.asset(
+                  //     'assets/images/$imgAsset.png',
+                  //   ),
+                  // ),
                   Positioned.fill(
                     right: 10,
                     top: 10,

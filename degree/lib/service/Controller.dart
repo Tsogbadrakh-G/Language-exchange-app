@@ -20,21 +20,17 @@ class DataController extends GetxController {
   final dio = Dio();
   String id = '', myname = '', myusername = '', key = '', email = '';
   Rx<String> picUrl = ''.obs;
-
   List<String> native_lans = List.empty(growable: true);
   RxInt unreadChats = 0.obs;
-  // Customer? getUser() {
-  //   // return userBox.get('owner');
-  //   print(userBox.values);
-  //   return userBox.values.toList()[0];
-  // }
   final firestoreInstance = FirebaseFirestore.instance;
   RxList<Chat> audioMessages = RxList.empty(growable: true);
   RxList<Chat> missedMessages = RxList.empty(growable: true);
   List<String> activeChatroomListeners = [];
   RxInt roomsLen = 0.obs;
-
   String fcmToken = '';
+  Map<String, bool> exitedForEachChannel = Map();
+  Map<String, bool> exitedForEachChannel_Voice = Map();
+
   Future<void> updateUserFCMtoken() async {
     final CollectionReference usersCollection =
         FirebaseFirestore.instance.collection('users');
@@ -55,13 +51,13 @@ class DataController extends GetxController {
     roomsLen.value = len;
   }
 
-  void getChatRoomIds() async {
+  void getCallHistories() async {
     QuerySnapshot querySnapshot =
         await firestoreInstance.collection('chatrooms').get();
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       String username = doc.id.replaceAll(myusername, "");
       username = username.replaceAll("_", "");
-      // log('user name: $username');
+
       QuerySnapshot chatSnapshot = await firestoreInstance
           .collection('chatrooms')
           .doc(doc.id)
@@ -70,7 +66,6 @@ class DataController extends GetxController {
 
       chatSnapshot.docs.forEach((chatDoc) {
         Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-
         Chat ret;
 
         if (val['type'] == 'request') {
@@ -84,11 +79,18 @@ class DataController extends GetxController {
           else
             callStatus = 'missed';
 
-          int year = int.parse(val['ts'].toString().substring(14, 18));
-          int month = int.parse(val['ts'].toString().substring(8, 10));
-          int day = int.parse(val['ts'].toString().substring(11, 13));
-          int hour = int.parse(val['ts'].toString().substring(0, 2));
-          int min = int.parse(val['ts'].toString().substring(3, 5));
+          List<String> parts = val['ts'].toString().split(',');
+
+          List<String> times = parts[0].split(':');
+          int hour = int.parse(times[0]);
+          int min = int.parse(times[1]);
+
+          List<String> dates = parts[0].split('/');
+
+          int year = int.parse(dates[2]);
+          int month = int.parse(dates[0]);
+          int day = int.parse(dates[1]);
+
           ret = Chat(
               id: val['id'].toString(),
               message: val['message'].toString(),
@@ -108,9 +110,6 @@ class DataController extends GetxController {
       print('audio chats len : ${audioMessages.length}');
     }
   }
-
-  Map<String, bool> exitedForEachChannel = Map();
-  Map<String, bool> exitedForEachChannel_Voice = Map();
 
   void SaveUser(String id, String name, String username, String url,
       String searchKey, String email) {
@@ -181,22 +180,19 @@ class DataController extends GetxController {
       "to_msg_${username}": lasMessageMap['to_msg_${username}']
     };
 
-    print('set last message');
     DatabaseMethods().updateLastMessageSend(chatroomId, lastMessageInfoMap);
   }
 
-//Listening last chat
-  void CheckToLastMessage(String chatroomId, String myUserName,
+  void checkToLastMessage(String chatroomId, String myUserName,
       String ousername, bool read, String sendBy, dynamic lastMessageData) {
     print('check ${exitedForEachChannel[ousername]}');
 
     bool exited = exitedForEachChannel[ousername] ?? true;
-    // print('exited $exited, username: $ousername, sendBy: $sendBy');
+
     if (!read && sendBy == ousername && !exited) {
       setLastMessage(
           chatroomId, lastMessageData, true, this.myusername, ousername);
     }
-    // });
   }
 
   addMessage(String chatRoomId, String text, String from, String transto,
@@ -257,8 +253,6 @@ class DataController extends GetxController {
         DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
       });
       String fcm_user = await getthisUserFCM(ousername, chatRoomId);
-      print('send msg');
-      print('user token: $fcm_user');
 
       Data.sendNotifcation(fcm_user, myusername, message);
     }
@@ -273,60 +267,6 @@ class DataController extends GetxController {
 
     return fcm;
   }
-  // final firestoreInstance = FirebaseFirestore.instance;
-  // void getChatRoomIds() async {
-  //   QuerySnapshot querySnapshot =
-  //       await firestoreInstance.collection('chatrooms').get();
-  //   for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-  //     String username = doc.id.replaceAll(myusername, "");
-  //     username = username.replaceAll("_", "");
-  //     //  log('user name: $username');
-  //     QuerySnapshot chatSnapshot = await firestoreInstance
-  //         .collection('chatrooms')
-  //         .doc(doc.id)
-  //         .collection('chats')
-  //         .get();
-
-  //     chatSnapshot.docs.forEach((chatDoc) {
-  //       Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-
-  //       Chat ret;
-
-  //       if (val['type'] == 'request') {
-  //         String callStatus = '';
-  //         if (val['sendBy'] == myusername)
-  //           callStatus = 'outbound';
-  //         else if (val['rejected'] as bool == true)
-  //           callStatus = 'missed';
-  //         else if (val['accept'] as bool == true)
-  //           callStatus = 'inbound';
-  //         else
-  //           callStatus = 'missed';
-
-  //         int year = int.parse(val['ts'].toString().substring(14, 18));
-  //         int month = int.parse(val['ts'].toString().substring(8, 10));
-  //         int day = int.parse(val['ts'].toString().substring(11, 13));
-  //         int hour = int.parse(val['ts'].toString().substring(0, 2));
-  //         int min = int.parse(val['ts'].toString().substring(3, 5));
-  //         ret = Chat(
-  //             id: val['id'].toString(),
-  //             message: val['message'].toString(),
-  //             chatuserName: val['sendBy'].toString(),
-  //             callStatus: callStatus,
-  //             time: val['ts'].toString(),
-  //             channel: doc.id,
-  //             officialTime: DateTime(year, month, day, hour, min));
-  //         audioMessages.add(ret);
-  //       }
-  //       audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
-  //     });
-
-  //     // print('chats $chatMessages in chatroom with ${doc.id}');
-  //     print('audio chats len : ${audioMessages.length}');
-  //   }
-
-  //   //setState(() {}); // Notify Flutter to rebuild the UI with the chat room IDs.
-  // }
 
   Map<String, StreamSubscription> NewMessages = Map();
 
@@ -384,66 +324,14 @@ class DataController extends GetxController {
           // }
 
           if (messageData["type"] == 'request' &&
-              messageData["sendBy"] != myusername &&
+              messageData["sendBy"] == username &&
               messageData["rejected"] as bool == false &&
               messageData["accept"] as bool == false &&
               exited) {
-            await SomniAlerts.alertBoxVertical(
-              onClose: () async {
-                Get.back();
-                try {
-                  final chatPairRef = FirebaseFirestore.instance
-                      .collection('chatrooms')
-                      .doc(channel)
-                      .collection('chats')
-                      .doc(messageData["id"]);
-                  await chatPairRef.update({
-                    'rejected': true,
-                  });
-                } catch (e) {
-                  print('Error updating chat pair: $e');
-                }
-              },
-              titleWidget: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  '',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              textWidget: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RichText(
-                    textScaleFactor:
-                        MediaQuery.of(Get.context!).textScaleFactor,
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      text: 'Видео дуудлага',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: 'Танд',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: '$username хэрэглэгчээс'),
-                        // TextSpan(
-                        //     text: 'stat ',
-                        //     style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: 'видео дуудлага ирж байна.'),
-                      ],
-                    )),
-              ),
-              button1: () async {
+            await SomniAlerts.alertCall(
+              context,
+              messageData["sendBy"],
+              () async {
                 int intValue = Random().nextInt(10000);
                 String token = await Data.generate_token(channel, intValue);
                 String key = channel + myusername;
@@ -465,6 +353,7 @@ class DataController extends GetxController {
                   from = 'Halh Mongolian';
                   to = user_native_lans[0];
                 }
+                Get.back();
                 Get.to(Video_call_screen(
                     channel, myusername, username, from, to, token, intValue));
                 try {
@@ -479,9 +368,8 @@ class DataController extends GetxController {
                 } catch (e) {
                   print('Error updating chat pair: $e');
                 }
-                Navigator.of(context).pop();
               },
-              button2: () async {
+              () async {
                 try {
                   final chatPairRef = FirebaseFirestore.instance
                       .collection('chatrooms')
@@ -496,9 +384,6 @@ class DataController extends GetxController {
                 }
                 Get.back();
               },
-              imgAsset: 'alert/alert_reminder',
-              button1Text: 'Дуудлага авах 🤙',
-              button2Text: 'Дуулага салгах 😴',
             );
           }
           if (messageData["type"] == "audio" && exited) {
@@ -511,7 +396,6 @@ class DataController extends GetxController {
                 messageData["url"], messageData["id"], channel);
           }
           processedMessageIds.add(messageData['id']);
-          // Process and display the new message as needed
         }
       });
     });

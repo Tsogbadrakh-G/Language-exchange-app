@@ -79,7 +79,7 @@ class _LogInState extends State<LogIn> {
 
       Get.to(Home());
       FirebaseUtils.main();
-      _dataController.getChatRoomIds();
+      _dataController.getCallHistories();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         SomniAlerts.showMyDialog(
