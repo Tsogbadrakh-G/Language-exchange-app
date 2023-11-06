@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
@@ -37,9 +40,9 @@ class _History_list_screen extends State<History_list_screen> {
                     itemBuilder: (BuildContext context, int index) {
                       return ChatRoomListTile(
                           chatRoomId: widget.calls[index].channel,
-                          myUsername: _dataController.myusername,
+                          userName: widget.calls[index].chatuserName,
                           read: false,
-                          time: widget.calls[index].time,
+                          time: widget.calls[index].officialTime,
                           callStatus: widget.calls[index].callStatus);
                     },
                   ),
@@ -69,12 +72,12 @@ class _History_list_screen extends State<History_list_screen> {
 }
 
 class ChatRoomListTile extends StatefulWidget {
-  final String chatRoomId, myUsername, time, callStatus;
+  final chatRoomId, userName, time, callStatus;
 
   final bool read;
   ChatRoomListTile(
       {required this.chatRoomId,
-      required this.myUsername,
+      required this.userName,
       required this.read,
       required this.time,
       required this.callStatus});
@@ -84,21 +87,18 @@ class ChatRoomListTile extends StatefulWidget {
 }
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
-  String profilePicUrl = "", name = "", username = "", id = "";
-
+  String picUrl = "", name = "", id = "";
   List<String> user_native_lans = [];
+
   getthisUserInfo() async {
-    username =
-        widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
+        await DatabaseMethods().getUserInfo(widget.userName);
     final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
     name = "${user["Name"]}";
-    profilePicUrl = "${user["Photo"]}";
+    picUrl = "${user["Photo"]}";
     id = "${user["Id"]}";
     user_native_lans = List<String>.from(user["native_lans"]);
-
-//    print('user info: ${user}');
+    log('username: ${widget.userName}, picUrl: $picUrl, name: $name');
   }
 
   @override
@@ -113,9 +113,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         future: getthisUserInfo(),
         builder: (context, snapshot) {
           return GestureDetector(
-            onTap: () async {
-              setState(() {});
-            },
+            onTap: () async {},
             child: Container(
               margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
@@ -136,30 +134,24 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     flex: 2,
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          _getAssetPath(widget.callStatus),
-                          height: 18,
-                          width: 18,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.5)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30))),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              profilePicUrl,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        picUrl == ""
+                            ? CircularProgressIndicator()
+                            : Container(
+                                height: 55,
+                                width: 55,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.black.withOpacity(0.5)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30))),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: CachedNetworkImage(
+                                    imageUrl: picUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
                         SizedBox(
                           width: 10.0,
                         ),
@@ -179,16 +171,30 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 height: 22 / 17,
                               ),
                             ),
-                            Text(
-                              widget.callStatus,
-                              style: const TextStyle(
-                                fontFamily: "Rubik",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff8e8e93),
-                                height: 17 / 14,
-                              ),
-                              textAlign: TextAlign.left,
+                            Row(
+                              children: [
+                                SvgPicture.asset(
+                                  _getAssetPath(widget.callStatus),
+                                  height: 18,
+                                  width: 18,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  widget.callStatus,
+                                  style: TextStyle(
+                                    fontFamily: "Rubik",
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: widget.callStatus == 'missed'
+                                        ? Colors.red
+                                        : Color(0xff8e8e93),
+                                    height: 17 / 14,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                )
+                              ],
                             )
                           ],
                         ),
@@ -204,11 +210,13 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                         //8-13
                         Text(
                           textAlign: TextAlign.end,
-                          widget.time.substring(8, 10) +
+                          '${widget.time.month}' +
                               " сарын " +
-                              widget.time.substring(8, 10) +
+                              '${widget.time.day}' +
                               "\n" +
-                              widget.time.substring(0, 6),
+                              '${widget.time.hour}' +
+                              ':' +
+                              '${widget.time.minute}',
                           style: TextStyle(
                               fontFamily: "Nunito",
                               color: Colors.black45,
