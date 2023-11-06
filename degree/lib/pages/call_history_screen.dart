@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:degree/pages/history_list_screen.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,8 @@ class _Call_history_screen extends State<Call_history_screen> {
   @override
   void initState() {
     myUserName = _dataController.myusername;
-
+    _dataController.getCallHistories();
+    log('init call history page');
     super.initState();
   }
 
@@ -71,43 +73,8 @@ class _Call_history_screen extends State<Call_history_screen> {
               ),
               History_list_screen(
                   calls: _dataController.missedMessages, isAll: false),
-              // Center(
-              //   child: Text("Calls"),
-              // ),
             ],
           ),
-          // bottomNavigationBar: BottomAppBar(
-          //   height: 50,
-          //   color: Colors.white,
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       border: Border(top: BorderSide(color: Colors.black, width: 1)),
-          //     ),
-          //     width: double.infinity,
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //       children: [
-          //         InkWell(
-          //           onTap: () {
-          //             Get.to(Call_history_screen());
-          //           },
-          //           child: Image.asset('assets/images/ic_call.png',
-          //               width: 80, height: 80, color: Color(0xff007AFF)),
-          //         ),
-          //         InkWell(
-          //           onTap: () {
-          //             Get.to(Home());
-          //           },
-          //           child: Image.asset(
-          //             'assets/images/ic_chat.png',
-          //             width: 80,
-          //             height: 80,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ),
       ),
     );
