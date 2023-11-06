@@ -52,63 +52,68 @@ class DataController extends GetxController {
   }
 
   void getCallHistories() async {
+    audioMessages = <Chat>[].obs;
+    missedMessages = <Chat>[].obs;
     QuerySnapshot querySnapshot =
         await firestoreInstance.collection('chatrooms').get();
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      String username = doc.id.replaceAll(myusername, "");
-      username = username.replaceAll("_", "");
+      //iteration of all chat rooms
+      if (doc.id.contains(myusername)) {
+        String username = doc.id.replaceAll(myusername, "");
+        username = username.replaceAll("_", "");
 
-      QuerySnapshot chatSnapshot = await firestoreInstance
-          .collection('chatrooms')
-          .doc(doc.id)
-          .collection('chats')
-          .get();
+        QuerySnapshot chatSnapshot = await firestoreInstance
+            .collection('chatrooms')
+            .doc(doc.id)
+            .collection('chats')
+            .get();
 
-      chatSnapshot.docs.forEach((chatDoc) {
-        Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
-        Chat ret;
+        chatSnapshot.docs.forEach((chatDoc) {
+          Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
+          Chat ret;
 
-        if (val['type'] == 'request') {
-          String callStatus = '';
-          if (val['sendBy'] == myusername)
-            callStatus = 'outbound';
-          else if (val['rejected'] as bool == true)
-            callStatus = 'missed';
-          else if (val['accept'] as bool == true)
-            callStatus = 'inbound';
-          else
-            callStatus = 'missed';
+          if (val['type'] == 'request') {
+            String callStatus = '';
+            if (val['sendBy'] == myusername)
+              callStatus = 'outbound';
+            else if (val['rejected'] as bool == true)
+              callStatus = 'missed';
+            else if (val['accept'] as bool == true)
+              callStatus = 'inbound';
+            else
+              callStatus = 'missed';
 
-          List<String> parts = val['ts'].toString().split(',');
+            List<String> parts = val['ts'].toString().split(',');
 
-          List<String> times = parts[0].split(':');
-          int hour = int.parse(times[0]);
-          int min = int.parse(times[1]);
+            List<String> times = parts[0].split(':');
+            int hour = int.parse(times[0]);
+            int min = int.parse(times[1]);
 
-          List<String> dates = parts[0].split('/');
+            List<String> dates = parts[1].split('/');
 
-          int year = int.parse(dates[2]);
-          int month = int.parse(dates[0]);
-          int day = int.parse(dates[1]);
+            print('date: ${dates[1]}');
+            int year = int.parse(dates[2]);
+            int month = int.parse(dates[0]);
+            int day = int.parse(dates[1]);
 
-          ret = Chat(
-              id: val['id'].toString(),
-              message: val['message'].toString(),
-              chatuserName: val['sendBy'].toString(),
-              callStatus: callStatus,
-              time: val['ts'].toString(),
-              channel: doc.id,
-              officialTime: DateTime(year, month, day, hour, min));
-          audioMessages.add(ret);
-          if (callStatus == 'missed') missedMessages.add(ret);
-        }
-
-        audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
-        missedMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
-      });
-
-      print('audio chats len : ${audioMessages.length}');
+            ret = Chat(
+                id: val['id'].toString(),
+                message: val['message'].toString(),
+                chatuserName: username,
+                callStatus: callStatus,
+                time: val['ts'].toString(),
+                channel: doc.id,
+                officialTime: DateTime(year, month, day, hour, min));
+            audioMessages.add(ret);
+            if (callStatus == 'missed') missedMessages.add(ret);
+          }
+        });
+      }
     }
+    audioMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
+    missedMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
+    print('audio chats len : ${audioMessages.length}');
+    print('missed audio chats len : ${missedMessages.length}');
   }
 
   void SaveUser(String id, String name, String username, String url,
@@ -119,16 +124,6 @@ class DataController extends GetxController {
     picUrl.value = url;
     this.key = searchKey;
     this.email = email;
-
-    // userBox.put(
-    //     'owner',
-    //     Customer(
-    //         id: id,
-    //         name: name,
-    //         username: username,
-    //         picUrl: picUrl,
-    //         SearchKey: searchKey,
-    //         email: email));
   }
 
   //Map<String, dynamic>? lastMessageData;
@@ -146,26 +141,6 @@ class DataController extends GetxController {
   //   } catch (e) {
   //     print('Error updating chat pair: $e');
   //   }
-  // }
-  // Stream<Map<String, dynamic>> listenToLastMessage(String chatroomId) {
-  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  //   return firestore
-  //       .collection('chatrooms')
-  //       .doc(chatroomId)
-  //       .snapshots()
-  //       .map((chatroomSnapshot) {
-  //     if (chatroomSnapshot.exists) {
-  //       lastMessageData = chatroomSnapshot.data() as Map<String, dynamic>;
-  //       print('listening a last message in Chat Page:$lastMessageData');
-  //       // Return the last message data as a stream
-  //       return lastMessageData ?? {};
-  //     } else {
-  //       print('none here');
-  //       // Return an empty map if the chatroom document doesn't exist
-  //       return {};
-  //     }
-  //   });
   // }
 
   void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap,
@@ -231,7 +206,6 @@ class DataController extends GetxController {
       int to = 0;
 
       if (lastMessageData["lastMessage"] is String) {
-        //log('$lastMessageData');
         to = lastMessageData['to_msg_${ousername}'] + 1;
       } else
         to = 1;
@@ -282,47 +256,9 @@ class DataController extends GetxController {
         final messageData = change.doc.data() as Map<String, dynamic>;
 
         if (!processedMessageIds.contains(messageData['id'])) {
-          // This message is newly added
-          // getChatRoomIds();
           bool exited = exitedForEachChannel_Voice[username] ?? true;
           print(
               'new message: ${messageData}, widget username: ${username}, exited: ${exited}');
-
-          // if (messageData["type"] == 'request') {
-          //   String callStatus = '';
-          //   if (messageData['sendBy'] == myusername)
-          //     callStatus = 'outbound';
-          //   else if (messageData['rejected'] as bool == true)
-          //     callStatus = 'missed';
-          //   else if (messageData['accept'] as bool == true)
-          //     callStatus = 'inbound';
-          //   else
-          //     callStatus = 'missed';
-          //   int year =
-          //       int.parse(messageData['ts'].toString().substring(14, 18));
-          //   int month =
-          //       int.parse(messageData['ts'].toString().substring(8, 10));
-          //   int day = int.parse(messageData['ts'].toString().substring(11, 13));
-          //   int hour = int.parse(messageData['ts'].toString().substring(0, 2));
-          //   int min = int.parse(messageData['ts'].toString().substring(3, 5));
-          //   Chat ret = Chat(
-          //       id: messageData['id'].toString(),
-          //       message: messageData['message'].toString(),
-          //       chatuserName: messageData['sendBy'].toString(),
-          //       callStatus: callStatus,
-          //       time: messageData['ts'].toString(),
-          //       channel: 'GTSOG321_TEST1',
-          //       officialTime: DateTime(year, month, day, hour, min));
-          //   audioMessages.add(ret);
-          //   print('call history added');
-          // }
-
-          // if (messageData["type"] == 'request') {
-          //   audioMessages.clear();
-          //   missedMessages.clear();
-          //   getChatRoomIds();
-          // }
-
           if (messageData["type"] == 'request' &&
               messageData["sendBy"] == username &&
               messageData["rejected"] as bool == false &&
