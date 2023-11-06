@@ -23,7 +23,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   DataController _dataController = Get.find();
   Helper _helperController = Get.find();
   bool search = false;
-  String? myName, myProfilePic, myUserName, myEmail, myId;
+  // String? myName, myProfilePic, myUserName, myEmail, myId;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
   PageController controller = PageController();
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
@@ -80,16 +80,14 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   }
 
   ontheload() async {
-    await getthesharedpref();
     getChannels();
-
     print('chat room ${chatRoomsStream}');
     if (chatRoomsStream != null)
       chatRoomListSubscription =
           chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
-          return e['to_msg_$myUserName'];
+          return e['to_msg_${_dataController.myusername}'];
         }).toList();
         if (!list.isEmpty || !(list.length == 0))
           _dataController.unreadChats.value =
@@ -110,18 +108,9 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   var queryResultSet = [];
   var tempSearchStore = [];
 
-  getthesharedpref() async {
-    myUserName = _dataController.myusername;
-    myName = _dataController.myname;
-    myProfilePic = _dataController.picUrl.value;
-    myEmail = _dataController.email;
-    myId = _dataController.id;
-
-    setState(() {});
-  }
-
   ListenRoom(String channel) async {
-    String username = channel.replaceAll("_", "").replaceAll(myUserName!, "");
+    String username =
+        channel.replaceAll("_", "").replaceAll(_dataController.myusername, "");
     username = username.replaceAll("_", "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
@@ -139,10 +128,10 @@ class _Chat_main_screen extends State<Chat_main_screen> {
     return StreamBuilder(
         stream: chatRoomsStream,
         builder: (context, AsyncSnapshot snapshot) {
-          print('snapsot: ${snapshot.hasData}');
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print('connection waiting');
-            return Text("Loading");
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData) {
@@ -157,11 +146,12 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
                       DocumentSnapshot ds = snapshot.data.docs[index];
-                      String username =
-                          ds.id.replaceAll("_", "").replaceAll(myUserName!, "");
+                      String username = ds.id
+                          .replaceAll("_", "")
+                          .replaceAll(_dataController.myusername, "");
                       _dataController.checkToLastMessage(
                           ds.id,
-                          myUserName!,
+                          _dataController.myusername,
                           username,
                           ds["read"],
                           ds["lastMessageSendBy"],
@@ -173,12 +163,12 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                       return ChatRoomListTile(
                         chatRoomId: ds.id,
                         lastMessage: ds["lastMessage"],
-                        myUsername: myUserName!,
+                        myUsername: _dataController.myusername,
                         sendBy: ds["lastMessageSendBy"],
                         time: ds["lastMessageSendTs"],
                         read: ds["read"],
-                        to_msg_num: ds['to_msg_$myUserName'],
-                        name: ds['sendByNameFrom'] == myName
+                        to_msg_num: ds['to_msg_${_dataController.myusername}'],
+                        name: ds['sendByNameFrom'] == _dataController.myname
                             ? ds['sendByNameTo']
                             : ds['sendByNameFrom'],
                       );
@@ -217,16 +207,6 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                 children: [
                   Container(
                       padding: EdgeInsets.all(2),
-                      // child: IconButton(
-                      //     onPressed: () {
-                      //       _globalKey.currentState!.openDrawer();
-                      //     },
-                      //     icon: Icon(
-                      //       Icons.menu,
-                      //       size: 32,
-                      //       // color: Colors.black.withOpacity(0.8),
-                      //       color: Color(0xff2675ec),
-                      //     )),
                       child: GestureDetector(
                         onTap: () {
                           _globalKey.currentState!.openDrawer();
@@ -241,7 +221,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
                     "ChatUp",
                     style: const TextStyle(
                       fontFamily: "Nunito",
-                      fontSize: 25,
+                      fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: Color(0xff2675ec),
                       height: 1,
@@ -370,12 +350,16 @@ class _Chat_main_screen extends State<Chat_main_screen> {
             ),
           ),
           Obx(() {
-            if (_dataController.roomsLen == 0)
+            if (_dataController.roomsLen == 0 && search == false)
               return SliverToBoxAdapter(
                 child: Container(
                     height: MediaQuery.sizeOf(context).height * 2 / 3,
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: Center(child: Text('no item'))),
+                    // decoration: BoxDecoration(border: Border.all()),
+                    child: Center(
+                        child: Text(
+                      'No item',
+                      style: TextStyle(fontFamily: 'Nunito'),
+                    ))),
               );
             else
               return SliverPadding(
@@ -409,7 +393,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
         await DatabaseMethods().getUserInfo(username.toUpperCase());
 
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
-    String key = chatroomId + myUserName!;
+    String key = chatroomId + _dataController.myusername;
 
     // if (usersBox.get(key) != null)
     // print(
@@ -429,7 +413,8 @@ class _Chat_main_screen extends State<Chat_main_screen> {
   }
 
   Widget buildResultCard(data) {
-    var chatRoomId = getChatRoomIdbyUsername(myUserName!, data["username"]);
+    var chatRoomId =
+        getChatRoomIdbyUsername(_dataController.myusername, data["username"]);
     return FutureBuilder(
         future: getthisUserInfo(data["username"], data['Id'], chatRoomId),
         builder: (context, snapshot) {
@@ -438,7 +423,7 @@ class _Chat_main_screen extends State<Chat_main_screen> {
               search = false;
 
               Map<String, dynamic> chatRoomInfoMap = {
-                "users": [myUserName, data["username"]],
+                "users": [_dataController.myusername, data["username"]],
               };
 
               print('created channel: $chatRoomId');
