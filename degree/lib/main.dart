@@ -1,15 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/util/firebase_options.dart';
-import 'package:degree/pages/home.dart';
-import 'package:degree/pages/login.dart';
 import 'package:degree/pages/onboard_screen.dart';
-import 'package:degree/pages/register.dart';
-import 'package:degree/pages/select_languages.dart';
-import 'package:degree/pages/splash_screen.dart';
-import 'package:degree/service/auth.dart';
-import 'package:degree/models/Customer.dart';
-import 'package:degree/service/Controller.dart';
-import 'package:degree/util/firebase.dart';
+import 'package:degree/models/customer.dart';
+import 'package:degree/service/controller.dart';
+
 import 'package:degree/util/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';
@@ -17,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'service/DataAPI.dart';
+import 'service/data_api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +23,7 @@ void main() async {
   Hive.registerAdapter(CustomerAdapter());
   usersBox = await Hive.openBox('testBox');
 
-  print(DateTime.now());
+  //print(DateTime.now());
 
   runApp(const MyApp());
 
@@ -69,7 +62,7 @@ class MyApp extends StatelessWidget {
       //     }),
       //home: Select_languages(),
       //home: SplashScreen(),
-      home: OnboardScreen(),
+      home: const OnboardScreen(),
       // home: LogIn(),
     );
   }

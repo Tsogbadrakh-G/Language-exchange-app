@@ -26,9 +26,9 @@ class _OnboardScreen extends State<OnboardScreen> {
               height: MediaQuery.of(context).size.height * 1 / 5,
             ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 80),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 80),
               width: double.infinity,
-              child: Text(
+              child: const Text(
                 'Санаа амар харилц!',
                 style: TextStyle(
                     decoration: TextDecoration.none,
@@ -39,52 +39,48 @@ class _OnboardScreen extends State<OnboardScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Container(
-              child: Image.asset(
-                'assets/images/ic_splash.png',
-                scale: 1.5,
-              ),
+            Image.asset(
+              'assets/images/ic_splash.png',
+              scale: 1.5,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Container(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  'Сомни',
-                  style: TextStyle(
-                      decoration: TextDecoration.none,
-                      fontSize: 25,
-                      fontFamily: 'Manrope',
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.normal,
-                      color: Color(0xff0057ff)),
-                  textAlign: TextAlign.center,
-                ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                'Сомни',
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    fontSize: 25,
+                    fontFamily: 'Manrope',
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.normal,
+                    color: Color(0xff0057ff)),
+                textAlign: TextAlign.center,
               ),
             ),
             // SizedBox(
             //   height: MediaQuery.of(context).size.height * 1 / 5,
             // ),
-            SizedBox(
+            const SizedBox(
               height: 80,
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 40),
+              margin: const EdgeInsets.symmetric(horizontal: 40),
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.to(Select_languages());
+                  Get.to(const SelectLanguages());
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  backgroundColor: Color(0xff0057ff),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: const Color(0xff0057ff),
                 ),
                 child: const Text(
                   'ЭХЛҮҮЛЭХ',
@@ -101,17 +97,17 @@ class _OnboardScreen extends State<OnboardScreen> {
               height: 10,
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 40),
+              margin: const EdgeInsets.symmetric(horizontal: 40),
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.to(LogIn());
+                  Get.to(const LogIn());
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  backgroundColor: Color(0xfff1eff6),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: const Color(0xfff1eff6),
                 ),
                 child: const Text(
                   'ШУУД НЭВТРЭХ',
@@ -131,8 +127,8 @@ class _OnboardScreen extends State<OnboardScreen> {
   }
 
   Future callDelay(BuildContext context) async {
-    print("call dellay21");
+    // print("call dellay21");
     await Future.delayed(const Duration(milliseconds: 5000), () {});
-    Get.to(LogIn());
+    Get.to(const LogIn());
   }
 }

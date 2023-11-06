@@ -1,10 +1,10 @@
 import 'package:degree/pages/register.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:degree/service/somni_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-List<String> out_lans = [
+List<String> outLans = [
   'Halh Mongolian',
   'Bengali',
   'Catalan',
@@ -44,45 +44,46 @@ List<String> out_lans = [
   'Western Persian'
 ];
 
-class Select_languages extends StatefulWidget {
-  const Select_languages({Key? key}) : super(key: key);
+class SelectLanguages extends StatefulWidget {
+  const SelectLanguages({Key? key}) : super(key: key);
 
   @override
-  State<Select_languages> createState() => _OnboardScreen();
+  State<SelectLanguages> createState() => _OnboardScreen();
 }
 
-class _OnboardScreen extends State<Select_languages> {
-  DataController _dataController = Get.find();
+class _OnboardScreen extends State<SelectLanguages> {
+  final DataController _dataController = Get.find();
   List<RxBool> isSelected =
-      List.generate(out_lans.length, (index) => false.obs, growable: false);
+      List.generate(outLans.length, (index) => false.obs, growable: false);
   List<String> retval = [];
 
   @override
   void initState() {
-    print('init select languages page $retval');
+    // print('init select languages page $retval');
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('build select');
+    //print('build select');
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: SelectLanguage(),
-      body: Container(
+      appBar: selectLanguageAppBar(),
+      body: SizedBox(
           // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           width: double.infinity,
           height: double.infinity,
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 width: double.infinity,
-                child: Text(
+                child: const Text(
                   'Өөрийн ярьдаг хэлээ сонгоно уу:',
                   style: TextStyle(
                     color: Color(0xff434347),
@@ -93,7 +94,7 @@ class _OnboardScreen extends State<Select_languages> {
               ),
               Expanded(
                   child: ListView.builder(
-                      itemCount: out_lans.length,
+                      itemCount: outLans.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
@@ -101,23 +102,24 @@ class _OnboardScreen extends State<Select_languages> {
                           },
                           child: Obx(
                             () => Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               child: Container(
-                                margin: EdgeInsets.symmetric(
+                                margin: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 20),
                                 decoration: BoxDecoration(
                                   border: Border.all(
                                       width: isSelected[index].value ? 1 : 1,
                                       color: isSelected[index].value
-                                          ? Color(0xff2675EC)
-                                          : Color(0xff8E8383)),
+                                          ? const Color(0xff2675EC)
+                                          : const Color(0xff8E8383)),
                                   color: isSelected[index].value
-                                      ? Color(0xff2675EC).withOpacity(0.3)
+                                      ? const Color(0xff2675EC).withOpacity(0.3)
                                       : Colors.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10)),
                                 ),
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 15),
                                 child: Row(
                                   children: [
@@ -129,25 +131,25 @@ class _OnboardScreen extends State<Select_languages> {
                                         height: 25,
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 14,
                                     ),
                                     Text(
-                                      out_lans[index],
-                                      style: TextStyle(
+                                      outLans[index],
+                                      style: const TextStyle(
                                           color: Color(0xff434347),
                                           fontSize: 15,
                                           fontFamily: 'Nunito',
                                           fontWeight: FontWeight.w500),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     isSelected[index].value
-                                        ? Icon(
+                                        ? const Icon(
                                             Icons.check_circle_outline,
                                             color: Color(0xff2675EC),
                                             size: 23,
                                           )
-                                        : Offstage()
+                                        : const Offstage()
                                   ],
                                 ),
                               ),
@@ -156,28 +158,30 @@ class _OnboardScreen extends State<Select_languages> {
                         );
                       })),
               Container(
-                padding: EdgeInsets.fromLTRB(30, 10, 30, 20),
+                padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
                 width: double.infinity,
                 child: Container(
-                  decoration: BoxDecoration(),
+                  decoration: const BoxDecoration(),
                   child: ElevatedButton(
                     onPressed: () {
-                      for (var i = 0; i < out_lans.length; i++) {
-                        if (isSelected[i].value)
-                          _dataController.native_lans.add(out_lans[i]);
+                      for (var i = 0; i < outLans.length; i++) {
+                        if (isSelected[i].value) {
+                          _dataController.nativeLans.add(outLans[i]);
+                        }
                       }
 
-                      if (_dataController.native_lans.length == 0)
+                      if (_dataController.nativeLans.isEmpty) {
                         SomniAlerts.showMyDialog(context,
                             'Та өөрийн ярьж чаддаг хэлээ сонгоогүй байна.');
-                      else
-                        Get.to(Register());
+                      } else {
+                        Get.to(const Register());
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      backgroundColor: Color(0xff0057ff),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      backgroundColor: const Color(0xff0057ff),
                     ),
                     child: const Text(
                       'Үргэлжлүүлэх',
@@ -196,7 +200,7 @@ class _OnboardScreen extends State<Select_languages> {
     );
   }
 
-  PreferredSizeWidget SelectLanguage() {
+  PreferredSizeWidget selectLanguageAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       leading: IconButton(
@@ -204,8 +208,8 @@ class _OnboardScreen extends State<Select_languages> {
             retval = [];
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios)),
-      title: Text(
+          icon: const Icon(Icons.arrow_back_ios)),
+      title: const Text(
         "Ярих хэлээ сонгох",
         style: TextStyle(
             fontFamily: 'Nunito',

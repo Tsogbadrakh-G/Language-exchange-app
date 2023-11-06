@@ -1,10 +1,10 @@
-import 'package:degree/service/DataAPI.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/data_api.dart';
+import 'package:degree/service/controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-List<String> voice_in_lans = [
+List<String> voiceInLans = [
   'Halh Mongolian',
   'Bengali',
   'Catalan',
@@ -44,7 +44,7 @@ List<String> voice_in_lans = [
   'Western Persian'
 ];
 
-final List<String> input_lans = [
+final List<String> inputLans = [
   'Halh Mongolian',
   'Bengali',
   'Catalan',
@@ -84,19 +84,20 @@ final List<String> input_lans = [
   'Western Persian'
 ];
 
-class Chat_more_screen extends StatefulWidget {
+class ChatMoreScreen extends StatefulWidget {
+  // ignore: prefer_typing_uninitialized_variables, non_constant_identifier_names
   final usrId, name, profileUrl, native_lans, channel;
-  const Chat_more_screen(
+  const ChatMoreScreen(
       this.usrId, this.name, this.profileUrl, this.native_lans, this.channel,
       {Key? key})
       : super(key: key);
 
   @override
-  State<Chat_more_screen> createState() => _Chat_more_screen();
+  State<ChatMoreScreen> createState() => _ChatMoreScreen();
 }
 
-class _Chat_more_screen extends State<Chat_more_screen> {
-  DataController _dataController = Get.find();
+class _ChatMoreScreen extends State<ChatMoreScreen> {
+  final DataController _dataController = Get.find();
   String? selectedValueFrom1;
   String? selectedValueTo1;
   String? selectedValueFrom2;
@@ -105,30 +106,31 @@ class _Chat_more_screen extends State<Chat_more_screen> {
   @override
   void initState() {
     key = widget.channel + _dataController.myusername;
-    print('init key: $key');
+    // print('init key: $key');
     if (usersBox.get(key) != null) {
-      print('users box is not null');
-      selectedValueFrom1 = usersBox.get(key)!.trans_from_voice;
-      selectedValueTo1 = usersBox.get(key)!.trans_to_voice;
-      selectedValueFrom2 = usersBox.get(key)!.trans_from_msg;
-      selectedValueTo2 = usersBox.get(key)!.trans_to_msg;
-      print(
-          'selected vals: from1: $selectedValueFrom1 to1:$selectedValueTo1 from2: $selectedValueFrom2 to2: $selectedValueTo2');
-    } else
-      print('users box is null');
+      // print('users box is not null');
+      selectedValueFrom1 = usersBox.get(key)!.transFromVoice;
+      selectedValueTo1 = usersBox.get(key)!.transToVoice;
+      selectedValueFrom2 = usersBox.get(key)!.transFromMsg;
+      selectedValueTo2 = usersBox.get(key)!.transToMsg;
+      // print(
+      //     'selected vals: from1: $selectedValueFrom1 to1:$selectedValueTo1 from2: $selectedValueFrom2 to2: $selectedValueTo2');
+    }
+    // else
+    //   print('users box is null');
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'name: ${widget.name}, profile url:  ${widget.profileUrl}, native lans: ${widget.native_lans}, input lans: ${input_lans}');
+    // print(
+    //     'name: ${widget.name}, profile url:  ${widget.profileUrl}, native lans: ${widget.native_lans}, input lans: ${input_lans}');
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: SelectLanguage(),
+      appBar: selectLanguage(),
       body: Container(
-        padding: EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -138,11 +140,11 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                 child: Column(
                   children: [
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 30),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
                       width: double.infinity,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xffF9F9F9),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
@@ -155,8 +157,8 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   //shape: BoxShape.circle,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(30)),
                                   border: Border.all(
                                     color: Colors.black.withOpacity(0.5),
                                   ),
@@ -165,13 +167,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                 height: 70,
                                 child: widget.profileUrl != null
                                     ? ClipRRect(
-                                        borderRadius: BorderRadius.all(
+                                        borderRadius: const BorderRadius.all(
                                             Radius.circular(30)),
                                         child: Image.network(
                                           widget.profileUrl,
                                           fit: BoxFit.fill,
                                         ))
-                                    : Offstage(),
+                                    : const Offstage(),
                               ),
                               //   ),
                               const SizedBox(
@@ -192,7 +194,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                       ),
                                       textAlign: TextAlign.left,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 5,
                                     ),
                                     Text(
@@ -209,13 +211,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   ],
                                 ),
                               ),
-                              Expanded(child: Text(''))
+                              const Expanded(child: Text(''))
                             ],
                           ),
-                          Divider(),
+                          const Divider(),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 15,
                               ),
                               Expanded(
@@ -223,9 +225,9 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   child: Wrap(
                                     direction: Axis.horizontal,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Speaks: ",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Manrope',
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
@@ -261,13 +263,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                       )
                                     ],
                                   )),
-                              Expanded(
+                              const Expanded(
                                   child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
                                     "Ready",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontFamily: "Inter",
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
@@ -286,22 +288,22 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 50,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 30),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xffF9F9F9F0),
+                      decoration: const BoxDecoration(
+                        color: Color(0xfff9f9f9f0),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
+                          const Row(
                             children: [
                               Icon(Icons.chat_bubble),
                               Spacer(
@@ -309,7 +311,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               ),
                               Text(
                                 "Your language ",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: "Inter",
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -331,13 +333,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               isExpanded: true,
                               hint: Row(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 4,
                                   ),
                                   Expanded(
                                     child: Text(
                                       selectedValueFrom2 ?? 'Halh Mongolian',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -347,20 +349,18 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(input_lans)
+                              items: List<String>.from(inputLans)
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
-                                          child: Container(
-                                            child: Text(
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           )))
                                   .toList(),
                               //   value: selectedValueFrom2,
@@ -407,9 +407,9 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                           const SizedBox(
                             height: 30,
                           ),
-                          Text(
+                          const Text(
                             "will be transated to",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: "Inter",
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -418,7 +418,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           DropdownButtonHideUnderline(
@@ -426,13 +426,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               isExpanded: true,
                               hint: Row(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 4,
                                   ),
                                   Expanded(
                                     child: Text(
                                       selectedValueTo2 ?? widget.native_lans[0],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -446,16 +446,14 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
-                                          child: Container(
-                                            child: Text(
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           )))
                                   .toList(),
                               //   value: selectedValueTo2,
@@ -503,22 +501,22 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 30),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xffF9F9F9F0),
+                      decoration: const BoxDecoration(
+                        color: Color(0xfff9f9f9f0),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
+                          const Row(
                             children: [
                               Icon(Icons.keyboard_voice),
                               // Image.asset("assets/images/ic_chat_translation.png",
@@ -530,7 +528,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               ),
                               Text(
                                 "Your language ",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: "Inter",
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -552,13 +550,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               isExpanded: true,
                               hint: Row(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 4,
                                   ),
                                   Expanded(
                                     child: Text(
                                       selectedValueFrom1 ?? 'Halh Mongolian',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -568,20 +566,18 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(input_lans)
+                              items: List<String>.from(inputLans)
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
-                                          child: Container(
-                                            child: Text(
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           )))
                                   .toList(),
                               //  value: selectedValueFrom1,
@@ -629,9 +625,9 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                           const SizedBox(
                             height: 30,
                           ),
-                          Text(
+                          const Text(
                             "will be transated to",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: "Inter",
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -640,7 +636,7 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           DropdownButtonHideUnderline(
@@ -648,13 +644,13 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                               isExpanded: true,
                               hint: Row(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 4,
                                   ),
                                   Expanded(
                                     child: Text(
                                       selectedValueTo1 ?? widget.native_lans[0],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
@@ -668,16 +664,14 @@ class _Chat_more_screen extends State<Chat_more_screen> {
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
-                                          child: Container(
-                                            child: Text(
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           )))
                                   .toList(),
                               //value: 'Bengali',
@@ -762,12 +756,12 @@ class _Chat_more_screen extends State<Chat_more_screen> {
     );
   }
 
-  PreferredSizeWidget SelectLanguage() {
+  PreferredSizeWidget selectLanguage() {
     return AppBar(
       backgroundColor: Colors.white,
       leading: IconButton(
           onPressed: () {
-            print('key: $key');
+            //print('key: $key');
             Data.addUser(
                 key,
                 selectedValueFrom1 ?? 'Halh Mongolian', //voice from
@@ -779,8 +773,8 @@ class _Chat_more_screen extends State<Chat_more_screen> {
 
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios)),
-      title: Text(
+          icon: const Icon(Icons.arrow_back_ios)),
+      title: const Text(
         "МЭДЭЭЛЭЛ",
         style: TextStyle(
             fontFamily: 'Nunito',

@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -73,7 +73,7 @@ abstract class FirebaseUtils {
       var fcmToken = await FirebaseMessaging.instance.getToken();
       _dataController.fcmToken = fcmToken ?? 'empty';
       _dataController.updateUserFCMtoken();
-      print('my token: $fcmToken');
+      log('my token: $fcmToken');
       // FirebaseMessaging.instance
       //     .sendMessage(to: fcmToken, data: {'message': 'mnessage'});
 

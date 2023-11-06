@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/DataAPI.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/data_api.dart';
+import 'package:degree/service/controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
@@ -16,19 +16,19 @@ import 'package:random_string/random_string.dart';
 
 const appId = "d565b44b98164c39b2b1855292b22dd2";
 
-class Video_call_screen extends StatefulWidget {
+class VideoCallScreen extends StatefulWidget {
   final String channel, myUserName, username, from, to, channelToken;
   final int uid;
-  const Video_call_screen(this.channel, this.myUserName, this.username,
-      this.from, this.to, this.channelToken, this.uid,
+  const VideoCallScreen(this.channel, this.myUserName, this.username, this.from,
+      this.to, this.channelToken, this.uid,
       {Key? key})
       : super(key: key);
 
   @override
-  State<Video_call_screen> createState() => _Video_call_screen();
+  State<VideoCallScreen> createState() => _VideoCallScreen();
 }
 
-class _Video_call_screen extends State<Video_call_screen> {
+class _VideoCallScreen extends State<VideoCallScreen> {
   int? _remoteUid;
   bool _localUserJoined = false;
   late RtcEngine _engine;
@@ -37,11 +37,11 @@ class _Video_call_screen extends State<Video_call_screen> {
   final dio = Dio();
   bool isRecording = false;
 
-  DataController _dataController = Get.find();
+  final DataController _dataController = Get.find();
 
   @override
   void initState() {
-    print('init video call screen');
+    //print('init video call screen');
     _dataController.exitedForEachChannel_Voice[widget.username] = false;
     initAgora();
     //_dataController.sendJoinRequest(widget.channel);
@@ -105,13 +105,14 @@ class _Video_call_screen extends State<Video_call_screen> {
         options: const ChannelMediaOptions(),
       );
     } catch (e) {
-      print('exception in agora: $e');
+      log('exception in agora: $e');
     }
   }
 
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
+    print('Video call screen');
     return Scaffold(
       // appBar: AppBar(
       //   leading: IconButton(
@@ -129,23 +130,23 @@ class _Video_call_screen extends State<Video_call_screen> {
             child: Container(
               decoration: BoxDecoration(
                   border: Border.all(),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                       image: AssetImage('assets/images/ic_splash.png'),
                       fit: BoxFit.fitWidth)),
             ),
           ),
           Positioned.fill(
             child: Container(
-              decoration:
-                  BoxDecoration(color: Color(0xff000000).withOpacity(0.9)),
+              decoration: BoxDecoration(
+                  color: const Color(0xff000000).withOpacity(0.9)),
               child: _remoteVideo(),
             ),
           ),
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 120, 0, 0),
-              child: Container(
+              padding: const EdgeInsets.fromLTRB(0, 120, 0, 0),
+              child: SizedBox(
                 width: 120,
                 height: 200,
                 child: Center(
@@ -158,7 +159,7 @@ class _Video_call_screen extends State<Video_call_screen> {
                                 ),
                               )
                             : const CircularProgressIndicator()
-                        : Text(
+                        : const Text(
                             'Recording in Progress',
                             style: TextStyle(fontSize: 20),
                           )),
@@ -173,7 +174,7 @@ class _Video_call_screen extends State<Video_call_screen> {
               child: FloatingActionButton(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                child: Icon(Icons.call_end),
+                child: const Icon(Icons.call_end),
                 onPressed: () async {
                   _dataController.exitedForEachChannel_Voice[widget.username] =
                       true;
@@ -189,21 +190,21 @@ class _Video_call_screen extends State<Video_call_screen> {
               scale: 1.2,
               child: FloatingActionButton(
                 backgroundColor: Colors.white70,
-                child: Icon(Icons.music_note),
                 foregroundColor: mute % 2 == 1 ? Colors.red : Colors.black,
                 onPressed: () async {
                   mute++;
-                  print('click $mute');
+                  print('click $mute ${widget.from} ${widget.to}');
                   if (mute % 2 == 0) {
                     await _engine.muteLocalAudioStream(true);
-
+                    print('here');
                     if (widget.from != widget.to) {
                       await _engine.stopAudioRecording();
-
+                      print('here1');
                       Directory tempDir = await getTemporaryDirectory();
                       String record = '${tempDir.absolute.path}/record.wav';
-
-                      print('recorded file: $record');
+                      print('here2');
+                      // print('recorded file: $record');
+                      print('from ${widget.from}, to: ${widget.to}');
                       setState(() {});
                       String val;
                       if (widget.to == "Halh Mongolian") {
@@ -225,8 +226,9 @@ class _Video_call_screen extends State<Video_call_screen> {
                       }
 
                       sendAudioLink(val);
-                    } else
+                    } else {
                       setState(() {});
+                    }
                   } else {
                     await _engine.muteLocalAudioStream(false);
 
@@ -253,6 +255,7 @@ class _Video_call_screen extends State<Video_call_screen> {
                     setState(() {});
                   }
                 },
+                child: const Icon(Icons.music_note),
               ),
             ),
           )
@@ -267,7 +270,7 @@ class _Video_call_screen extends State<Video_call_screen> {
     String formattedDate = DateFormat.yMd().format(now);
     String hour = DateFormat.Hm().format(now);
 
-    print('video time in vidoe call screen: $formattedDate, $hour');
+    //  print('video time in vidoe call screen: $formattedDate, $hour');
     Map<String, dynamic> messageInfoMap = {
       "id": messageId,
       "type": "audio",
@@ -276,7 +279,7 @@ class _Video_call_screen extends State<Video_call_screen> {
       "sendBy": widget.myUserName,
       "read": false,
       "time": FieldValue.serverTimestamp(),
-      "ts": hour + " , " + formattedDate,
+      "ts": "$hour , $formattedDate",
       "missed": false
     };
 
@@ -294,16 +297,16 @@ class _Video_call_screen extends State<Video_call_screen> {
       );
     } else {
       return Padding(
-          padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+          padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
           child: Column(
             children: [
               Text(
                 widget.username,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.white, fontFamily: 'Nunito', fontSize: 20),
                 textAlign: TextAlign.center,
               ),
-              Text(
+              const Text(
                 'Холбогдож байна...',
                 style: TextStyle(
                     color: Color.fromARGB(255, 143, 143, 150),

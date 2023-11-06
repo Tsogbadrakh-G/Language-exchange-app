@@ -24,8 +24,9 @@ class NotificationService {
         onDidReceiveNotificationResponse: onDidReceiveNotification);
     NotificationAppLaunchDetails? detail =
         await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    if (detail?.notificationResponse != null)
+    if (detail?.notificationResponse != null) {
       onDidReceiveNotification(detail!.notificationResponse!);
+    }
   }
 
   static onDidReceiveNotification(

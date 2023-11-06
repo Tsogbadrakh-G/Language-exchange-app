@@ -1,31 +1,32 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:degree/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Helper extends GetxController {
-  DataController _dataController = Get.find();
+  final DataController _dataController = Get.find();
 
   void selectedImage() async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
 
-    if (_file == null) return;
+    if (file == null) return;
 
-    File img = File(_file.path);
+    File img = File(file.path);
     var time = DateTime.now().millisecondsSinceEpoch.toString();
     try {
       await FirebaseStorage.instance
           .ref('${_dataController.myusername}/$time.png')
           .putFile(img);
     } catch (e) {
-      print('upload image to firebase exception: $e');
+      log('image select: $e');
     }
 
     _dataController.picUrl.value = await FirebaseStorage.instance
@@ -44,7 +45,7 @@ class Helper extends GetxController {
     return Drawer(
       width: 300,
       elevation: 30,
-      backgroundColor: Color(0xFfFFFFFF),
+      backgroundColor: const Color(0xFfFFFFFF),
       shadowColor: Colors.white,
       surfaceTintColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -60,9 +61,9 @@ class Helper extends GetxController {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         "Settings",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: "Gilroy",
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -75,7 +76,7 @@ class Helper extends GetxController {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_back_ios,
                           color: Color(0xff2675ec),
                           size: 25,
@@ -91,15 +92,15 @@ class Helper extends GetxController {
                       Container(
                         width: 90,
                         height: 80,
-                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: Stack(
                           children: [
                             GestureDetector(
                               onLongPress: selectedImage,
                               child: Container(
                                 decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30)),
                                     border: Border.all(
                                         color: Colors.black.withOpacity(0.5))),
                                 child: ClipRRect(
@@ -123,7 +124,7 @@ class Helper extends GetxController {
                           ],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 12,
                       ),
                       Expanded(
@@ -190,8 +191,8 @@ class Helper extends GetxController {
               //           fontFamily: 'Nunito',
               //           fontWeight: FontWeight.w400)),
               // ),
-              Divider(),
-              SizedBox(
+              const Divider(),
+              const SizedBox(
                 height: 10,
               ),
               DrawerItem(
@@ -200,8 +201,9 @@ class Helper extends GetxController {
                 myFunction: () async {
                   await FirebaseAuth.instance.signOut();
 
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => LogIn()),
+                      MaterialPageRoute(builder: (context) => const LogIn()),
                       (Route<dynamic> route) => false);
                 },
               )
@@ -217,7 +219,7 @@ class DrawerItem extends StatelessWidget {
   final String title;
   final IconData icon;
   final void Function() myFunction;
-  DrawerItem(
+  const DrawerItem(
       {super.key,
       required this.title,
       required this.icon,
@@ -233,7 +235,7 @@ class DrawerItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Color(0xff2675ec),
+              color: const Color(0xff2675ec),
               size: 30,
             ),
             const SizedBox(

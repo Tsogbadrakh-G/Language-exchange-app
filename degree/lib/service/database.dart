@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:get/get.dart';
 
 class DatabaseMethods {
@@ -21,7 +21,7 @@ class DatabaseMethods {
         .get();
   }
 
-  Future<QuerySnapshot> Search(String username) async {
+  Future<QuerySnapshot> search(String username) async {
     return await FirebaseFirestore.instance
         .collection("users")
         .where("SearchKey", isEqualTo: username.substring(0, 1).toUpperCase())
@@ -94,9 +94,9 @@ class DatabaseMethods {
 
       // Use the document ID to delete the chatroom.
       await chatrooms.doc(chatroomId).delete();
-      print('Chatroom deleted successfully.');
+      log('Chatroom deleted successfully.');
     } catch (e) {
-      print('Error deleting chatroom: $e');
+      log('Error deleting chatroom: $e');
     }
   }
 }

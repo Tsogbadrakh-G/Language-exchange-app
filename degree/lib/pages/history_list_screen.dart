@@ -2,23 +2,23 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 
-class History_list_screen extends StatefulWidget {
+class HistoryListScreen extends StatefulWidget {
   final calls, isAll;
-  const History_list_screen({this.calls, this.isAll});
+  const HistoryListScreen({super.key, this.calls, this.isAll});
 
   @override
-  State<History_list_screen> createState() => _History_list_screen();
+  State<HistoryListScreen> createState() => _HistoryListScreen();
 }
 
-class _History_list_screen extends State<History_list_screen> {
-  DataController _dataController = Get.find();
+class _HistoryListScreen extends State<HistoryListScreen> {
+  final DataController _dataController = Get.find();
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -31,7 +31,8 @@ class _History_list_screen extends State<History_list_screen> {
           },
           child: widget.calls.length != 0
               ? Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   //decoration: BoxDecoration(border: Border.all()),
                   width: double.infinity,
                   height: double.infinity,
@@ -47,36 +48,36 @@ class _History_list_screen extends State<History_list_screen> {
                     },
                   ),
                 )
-              : Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('No Recents',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'Nunito',
-                              fontWeight: FontWeight.w500)),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      SvgPicture.asset(
-                        _getAssetPath(widget.isAll ? 'outbound' : 'missed'),
-                        height: 22,
-                        width: 22,
-                      ),
-                    ],
-                  ),
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('No Recents',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Nunito',
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    SvgPicture.asset(
+                      _getAssetPath(widget.isAll ? 'outbound' : 'missed'),
+                      height: 22,
+                      width: 22,
+                    ),
+                  ],
                 )),
     );
   }
 }
 
 class ChatRoomListTile extends StatefulWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final chatRoomId, userName, time, callStatus;
 
   final bool read;
-  ChatRoomListTile(
-      {required this.chatRoomId,
+  const ChatRoomListTile(
+      {super.key,
+      required this.chatRoomId,
       required this.userName,
       required this.read,
       required this.time,
@@ -88,7 +89,7 @@ class ChatRoomListTile extends StatefulWidget {
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String picUrl = "", name = "", id = "";
-  List<String> user_native_lans = [];
+  List<String> userNativeLans = [];
 
   getthisUserInfo() async {
     QuerySnapshot querySnapshot =
@@ -97,7 +98,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     name = "${user["Name"]}";
     picUrl = "${user["Photo"]}";
     id = "${user["Id"]}";
-    user_native_lans = List<String>.from(user["native_lans"]);
+    userNativeLans = List<String>.from(user["native_lans"]);
     log('username: ${widget.userName}, picUrl: $picUrl, name: $name');
   }
 
@@ -115,9 +116,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           return GestureDetector(
             onTap: () async {},
             child: Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-              decoration: BoxDecoration(
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Color(0xffBEBEBE),
@@ -135,15 +136,15 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     child: Row(
                       children: [
                         picUrl == ""
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : Container(
                                 height: 55,
                                 width: 55,
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         color: Colors.black.withOpacity(0.5)),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30))),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30))),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(30),
                                   child: CachedNetworkImage(
@@ -152,7 +153,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                   ),
                                 ),
                               ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10.0,
                         ),
                         Column(
@@ -163,7 +164,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             ),
                             Text(
                               name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontFamily: "Nunito",
                                 color: Colors.black,
                                 fontSize: 17.0,
@@ -178,7 +179,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                   height: 18,
                                   width: 18,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
                                 Text(
@@ -189,7 +190,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                     fontWeight: FontWeight.w400,
                                     color: widget.callStatus == 'missed'
                                         ? Colors.red
-                                        : Color(0xff8e8e93),
+                                        : const Color(0xff8e8e93),
                                     height: 17 / 14,
                                   ),
                                   textAlign: TextAlign.left,
@@ -210,14 +211,14 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                         //8-13
                         Text(
                           textAlign: TextAlign.end,
-                          '${widget.time.month}' +
-                              " сарын " +
-                              '${widget.time.day}' +
-                              "\n" +
-                              '${widget.time.hour}' +
-                              ':' +
-                              '${widget.time.minute}',
-                          style: TextStyle(
+                          '${widget.time.month}'
+                          " сарын "
+                          '${widget.time.day}'
+                          "\n"
+                          '${widget.time.hour}'
+                          ':'
+                          '${widget.time.minute}',
+                          style: const TextStyle(
                               fontFamily: "Nunito",
                               color: Colors.black45,
                               fontSize: 14.0,

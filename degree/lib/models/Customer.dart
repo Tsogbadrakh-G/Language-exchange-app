@@ -6,23 +6,23 @@ class Customer {
   String id;
 
   @HiveField(1)
-  String trans_from_voice;
+  String transFromVoice;
 
   @HiveField(2)
-  String trans_to_voice;
+  String transToVoice;
 
   @HiveField(3)
-  String trans_from_msg;
+  String transFromMsg;
 
   @HiveField(4)
-  String trans_to_msg;
+  String transToMsg;
 
   Customer({
     required this.id,
-    required this.trans_from_voice,
-    required this.trans_to_voice,
-    required this.trans_from_msg,
-    required this.trans_to_msg,
+    required this.transFromVoice,
+    required this.transToVoice,
+    required this.transFromMsg,
+    required this.transToMsg,
   });
 }
 
@@ -34,10 +34,10 @@ class CustomerAdapter extends TypeAdapter<Customer> {
   Customer read(BinaryReader reader) {
     Customer model = Customer(
       id: reader.read(),
-      trans_from_voice: reader.read(),
-      trans_to_voice: reader.read(),
-      trans_from_msg: reader.read(),
-      trans_to_msg: reader.read(),
+      transFromVoice: reader.read(),
+      transToVoice: reader.read(),
+      transFromMsg: reader.read(),
+      transToMsg: reader.read(),
     );
 
     return model;
@@ -46,9 +46,9 @@ class CustomerAdapter extends TypeAdapter<Customer> {
   @override
   void write(BinaryWriter writer, Customer obj) {
     writer.write(obj.id);
-    writer.write(obj.trans_from_voice);
-    writer.write(obj.trans_to_voice);
-    writer.write(obj.trans_from_msg);
-    writer.write(obj.trans_to_msg);
+    writer.write(obj.transFromVoice);
+    writer.write(obj.transToVoice);
+    writer.write(obj.transFromMsg);
+    writer.write(obj.transToMsg);
   }
 }

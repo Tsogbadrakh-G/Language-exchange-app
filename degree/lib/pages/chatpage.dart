@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/DataAPI.dart';
+import 'package:degree/service/data_api.dart';
 import 'package:degree/pages/Video_call_screen.dart';
 import 'package:degree/pages/chat_more_screen.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../service/database.dart';
@@ -12,7 +12,8 @@ import '../service/database.dart';
 class ChatPage extends StatefulWidget {
   final String name, profileurl, username, channel, userId;
   const ChatPage(
-      {required this.name,
+      {super.key,
+      required this.name,
       required this.profileurl,
       required this.username,
       required this.channel,
@@ -23,11 +24,11 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  DataController _dataController = Get.find();
-  TextEditingController messagecontroller = new TextEditingController();
+  final DataController _dataController = Get.find();
+  TextEditingController messagecontroller = TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
-  int translation_status = 1;
+  int translationStatus = 1;
   var args;
 
   String? selectedValueFromMsg;
@@ -66,7 +67,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     ontheload();
-    print('init chat page');
+    //print('init chat page');
 
     super.initState();
   }
@@ -74,20 +75,21 @@ class _ChatPageState extends State<ChatPage> {
   void languageSelection() {
     key = widget.channel + _dataController.myusername;
     if (usersBox.get(key) != null) {
-      print('users box is not null in chatpage');
-      selectedValueFromVoice = usersBox.get(key)!.trans_from_voice;
-      selectedValueToVoice = usersBox.get(key)!.trans_to_voice;
-      selectedValueFromMsg = usersBox.get(key)!.trans_from_msg;
-      selectedValueToMsg = usersBox.get(key)!.trans_to_msg;
-    } else
-      print('users box is null in chatpage');
+      //  print('users box is not null in chatpage');
+      selectedValueFromVoice = usersBox.get(key)!.transFromVoice;
+      selectedValueToVoice = usersBox.get(key)!.transToVoice;
+      selectedValueFromMsg = usersBox.get(key)!.transFromMsg;
+      selectedValueToMsg = usersBox.get(key)!.transToMsg;
+    }
+    // else
+    //   print('users box is null in chatpage');
   }
 
   getChatRoomIdbyUsername(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
+      return "${b}_$a";
     } else {
-      return "$a\_$b";
+      return "${a}_$b";
     }
   }
 
@@ -98,22 +100,24 @@ class _ChatPageState extends State<ChatPage> {
       children: [
         Flexible(
             child: Container(
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  bottomRight:
-                      sendByMe ? Radius.circular(0) : Radius.circular(24),
-                  topRight: Radius.circular(24),
-                  bottomLeft:
-                      sendByMe ? Radius.circular(24) : Radius.circular(0)),
+                  topLeft: const Radius.circular(24),
+                  bottomRight: sendByMe
+                      ? const Radius.circular(0)
+                      : const Radius.circular(24),
+                  topRight: const Radius.circular(24),
+                  bottomLeft: sendByMe
+                      ? const Radius.circular(24)
+                      : const Radius.circular(0)),
               color: sendByMe
-                  ? Color.fromARGB(255, 234, 236, 240)
-                  : Color.fromARGB(255, 211, 228, 243)),
+                  ? const Color.fromARGB(255, 234, 236, 240)
+                  : const Color.fromARGB(255, 211, 228, 243)),
           child: Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
                 color: Colors.black,
                 fontSize: 15.0,
                 fontWeight: FontWeight.w500),
@@ -129,87 +133,86 @@ class _ChatPageState extends State<ChatPage> {
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.builder(
-                  padding: EdgeInsets.only(bottom: 90.0, top: 130),
+                  padding: const EdgeInsets.only(bottom: 90.0, top: 130),
                   itemCount: snapshot.data.docs.length,
                   reverse: true,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
                     if (ds['type'] == 'text') {
-                      print('text: ${ds['message']}');
+                      //print('text: ${ds['message']}');
                       return chatMessageTile(
                           ds["message"], myUserName == ds["sendBy"]);
                     } else {
-                      print('audio');
-                      return Offstage();
+                      //print('audio');
+                      return const Offstage();
                     }
                   })
-              : Center(
+              : const Center(
                   child: CircularProgressIndicator(),
                 );
         });
   }
 
-  List<String> chat_out_lans = [];
-  List<String> out_lans = [];
+  List<String> chatOutLans = [];
+  List<String> outLans = [];
 
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments;
     languageSelection();
 
-    out_lans = args as List<String>;
-    print('args- $args');
+    outLans = args as List<String>;
+    //print('args- $args');
     return Scaffold(
       appBar: buildAppBar(),
-      backgroundColor: Color(0xFF553370),
-      body: Container(
-        child: Stack(
-          children: [
-            Container(
-                width: double.infinity,
-                height: double.infinity,
+      backgroundColor: const Color(0xFF553370),
+      body: Stack(
+        children: [
+          Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: chatMessage()),
+          Container(
+            margin:
+                const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+            alignment: Alignment.bottomCenter,
+            child: Material(
+              elevation: 5.0,
+              borderRadius: BorderRadius.circular(30),
+              child: Container(
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: chatMessage()),
-            Container(
-              margin: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-              alignment: Alignment.bottomCenter,
-              child: Material(
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(30),
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: TextField(
-                    controller: messagecontroller,
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Type a message",
-                        hintStyle: TextStyle(color: Colors.black45),
-                        suffixIcon: GestureDetector(
-                            onTap: () {
-                              _dataController.addMessage(
-                                  widget.channel,
-                                  messagecontroller.text,
-                                  selectedValueFromMsg ?? "Halh Mongolian",
-                                  selectedValueToMsg ?? out_lans[0],
-                                  widget.username,
-                                  widget.name);
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30)),
+                child: TextField(
+                  controller: messagecontroller,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Type a message",
+                      hintStyle: const TextStyle(color: Colors.black45),
+                      suffixIcon: GestureDetector(
+                          onTap: () {
+                            _dataController.addMessage(
+                                widget.channel,
+                                messagecontroller.text,
+                                selectedValueFromMsg ?? "Halh Mongolian",
+                                selectedValueToMsg ?? outLans[0],
+                                widget.username,
+                                widget.name);
 
-                              messagecontroller.clear();
-                            },
-                            child: Icon(
-                              Icons.send_rounded,
-                            ))),
-                  ),
+                            messagecontroller.clear();
+                          },
+                          child: const Icon(
+                            Icons.send_rounded,
+                          ))),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -241,7 +244,8 @@ class _ChatPageState extends State<ChatPage> {
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(30)),
                         //shape: BoxShape.circle,
                         border:
                             Border.all(color: Colors.black.withOpacity(0.5))),
@@ -249,14 +253,15 @@ class _ChatPageState extends State<ChatPage> {
                     height: 60,
                     child: myProfilePic != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(30)),
                             child: Image.network(
                               widget.profileurl,
                               fit: BoxFit.fill,
                             ))
-                        : Offstage(),
+                        : const Offstage(),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Wrap(
@@ -276,7 +281,7 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Visibility(
                     visible: true,
                     child: Container(
@@ -286,16 +291,16 @@ class _ChatPageState extends State<ChatPage> {
                         onPressed: () async {
                           //if (translation_status % 2 == 0) {
                           int intValue = Random().nextInt(10000);
-                          String token = await Data.generate_token(
+                          String token = await Data.generateToken(
                               widget.channel, intValue);
 
-                          print('channel token $token, uid: $intValue');
-                          Get.to(Video_call_screen(
+                          // print('channel token $token, uid: $intValue');
+                          Get.to(VideoCallScreen(
                               widget.channel,
                               myUserName!,
                               widget.username,
                               selectedValueFromVoice ?? 'Halh Mongolian',
-                              selectedValueToVoice ?? out_lans[0],
+                              selectedValueToVoice ?? outLans[0],
                               token,
                               intValue));
                           _dataController.sendJoinRequest(widget.channel);
@@ -326,11 +331,11 @@ class _ChatPageState extends State<ChatPage> {
                       width: 24,
                       child: RawMaterialButton(
                         onPressed: () async {
-                          await Get.to(Chat_more_screen(
+                          await Get.to(ChatMoreScreen(
                               widget.userId,
                               widget.name,
                               widget.profileurl,
-                              out_lans,
+                              outLans,
                               chatRoomId));
                           setState(() {});
                         },
@@ -353,7 +358,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    print('closing chatpage');
+    //print('closing chatpage');
     _dataController
         .exitedForEachChannel[myUserName ?? _dataController.myusername] = true;
     // lastMessageStream?.cancel();

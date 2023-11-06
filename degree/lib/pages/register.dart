@@ -1,4 +1,4 @@
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:degree/service/somni_alert.dart';
 import 'package:degree/util/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,13 +17,13 @@ class Register extends StatefulWidget {
 }
 
 class _Register extends State<Register> {
-  DataController _dataController = Get.find();
+  final DataController _dataController = Get.find();
   String email = "", password = "", name = "", confirmPassword = "";
 
-  TextEditingController mailcontroller = new TextEditingController();
-  TextEditingController passwordcontroller = new TextEditingController();
-  TextEditingController namecontroller = new TextEditingController();
-  TextEditingController confirmPasswordcontroller = new TextEditingController();
+  TextEditingController mailcontroller = TextEditingController();
+  TextEditingController passwordcontroller = TextEditingController();
+  TextEditingController namecontroller = TextEditingController();
+  TextEditingController confirmPasswordcontroller = TextEditingController();
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
   FocusNode focusNode3 = FocusNode();
@@ -44,35 +44,38 @@ class _Register extends State<Register> {
     super.initState();
   }
 
-  void Validation() {
+  void validation() {
     _isValidMail = EmailValidator.validate(mailcontroller.text);
-    if (namecontroller.text.isEmpty)
+    if (namecontroller.text.isEmpty) {
       _isEmptyName = true;
-    else
+    } else {
       _isEmptyName = false;
-    if (passwordcontroller.text.isEmpty)
+    }
+    if (passwordcontroller.text.isEmpty) {
       _isEmptyPass = true;
-    else
+    } else {
       _isEmptyPass = false;
-    if (confirmPasswordcontroller.text.isEmpty)
+    }
+    if (confirmPasswordcontroller.text.isEmpty) {
       _isEmptyPassConfirm = true;
-    else
+    } else {
       _isEmptyPassConfirm = false;
+    }
 
-    print(
-        'validation name $_isEmptyName, pass: $_isEmptyPass, cpass: $_isEmptyPassConfirm, mail: $_isValidMail');
+    //print(
+    //  'validation name $_isEmptyName, pass: $_isEmptyPass, cpass: $_isEmptyPassConfirm, mail: $_isValidMail');
   }
 
   registration() async {
     if (password == confirmPassword) {
-      print('register');
+      // print('register');
       try {
         email = email.toLowerCase().trim();
 
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        String Id = randomAlphaNumeric(10);
+        String id = randomAlphaNumeric(10);
         String user = email.replaceAll("@gmail.com", "");
         String updateusername =
             user.replaceFirst(user[0], user[0].toUpperCase());
@@ -85,64 +88,68 @@ class _Register extends State<Register> {
           "SearchKey": firstletter,
           "Photo":
               "https://firebasestorage.googleapis.com/v0/b/language-exchange-app-cf264.appspot.com/o/images%2Fimg_profile.png?alt=media&token=82d48d53-f2d7-4c3c-8daa-930ce1253b72&_gl=1*1c3e9ai*_ga*MTAwMzU1OTkzMi4xNjc4OTc2OTE3*_ga_CW55HF8NVT*MTY5ODQ1ODE1OS41MC4xLjE2OTg0NjM0MTEuMjAuMC4w",
-          "Id": Id,
-          "native_lans": _dataController.native_lans
+          "Id": id,
+          "native_lans": _dataController.nativeLans
         };
 
-        await DatabaseMethods().addUserDetails(userInfoMap, Id);
+        await DatabaseMethods().addUserDetails(userInfoMap, id);
 
-        _dataController.SaveUser(
-            Id,
+        _dataController.saveUser(
+            id,
             namecontroller.text,
             updateusername.toUpperCase(),
             userInfoMap["Photo"],
             firstletter,
             email);
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
           "Registered Successfully",
           style: TextStyle(fontSize: 20.0),
         )));
 
-        Get.to(Home());
+        Get.to(const Home());
         FirebaseUtils.main();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Colors.orangeAccent,
               content: Text(
                 "Password Provided is too Weak",
                 style: TextStyle(fontSize: 18.0),
               )));
         } else if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Colors.orangeAccent,
               content: Text(
                 "Account Already exists",
                 style: TextStyle(fontSize: 18.0),
               )));
         }
-        print('sign up exception: ${e.code}');
+        // print('sign up exception: ${e.code}');
       }
-    } else
+    } else {
       SomniAlerts.showMyDialog(context,
           'Таны оруулсан нууц үг болон баталгаажуулсан нууц үг ижилхэн эсэхийг шалгана уу!');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     // args = ModalRoute.of(context)!.settings.arguments;
-    print('args ${_dataController.native_lans}');
+    // print('args ${_dataController.native_lans}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              _dataController.native_lans = [];
+              _dataController.nativeLans = [];
               Get.back();
             },
-            icon: Icon(Icons.arrow_back)),
+            icon: const Icon(Icons.arrow_back)),
         centerTitle: true,
       ),
       body: GestureDetector(
@@ -200,11 +207,11 @@ class _Register extends State<Register> {
                   'assets/images/ic_splash.png',
                   scale: 1.5,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   width: double.infinity,
                   child: Form(
                     key: _formkey,
@@ -212,7 +219,7 @@ class _Register extends State<Register> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextFormField(
                             focusNode: focusNode1,
                             textAlignVertical: TextAlignVertical.center,
@@ -221,16 +228,17 @@ class _Register extends State<Register> {
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1,
-                                    color: Color(0xff434347).withOpacity(0.5)),
+                                    color: const Color(0xff434347)
+                                        .withOpacity(0.5)),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   width: 1.5,
                                   color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нэр",
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
@@ -241,18 +249,18 @@ class _Register extends State<Register> {
                         ),
                         if (_isEmptyName)
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               'Нэрээ оруулна уу.',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextFormField(
                             focusNode: focusNode2,
                             textAlignVertical: TextAlignVertical.center,
@@ -261,16 +269,17 @@ class _Register extends State<Register> {
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1,
-                                    color: Color(0xff434347).withOpacity(0.5)),
+                                    color: const Color(0xff434347)
+                                        .withOpacity(0.5)),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   width: 1.5,
                                   color: Colors.black87,
                                 ),
                               ),
                               hintText: "Имэйл",
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
@@ -281,18 +290,18 @@ class _Register extends State<Register> {
                         ),
                         if (!_isValidMail)
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               'Имэйлээ оруулна уу.',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextFormField(
                             focusNode: focusNode3,
                             textAlignVertical: TextAlignVertical.center,
@@ -307,16 +316,17 @@ class _Register extends State<Register> {
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1,
-                                    color: Color(0xff434347).withOpacity(0.5)),
+                                    color: const Color(0xff434347)
+                                        .withOpacity(0.5)),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   width: 1.5,
                                   color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нууц үг",
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
@@ -328,18 +338,18 @@ class _Register extends State<Register> {
                         ),
                         if (_isEmptyPass)
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               'Нууц үгээ оруулна уу.',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextFormField(
                             focusNode: focusNode4,
                             textAlignVertical: TextAlignVertical.center,
@@ -348,16 +358,17 @@ class _Register extends State<Register> {
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1,
-                                    color: Color(0xff434347).withOpacity(0.5)),
+                                    color: const Color(0xff434347)
+                                        .withOpacity(0.5)),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   width: 1.5,
                                   color: Colors.black87,
                                 ),
                               ),
                               hintText: "Нууц үг баталгаажуулах",
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.normal,
@@ -369,33 +380,33 @@ class _Register extends State<Register> {
                         ),
                         if (_isEmptyPassConfirm)
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               'Баталгаажуулах нууц үгээ оруулна уу.',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30.0,
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                   child: Container(
-                    decoration: BoxDecoration(),
+                    decoration: const BoxDecoration(),
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          Validation();
+                          validation();
                         });
 
                         if (!_isEmptyName &&
@@ -410,15 +421,15 @@ class _Register extends State<Register> {
                               confirmPassword = confirmPasswordcontroller.text;
                             });
                           }
-                          print('object');
+                          // print('object');
                           registration();
                         }
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        backgroundColor: Color(0xff0057ff),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        backgroundColor: const Color(0xff0057ff),
                       ),
                       child: const Text(
                         'Бүртгүүлэх',

@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/call_history_screen.dart';
 import 'package:degree/pages/chat_main_screen.dart';
-import 'package:degree/service/Controller.dart';
+import 'package:degree/service/controller.dart';
 import 'package:degree/service/database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
-  DataController _dataController = Get.find();
+  final DataController _dataController = Get.find();
 
   StreamSubscription? chatRoomListSubscription;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
@@ -34,7 +32,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         FirebaseFirestore.instance.collection('users');
 
     await usersCollection.doc(_dataController.id).update({'status': 'online'});
-    print('user status: $status');
+    //print('user status: $status');
   }
 
   @override
@@ -48,17 +46,19 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   Future<void> load() async {
     chatRoomsStream = await DatabaseMethods().getChatRooms();
-    if (chatRoomsStream != null)
+    if (chatRoomsStream != null) {
       chatRoomListSubscription =
           chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
           return e['to_msg_${_dataController.myusername}'];
         }).toList();
-        if (!list.isEmpty || !(list.length == 0))
+        if (list.isNotEmpty) {
           _dataController.unreadChats.value =
               list.reduce((value, element) => value + element);
+        }
       });
+    }
   }
 
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
@@ -74,8 +74,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     width: 50,
                     height: 30,
                     color: bottomSelectedIndex != 0
-                        ? Color(0xff7C7C82A6).withOpacity(0.65)
-                        : Color(0xff2675EC),
+                        ? const Color(0xff7c7c82a6).withOpacity(0.65)
+                        : const Color(0xff2675EC),
                   ),
                 ),
                 if (_dataController.unreadChats.value > 0) ...[
@@ -83,16 +83,16 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       top: 0,
                       right: 5,
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        decoration: BoxDecoration(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 1),
+                        decoration: const BoxDecoration(
                             color: Colors.red,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Text(
                           '${_dataController.unreadChats.value}',
-                          style:
-                              TextStyle(fontSize: 8, color: Color(0xffFEFFFE)),
+                          style: const TextStyle(
+                              fontSize: 8, color: Color(0xffFEFFFE)),
                         ),
                       )),
                 ],
@@ -112,8 +112,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   width: 30,
                   height: 30,
                   color: bottomSelectedIndex != 1
-                      ? Color(0xff7C7C82A6).withOpacity(0.65)
-                      : Color(0xff2675EC),
+                      ? const Color(0xff7c7c82a6).withOpacity(0.65)
+                      : const Color(0xff2675EC),
                 ),
               ),
               if (0 > 0) ...[
@@ -121,11 +121,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     top: 0,
                     right: 5,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 1),
+                      decoration: const BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Text(
+                      child: const Text(
                         '',
                         style: TextStyle(fontSize: 8, color: Color(0xffFEFFFE)),
                       ),
@@ -153,7 +154,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     setState(() {
       bottomSelectedIndex = index;
       pageController.animateToPage(index,
-          duration: Duration(milliseconds: 500), curve: Curves.easeOut);
+          duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
 
@@ -163,9 +164,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       onPageChanged: (index) {
         pageChanged(index);
       },
-      children: <Widget>[
-        Chat_main_screen(),
-        Call_history_screen(),
+      children: const <Widget>[
+        ChatMainScreen(),
+        CallHistoryScreen(),
       ],
     );
   }
@@ -179,19 +180,19 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         body: buildPageView(),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Color(0xff545458A6).withOpacity(0.65),
-            border: Border(
+            color: const Color(0xff545458a6).withOpacity(0.65),
+            border: const Border(
               top: BorderSide(color: Color(0xffF6F6F6)),
             ),
           ),
           child: BottomNavigationBar(
-            backgroundColor: Color(0xffF6F6F6),
+            backgroundColor: const Color(0xffF6F6F6),
             currentIndex: bottomSelectedIndex,
             items: buildBottomNavBarItems(),
             onTap: (index) {
               bottomTapped(index);
             },
-            selectedItemColor: Color(0xff007AFF),
+            selectedItemColor: const Color(0xff007AFF),
           ),
         ));
 

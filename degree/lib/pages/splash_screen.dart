@@ -9,7 +9,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     callDelay(context);
     return Container(
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(color: Colors.white),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -17,7 +17,7 @@ class SplashScreen extends StatelessWidget {
             Image.asset(
               'assets/images/ic_splash.png',
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             // Text(

@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:degree/models/Customer.dart';
+import 'package:degree/models/customer.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';
@@ -11,11 +11,11 @@ class Data {
   List<String> inputLanguages = [];
 
   List<String> outputLanguages = [];
-  String app_id = 'd565b44b98164c39b2b1855292b22dd2';
-  String app_certificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
+  // String appId = 'd565b44b98164c39b2b1855292b22dd2';
+  // String appCertificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
 
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  static final url = 'http://51.20.44.63:5000/todo';
+  static const url = 'http://51.20.44.63:5000/todo';
   //static final url = 'http://192.168.1.98:5000/todo';
 
   static Future<dynamic> sendAudio(String path, String from, String to,
@@ -32,8 +32,7 @@ class Data {
       'myUsername': myUsername
     });
 
-    //log('pre res and its roomid: $chatroomId');
-
+    print('pre req');
     final response = await dio.post(
       url,
       data: formData,
@@ -60,17 +59,16 @@ class Data {
       'output': to,
     });
 
-    print('pre response for text $text |$from| {$to}');
+    //print('pre response for text $text |$from| {$to}');
 
     final response = await dio.post(
       url,
       data: formData,
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
-    log('response: ${response}');
 
     if (response.statusCode == 200) {
-      print('translated: ${response.data['message']}');
+      // print('translated: ${response.data['message']}');
 
       return response.data['message'];
     } else {
@@ -88,23 +86,16 @@ class Data {
     FormData formData =
         FormData.fromMap({'fcm': toToken, 'name': name, 'content': content});
 
-    print('pre response for notification $formData');
+    // print('pre response for notification $formData');
 
-    final response = await dio.get(
+    dio.get(
       localUrl,
       data: formData,
       options: Options(headers: {"Content-Type": "multipart/form-data"}),
     );
-    log('response: ${response}');
-
-    if (response.statusCode == 200) {
-      print('download: ${response}');
-    } else {
-      print('unsuccessfull req');
-    }
   }
 
-  static Future<String> generate_token(String roomid, int uid) async {
+  static Future<String> generateToken(String roomid, int uid) async {
     final localUrl = 'http://51.20.44.63:5000/generate_agora_token/' + roomid;
     //final localUrl = 'http://192.168.1.98:5000/generate_agora_token/' + roomid;
 
@@ -139,10 +130,10 @@ class Data {
         id,
         Customer(
           id: id,
-          trans_from_voice: fromVoice,
-          trans_to_voice: toVoice,
-          trans_from_msg: fromMsg,
-          trans_to_msg: toMsg,
+          transFromVoice: fromVoice,
+          transToVoice: toVoice,
+          transFromMsg: fromMsg,
+          transToMsg: toMsg,
         ));
   }
 
