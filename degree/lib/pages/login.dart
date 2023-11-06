@@ -1,6 +1,6 @@
 import 'package:degree/pages/onboard_screen.dart';
 import 'package:degree/service/Controller.dart';
-import 'package:degree/service/model/somni_alert.dart';
+import 'package:degree/service/somni_alert.dart';
 import 'package:degree/util/firebase.dart';
 import 'package:flutter/material.dart';
 import '../service/database.dart';

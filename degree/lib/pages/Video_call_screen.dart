@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/DataAPI.dart';
+import 'package:degree/service/DataAPI.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:dio/dio.dart';

@@ -1,6 +1,6 @@
 import 'package:degree/pages/register.dart';
 import 'package:degree/service/Controller.dart';
-import 'package:degree/service/model/somni_alert.dart';
+import 'package:degree/service/somni_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

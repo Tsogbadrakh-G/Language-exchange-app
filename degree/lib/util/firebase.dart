@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
-import '../firebase_options.dart';
+import 'firebase_options.dart';
 // import '../models/token/token.dart';
 // import '../service/locator.dart';
 // import '../service/navigation.dart';

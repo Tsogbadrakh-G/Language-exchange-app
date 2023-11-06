@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/DataAPI.dart';
-import 'package:degree/Video_call_screen.dart';
+import 'package:degree/service/DataAPI.dart';
+import 'package:degree/pages/Video_call_screen.dart';
 import 'package:degree/pages/chat_more_screen.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:flutter/material.dart';

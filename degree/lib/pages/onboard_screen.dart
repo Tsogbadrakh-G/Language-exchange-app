@@ -2,7 +2,6 @@ import 'package:degree/pages/login.dart';
 import 'package:degree/pages/select_languages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 
 class OnboardScreen extends StatefulWidget {
   const OnboardScreen({Key? key}) : super(key: key);

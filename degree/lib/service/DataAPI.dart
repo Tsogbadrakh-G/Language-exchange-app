@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:degree/service/model/Customer.dart';
+import 'package:degree/models/Customer.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';

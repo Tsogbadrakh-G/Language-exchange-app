@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/DataAPI.dart';
+import 'package:degree/service/DataAPI.dart';
 import 'package:degree/pages/chatpage.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
-import 'package:degree/service/model/Customer.dart';
+import 'package:degree/models/Customer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';

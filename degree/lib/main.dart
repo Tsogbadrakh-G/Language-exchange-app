@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/firebase_options.dart';
+import 'package:degree/util/firebase_options.dart';
 import 'package:degree/pages/home.dart';
 import 'package:degree/pages/login.dart';
 import 'package:degree/pages/onboard_screen.dart';
@@ -7,7 +7,7 @@ import 'package:degree/pages/register.dart';
 import 'package:degree/pages/select_languages.dart';
 import 'package:degree/pages/splash_screen.dart';
 import 'package:degree/service/auth.dart';
-import 'package:degree/service/model/Customer.dart';
+import 'package:degree/models/Customer.dart';
 import 'package:degree/service/Controller.dart';
 import 'package:degree/util/firebase.dart';
 import 'package:degree/util/utils.dart';
@@ -17,7 +17,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'DataAPI.dart';
+import 'service/DataAPI.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +25,6 @@ void main() async {
   await Firebase.initializeApp(
       name: 'App', options: DefaultFirebaseOptions.currentPlatform);
 
-  //await Firebase.initializeApp();
-  //FirebaseUtils.main();
   var appDir = await getApplicationSupportDirectory();
   Hive.init(appDir.path);
   Hive.registerAdapter(CustomerAdapter());
