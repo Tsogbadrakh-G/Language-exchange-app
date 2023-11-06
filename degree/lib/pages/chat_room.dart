@@ -1,6 +1,10 @@
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/DataAPI.dart';
 import 'package:degree/pages/chatpage.dart';
+import 'package:degree/service/Controller.dart';
 import 'package:degree/service/database.dart';
 import 'package:degree/service/model/Customer.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,8 +31,9 @@ class ChatRoomListTile extends StatefulWidget {
 }
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
-  String profilePicUrl = "", name = "", username = "", id = "";
+  String picUrl = "", name = "", username = "", id = "";
   List<String> user_native_lans = [];
+  DataController _dataController = Get.find();
   getthisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
@@ -36,8 +41,10 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
         await DatabaseMethods().getUserInfo(username.toUpperCase());
     user_native_lans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
     name = "${querySnapshot.docs[0]["Name"]}";
-    profilePicUrl = "${querySnapshot.docs[0]["Photo"]}";
+    picUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
+
+    log('user name: $username, URL: $picUrl');
 
     String key = widget.chatRoomId + widget.myUsername;
 
@@ -66,6 +73,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
+          log('room build');
           return Slidable(
             key: Key(widget.chatRoomId),
             useTextDirection: false,
@@ -75,6 +83,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 children: [
                   SlidableAction(
                     onPressed: (context) {
+                      if (_dataController.roomsLen > 0)
+                        _dataController.roomsLen--;
                       DatabaseMethods().deleteChatroom(widget.chatRoomId);
                     },
                     padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -84,14 +94,16 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     label: 'delete',
                   ),
                 ]),
-            child: GestureDetector(
+            child: InkWell(
+              highlightColor: Colors.amberAccent,
+              splashColor: Colors.red.shade100,
               onTap: () async {
                 print('click to ${widget.chatRoomId}');
                 await Get.to(
                     ChatPage(
                       userId: id,
                       name: name,
-                      profileurl: profilePicUrl,
+                      profileurl: picUrl,
                       username: username,
                       channel: widget.chatRoomId,
                     ),
@@ -101,17 +113,20 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
+                padding: EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
+                    //border: Border.all(),
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20))),
                 width: double.infinity,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    profilePicUrl == ""
+                    picUrl == ""
                         ? CircularProgressIndicator()
                         : Container(
+                            height: 70,
+                            width: 70,
                             decoration: BoxDecoration(
                                 border: Border.all(
                                     color: Colors.black.withOpacity(0.5)),
@@ -119,10 +134,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                     BorderRadius.all(Radius.circular(30))),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(30),
-                              child: Image.network(
-                                profilePicUrl,
-                                height: 60,
-                                width: 60,
+                              child: CachedNetworkImage(
+                                imageUrl: picUrl,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -141,12 +154,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             widget.name,
                             style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 17.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w500),
                           ),
-                          // const SizedBox(
-                          //   height: 5,
-                          // ),
                           Container(
                             child: Text(
                               widget.sendBy == widget.myUsername
@@ -154,15 +164,15 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                   : widget.lastMessage,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: widget.sendBy == widget.myUsername
-                                    ? Color(0xff848484)
-                                    : widget.read
-                                        ? Color(0xff848484)
-                                        : Color(0xff2675ec),
-                                fontFamily: "Nunito",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                                  color: widget.sendBy == widget.myUsername
+                                      ? Color(0xff848484)
+                                      : widget.read
+                                          ? Color(0xff848484)
+                                          : Color(0xff2675ec),
+                                  fontFamily: "Nunito",
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2),
                             ),
                           ),
                         ],
@@ -178,7 +188,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           widget.time,
                           style: TextStyle(
                               color: Colors.black45,
-                              fontSize: 14.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(
@@ -196,7 +206,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                               '${widget.to_msg_num}',
                               style: const TextStyle(
                                 fontFamily: "Nunito",
-                                fontSize: 15,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
                                 height: 13 / 15,
@@ -208,7 +218,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             widget.sendBy == widget.myUsername)
                           Image.asset(
                             'assets/images/img_viewed.png',
-                            scale: 1.9,
+                            scale: 2,
                           ),
                       ],
                     )
