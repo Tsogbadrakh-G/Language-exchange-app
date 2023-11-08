@@ -27,7 +27,7 @@ class DataController extends GetxController {
   RxList<Chat> missedMessages = RxList.empty(growable: true);
   List<String> activeChatroomListeners = [];
   RxInt roomsLen = 0.obs;
-  RxBool online = false.obs;
+
   String fcmToken = '';
   Map<String, bool> exitedForEachChannel = {};
   // ignore: non_constant_identifier_names
@@ -198,7 +198,6 @@ class DataController extends GetxController {
         "imgUrl": picUrl.value,
         //"missed": false
       };
-      //print('room $chatRoomId');
 
       DocumentSnapshot ds = await FirebaseFirestore.instance
           .collection("chatrooms")
@@ -206,7 +205,6 @@ class DataController extends GetxController {
           .get();
       Map<String, dynamic>? lastMessageData = ds.data() as Map<String, dynamic>;
 
-      // print('lastmessage dta: $lastMessageData');
       int to = 0;
 
       if (lastMessageData["lastMessage"] is String) {

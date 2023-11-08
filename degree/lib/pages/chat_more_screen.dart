@@ -152,11 +152,9 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                         children: [
                           Row(
                             children: [
-                              // Expanded(
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  //shape: BoxShape.circle,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(30)),
                                   border: Border.all(
@@ -175,7 +173,6 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                         ))
                                     : const Offstage(),
                               ),
-                              //   ),
                               const SizedBox(
                                 width: 15,
                               ),

@@ -127,21 +127,39 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                   children: [
                     picUrl == ""
                         ? const CircularProgressIndicator()
-                        : Container(
-                            height: 65,
-                            width: 65,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.black.withOpacity(0.5)),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(30))),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: CachedNetworkImage(
-                                imageUrl: picUrl,
-                                fit: BoxFit.cover,
+                        : Stack(
+                            children: [
+                              Container(
+                                height: 65,
+                                width: 65,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.black.withOpacity(0.5)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30))),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: CachedNetworkImage(
+                                    imageUrl: picUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20))),
+                                    padding: EdgeInsets.all(2),
+                                    child: Image.asset(
+                                      'assets/images/img_online.png',
+                                      scale: 1.7,
+                                    )),
+                              ),
+                            ],
                           ),
                     const SizedBox(
                       width: 10.0,
