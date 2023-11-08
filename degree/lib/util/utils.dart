@@ -125,7 +125,7 @@ class Helper extends GetxController {
                         ),
                       ),
                       const SizedBox(
-                        width: 12,
+                        width: 10,
                       ),
                       Expanded(
                         child: Text(
@@ -143,7 +143,7 @@ class Helper extends GetxController {
                     ],
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                   DrawerItem(
                     title: 'Хэрэглэгчийн булан',
@@ -200,6 +200,11 @@ class Helper extends GetxController {
                 icon: Icons.logout,
                 myFunction: () async {
                   await FirebaseAuth.instance.signOut();
+                  final CollectionReference usersCollection =
+                      FirebaseFirestore.instance.collection('users');
+                  await usersCollection
+                      .doc(_dataController.id)
+                      .update({'status': 'offline'});
 
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pushAndRemoveUntil(
@@ -229,8 +234,11 @@ class DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: myFunction,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 25, left: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.only(bottom: 13, left: 10, top: 12),
         child: Row(
           children: [
             Icon(

@@ -128,8 +128,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                     picUrl == ""
                         ? const CircularProgressIndicator()
                         : Container(
-                            height: 70,
-                            width: 70,
+                            height: 65,
+                            width: 65,
                             decoration: BoxDecoration(
                                 border: Border.all(
                                     color: Colors.black.withOpacity(0.5)),
@@ -157,7 +157,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                             widget.name,
                             style: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 14.0,
+                                fontSize: 17.0,
                                 fontWeight: FontWeight.w500),
                           ),
                           Text(
@@ -172,7 +172,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                         ? const Color(0xff848484)
                                         : const Color(0xff2675ec),
                                 fontFamily: "Nunito",
-                                fontSize: 12,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w500,
                                 height: 1.2),
                           ),

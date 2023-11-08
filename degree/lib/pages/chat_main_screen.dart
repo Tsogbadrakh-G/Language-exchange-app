@@ -219,17 +219,20 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                           height: 20,
                         ),
                       )),
-                  const Text(
-                    "ChatUp",
-                    style: TextStyle(
-                      fontFamily: "Nunito",
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff2675ec),
-                      height: 1,
+                  InkWell(
+                    onTap: () {},
+                    child: const Text(
+                      "ChatUp",
+                      style: TextStyle(
+                        fontFamily: "Nunito",
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff2675ec),
+                        height: 1,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  )
+                  ),
                 ],
               ),
             ],
@@ -259,7 +262,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             titleSpacing: 0,
             automaticallyImplyLeading: false,
             title: Container(
-              // height: 35,
+              height: 37,
               decoration: const BoxDecoration(
                   //color: Colors.white,
                   // borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -278,7 +281,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                 },
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color(0xff0000000d).withOpacity(0.05),
+                  fillColor: Colors.white,
                   contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   suffixIcon: IconButton(
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -309,7 +312,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                               setState(() {});
                             },
                             child: const Icon(
-                              size: 30,
+                              size: 25,
                               Icons.search,
                               color: Color(0Xff2675EC),
                             ),

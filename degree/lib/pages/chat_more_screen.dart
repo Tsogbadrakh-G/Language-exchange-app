@@ -130,7 +130,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
       backgroundColor: Colors.white,
       appBar: selectLanguage(),
       body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        //padding: const EdgeInsets.symmetric(vertical: 10),
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -163,8 +163,8 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                     color: Colors.black.withOpacity(0.5),
                                   ),
                                 ),
-                                width: 70,
-                                height: 70,
+                                width: 65,
+                                height: 65,
                                 child: widget.profileUrl != null
                                     ? ClipRRect(
                                         borderRadius: const BorderRadius.all(
@@ -211,7 +211,15 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ],
                                 ),
                               ),
-                              const Expanded(child: Text(''))
+                              Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30))),
+                                  child: Image.asset(
+                                    'assets/images/flags/Halh Mongolian.png',
+                                    width: 45,
+                                    height: 40,
+                                  )),
                             ],
                           ),
                           const Divider(),

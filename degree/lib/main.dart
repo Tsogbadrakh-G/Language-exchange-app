@@ -2,7 +2,6 @@ import 'package:degree/util/firebase_options.dart';
 import 'package:degree/pages/onboard_screen.dart';
 import 'package:degree/models/customer.dart';
 import 'package:degree/service/controller.dart';
-
 import 'package:degree/util/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';

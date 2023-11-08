@@ -19,20 +19,19 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   StreamSubscription? chatRoomListSubscription;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
 
   @override
   void initState() {
     super.initState();
     load();
+    setStatus('online');
     WidgetsBinding.instance.addObserver(this);
   }
 
   Future<void> setStatus(String status) async {
-    final CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('users');
-
-    await usersCollection.doc(_dataController.id).update({'status': 'online'});
-    //print('user status: $status');
+    await usersCollection.doc(_dataController.id).update({'status': status});
   }
 
   @override
@@ -100,13 +99,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             );
           }),
           label: 'Chats'),
-      // BottomNavigationBarItem(
-      //     icon: new Icon(Icons.missed_video_call), label: 'Calls'),
       BottomNavigationBarItem(
           icon: Stack(
             children: [
               InkWell(
-                // onTap: () {},
                 child: Image.asset(
                   'assets/images/ic_video.png',
                   width: 30,
@@ -173,89 +169,30 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(''),
-        // ),
-        body: buildPageView(),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xff545458a6).withOpacity(0.65),
-            border: const Border(
-              top: BorderSide(color: Color(0xffF6F6F6)),
-            ),
-          ),
-          child: BottomNavigationBar(
-            backgroundColor: const Color(0xffF6F6F6),
-            currentIndex: bottomSelectedIndex,
-            items: buildBottomNavBarItems(),
-            onTap: (index) {
-              bottomTapped(index);
-            },
-            selectedItemColor: const Color(0xff007AFF),
-          ),
-        ));
-
-    // bottomNavigationBar: BottomAppBar(
-    //     padding: EdgeInsets.symmetric(),
-    //     height: 60,
-    //     surfaceTintColor: Colors.white,
-    //     color: Colors.white,
-    //     child: Container(
-    //       width: double.infinity,
-    //       decoration: BoxDecoration(
-    //         border: Border(top: BorderSide(color: Colors.black, width: 1)),
-    //       ),
-    //       child: Row(
-    //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-    //         children: [
-    //           InkWell(
-    //             onTap: () {
-    //               Get.to(Call_history_screen());
-    //             },
-    //             child: Image.asset(
-    //               'assets/images/ic_call.png',
-    //               width: 80,
-    //               height: 80,
-    //             ),
-    //           ),
-    //           Obx(() {
-    //             return Stack(
-    //               children: [
-    //                 InkWell(
-    //                   onTap: () {},
-    //                   child: Image.asset(
-    //                     'assets/images/ic_chat.png',
-    //                     width: 80,
-    //                     height: 80,
-    //                     color: Color(0xff007AFF),
-    //                   ),
-    //                 ),
-    //                 if (_dataController.unreadChats.value > 0) ...[
-    //                   Positioned(
-    //                       top: 5,
-    //                       //left: 10,
-    //                       right: 20,
-    //                       child: Container(
-    //                         padding: EdgeInsets.symmetric(
-    //                             horizontal: 5, vertical: 1),
-    //                         decoration: BoxDecoration(
-    //                             color: Colors.red,
-    //                             borderRadius:
-    //                                 BorderRadius.all(Radius.circular(10))),
-    //                         child: Text(
-    //                           '${_dataController.unreadChats.value}',
-    //                           style: TextStyle(
-    //                               fontSize: 8, color: Color(0xffFEFFFE)),
-    //                         ),
-    //                       )),
-    //                 ],
-    //               ],
-    //             );
-    //           }),
-    //         ],
-    //       ),
-    //     )),
+    return WillPopScope(
+        onWillPop: () async {
+          print('app paused');
+          return true;
+        },
+        child: Scaffold(
+            body: buildPageView(),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xff545458a6).withOpacity(0.65),
+                border: const Border(
+                  top: BorderSide(color: Color(0xffF6F6F6)),
+                ),
+              ),
+              child: BottomNavigationBar(
+                backgroundColor: const Color(0xffF6F6F6),
+                currentIndex: bottomSelectedIndex,
+                items: buildBottomNavBarItems(),
+                onTap: (index) {
+                  bottomTapped(index);
+                },
+                selectedItemColor: const Color(0xff007AFF),
+              ),
+            )));
   }
 
   @override

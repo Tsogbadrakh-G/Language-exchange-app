@@ -165,7 +165,7 @@ class _ChatPageState extends State<ChatPage> {
     //print('args- $args');
     return Scaffold(
       appBar: buildAppBar(),
-      backgroundColor: const Color(0xFF553370),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Container(
@@ -304,17 +304,6 @@ class _ChatPageState extends State<ChatPage> {
                               token,
                               intValue));
                           _dataController.sendJoinRequest(widget.channel);
-                          // } else {
-                          //   Fluttertoast.showToast(
-                          //     msg: 'Ta voice translation icon-ийг сонгоно уу.',
-                          //     toastLength: Toast.LENGTH_SHORT,
-                          //     gravity: ToastGravity.BOTTOM,
-                          //     timeInSecForIosWeb: 1,
-                          //     backgroundColor:
-                          //         Color.fromARGB(255, 199, 197, 197),
-                          //     textColor: Colors.black,
-                          //   );
-                          // }
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_video.png",

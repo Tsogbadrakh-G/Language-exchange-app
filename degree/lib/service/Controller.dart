@@ -27,6 +27,7 @@ class DataController extends GetxController {
   RxList<Chat> missedMessages = RxList.empty(growable: true);
   List<String> activeChatroomListeners = [];
   RxInt roomsLen = 0.obs;
+  RxBool online = false.obs;
   String fcmToken = '';
   Map<String, bool> exitedForEachChannel = {};
   // ignore: non_constant_identifier_names
@@ -264,69 +265,83 @@ class DataController extends GetxController {
           bool exited = exitedForEachChannel_Voice[username] ?? true;
           print(
               'new message: $messageData, widget username: $username, exited: $exited');
+          QuerySnapshot querySnapshot =
+              await DatabaseMethods().getUserInfo(username.toUpperCase());
+          final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
+          String status = user['status'];
+
           if (messageData["type"] == 'request' &&
               messageData["sendBy"] == username &&
               messageData["rejected"] as bool == false &&
-              messageData["accept"] as bool == false &&
-              exited) {
-            await SomniAlerts.alertVideoCall(
-              messageData["sendBy"],
-              () async {
-                int intValue = Random().nextInt(10000);
-                String token = await Data.generateToken(channel, intValue);
-                String key = channel + myusername;
-                Customer? user = usersBox.get(key);
-                String from = '', to = '';
-                if (user != null) {
-                  from = user.transFromVoice;
-                  to = user.transToVoice;
-                } else {
-                  usersBox.put(
-                      channel,
-                      Customer(
-                        id: '1',
-                        transFromVoice: 'Halh Mongolian',
-                        transToVoice: userNativeLans[0],
-                        transFromMsg: 'Halh Mongolian',
-                        transToMsg: userNativeLans[0],
-                      ));
-                  from = 'Halh Mongolian';
-                  to = userNativeLans[0];
-                }
-                Get.back();
-                Get.to(VideoCallScreen(
-                    channel, myusername, username, from, to, token, intValue));
-                try {
-                  final chatPairRef = FirebaseFirestore.instance
-                      .collection('chatrooms')
-                      .doc(channel)
-                      .collection('chats')
-                      .doc(messageData["id"]);
-                  await chatPairRef.update({
-                    'accept': true,
-                  });
-                } catch (e) {
-                  ('Error updating chat pair: $e');
-                }
-              },
-              () async {
-                try {
-                  final chatPairRef = FirebaseFirestore.instance
-                      .collection('chatrooms')
-                      .doc(channel)
-                      .collection('chats')
-                      .doc(messageData["id"]);
-                  await chatPairRef.update({
-                    'rejected': true,
-                  });
-                } catch (e) {
-                  print('Error updating chat pair: $e');
-                }
-                Get.back();
-              },
-            );
-          }
-          if (messageData["type"] == "audio" && exited) {
+              messageData["accept"] as bool == false) {
+            if (status == 'offline') {
+              final chatPairRef = FirebaseFirestore.instance
+                  .collection('chatrooms')
+                  .doc(channel)
+                  .collection('chats')
+                  .doc(messageData["id"]);
+              await chatPairRef.update({
+                'rejected': true,
+              });
+            } else if (exited) {
+              await SomniAlerts.alertVideoCall(
+                messageData["sendBy"],
+                () async {
+                  int intValue = Random().nextInt(10000);
+                  String token = await Data.generateToken(channel, intValue);
+                  String key = channel + myusername;
+                  Customer? user = usersBox.get(key);
+                  String from = '', to = '';
+                  if (user != null) {
+                    from = user.transFromVoice;
+                    to = user.transToVoice;
+                  } else {
+                    usersBox.put(
+                        channel,
+                        Customer(
+                          id: '1',
+                          transFromVoice: 'Halh Mongolian',
+                          transToVoice: userNativeLans[0],
+                          transFromMsg: 'Halh Mongolian',
+                          transToMsg: userNativeLans[0],
+                        ));
+                    from = 'Halh Mongolian';
+                    to = userNativeLans[0];
+                  }
+                  Get.back();
+                  Get.to(VideoCallScreen(channel, myusername, username, from,
+                      to, token, intValue));
+                  try {
+                    final chatPairRef = FirebaseFirestore.instance
+                        .collection('chatrooms')
+                        .doc(channel)
+                        .collection('chats')
+                        .doc(messageData["id"]);
+                    await chatPairRef.update({
+                      'accept': true,
+                    });
+                  } catch (e) {
+                    ('Error updating chat pair: $e');
+                  }
+                },
+                () async {
+                  try {
+                    final chatPairRef = FirebaseFirestore.instance
+                        .collection('chatrooms')
+                        .doc(channel)
+                        .collection('chats')
+                        .doc(messageData["id"]);
+                    await chatPairRef.update({
+                      'rejected': true,
+                    });
+                  } catch (e) {
+                    print('Error updating chat pair: $e');
+                  }
+                  Get.back();
+                },
+              );
+            }
+          } else if (messageData["type"] == "audio" && exited) {
             updateChatReadState(messageData["id"], false, true, channel);
           } else if (messageData["type"] == "audio" &&
               messageData["sendBy"] == username &&
@@ -359,7 +374,7 @@ class DataController extends GetxController {
 
   updateChatReadState(
       String chatId, bool read, bool missed, String channel) async {
-    print('update data: id-$chatId, read- $read, miss- $missed');
+    //print('update data: id-$chatId, read- $read, miss- $missed');
     try {
       final chatPairRef = FirebaseFirestore.instance
           .collection('chatrooms')

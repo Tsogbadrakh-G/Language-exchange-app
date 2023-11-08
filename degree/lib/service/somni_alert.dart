@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 
 class SomniAlerts {
   static Future<void> showMyDialog(BuildContext context, String s1) async {
@@ -40,157 +39,37 @@ class SomniAlerts {
     );
   }
 
-  // static Future<void> alertCall(
-  //   BuildContext context,
-  //   String s1,
-  //   Function() button1,
-  //   Function() button2,
-  // ) async {
-  //   return await showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         backgroundColor: Colors.white,
-  //         contentPadding: const EdgeInsets.all(0),
-  //         content: Container(
-  //           //  decoration: BoxDecoration(border: Border.all()),
-  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-  //           width: 320,
-  //           // height: 160,
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Row(
-  //                 children: [
-  //                   ClipRRect(
-  //                     borderRadius: const BorderRadius.all(Radius.circular(20)),
-  //                     child: Image.asset(
-  //                       'assets/images/call.png',
-  //                       fit: BoxFit.cover,
-  //                       width: 50,
-  //                       height: 50,
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     width: 20,
-  //                   ),
-  //                   Expanded(
-  //                     child: Text(
-  //                       'Танд $s1 хэрэглэгчээс видео дуудлага ирж байна.',
-  //                       style:
-  //                           const TextStyle(fontFamily: 'Nunito', height: 1.2),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(
-  //                 height: 20,
-  //               ),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Transform.scale(
-  //                     scale: 1,
-  //                     child: ClipRRect(
-  //                       borderRadius:
-  //                           const BorderRadius.all(Radius.circular(30)),
-  //                       child: FloatingActionButton(
-  //                           backgroundColor: Colors.green,
-  //                           foregroundColor: Colors.white,
-  //                           onPressed: button1,
-  //                           child: const Icon(Icons.call_end)),
-  //                     ),
-  //                   ),
-  //                   Transform.scale(
-  //                     scale: 1,
-  //                     child: ClipRRect(
-  //                       borderRadius:
-  //                           const BorderRadius.all(Radius.circular(30)),
-  //                       child: FloatingActionButton(
-  //                           backgroundColor: Colors.red,
-  //                           foregroundColor: Colors.white,
-  //                           onPressed: button2,
-  //                           child: const Icon(Icons.call_end)),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   static Future<void> alertVideoCall(
     String s1,
     Function() button1,
     Function() button2,
   ) {
-    return Get.dialog(
-      Container(
-        //  decoration: BoxDecoration(border: Border.all()),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        width: 320,
-        // height: 160,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  child: Image.asset(
-                    'assets/images/call.png',
-                    fit: BoxFit.cover,
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                  child: Text(
-                    'Танд $s1 хэрэглэгчээс видео дуудлага ирж байна.',
-                    style: const TextStyle(fontFamily: 'Nunito', height: 1.2),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Transform.scale(
-                  scale: 1,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    child: FloatingActionButton(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        onPressed: button1,
-                        child: const Icon(Icons.call_end)),
-                  ),
-                ),
-                Transform.scale(
-                  scale: 1,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    child: FloatingActionButton(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        onPressed: button2,
-                        child: const Icon(Icons.call_end)),
-                  ),
-                ),
-              ],
-            )
-          ],
+    return Get.defaultDialog(
+      title: 'Ирэх дуудлага',
+      content: Text(
+        'Танд $s1 хэрэглэгчээс видео дуудлага ирж байна.',
+        style: const TextStyle(fontFamily: 'Nunito', height: 1.2),
+      ),
+      confirm: Transform.scale(
+        scale: 1,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
+          child: FloatingActionButton(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              onPressed: button1,
+              child: const Icon(Icons.call_end)),
+        ),
+      ),
+      cancel: Transform.scale(
+        scale: 1,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
+          child: FloatingActionButton(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              onPressed: button2,
+              child: const Icon(Icons.call_end)),
         ),
       ),
     );
