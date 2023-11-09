@@ -375,12 +375,12 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                 });
                               },
                               buttonStyleData: ButtonStyleData(
-                                height: 60,
+                                height: 50,
                                 width: double.infinity,
                                 padding:
                                     const EdgeInsets.only(left: 14, right: 14),
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: Colors.black26,
                                     ),

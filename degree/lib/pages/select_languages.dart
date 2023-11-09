@@ -34,14 +34,14 @@ List<String> outLans = [
   'Swahili',
   'Swedish',
   'Tagalog',
-  'Telugu',
+  //'Telugu',
   'Thai',
   'Turkish',
   'Ukrainian',
-  'Urdu',
-  'Vietnamese',
-  'Welsh',
-  'Western Persian'
+  // 'Urdu',
+  // 'Vietnamese',
+  // 'Welsh',
+  // 'Western Persian'
 ];
 
 class SelectLanguages extends StatefulWidget {
@@ -126,7 +126,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(5),
                                       child: Image.asset(
-                                        'assets/images/flags/German.png',
+                                        'assets/images/flags/${outLans[index]}.png',
                                         width: 30,
                                         height: 25,
                                       ),

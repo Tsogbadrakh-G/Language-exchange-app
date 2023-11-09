@@ -22,8 +22,6 @@ void main() async {
   Hive.registerAdapter(CustomerAdapter());
   usersBox = await Hive.openBox('testBox');
 
-  //print(DateTime.now());
-
   runApp(const MyApp());
 
   Get.put(DataController());
