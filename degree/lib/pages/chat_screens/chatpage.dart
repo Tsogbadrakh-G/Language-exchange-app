@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/data_api.dart';
-import 'package:degree/pages/Video_call_screen.dart';
-import 'package:degree/pages/chat_more_screen.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/pages/video_call_screens/Video_call_screen.dart';
+import 'package:degree/pages/chat_screens/chat_more_screen.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../service/database.dart';
+import '../../service/database.dart';
 
 class ChatPage extends StatefulWidget {
   final String name, profileurl, username, channel, userId;
@@ -37,8 +37,8 @@ class _ChatPageState extends State<ChatPage> {
   String? selectedValueToVoice;
 
   getthesharedpref() async {
-    myUserName = _dataController.myusername;
-    myName = _dataController.myname;
+    myUserName = _dataController.myUserName;
+    myName = _dataController.myName;
     myProfilePic = _dataController.picUrl.value;
     myEmail = _dataController.email;
 
@@ -73,7 +73,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void languageSelection() {
-    key = widget.channel + _dataController.myusername;
+    key = widget.channel + _dataController.myUserName;
     if (usersBox.get(key) != null) {
       //  print('users box is not null in chatpage');
       selectedValueFromVoice = usersBox.get(key)!.transFromVoice;
@@ -349,7 +349,7 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     //print('closing chatpage');
     _dataController
-        .exitedForEachChannel[myUserName ?? _dataController.myusername] = true;
+        .exitedForEachChannel[myUserName ?? _dataController.myUserName] = true;
     // lastMessageStream?.cancel();
     super.dispose();
   }

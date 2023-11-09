@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:degree/pages/register.dart';
+import 'package:degree/pages/login_screens/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 

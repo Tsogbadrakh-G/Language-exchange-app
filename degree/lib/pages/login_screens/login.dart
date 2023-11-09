@@ -1,15 +1,15 @@
 import 'dart:developer';
 
-import 'package:degree/pages/onboard_screen.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/pages/home.dart';
+import 'package:degree/pages/login_screens/onboard_screen.dart';
+import 'package:degree/service/Controllers/dataController.dart';
+import 'package:degree/service/database.dart';
 import 'package:degree/service/somni_alert.dart';
 import 'package:degree/util/firebase.dart';
 import 'package:flutter/material.dart';
-import '../service/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'home.dart';
 import 'package:degree/pages/forgotpassword.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -85,7 +85,7 @@ class _LogInState extends State<LogIn> {
 
       Get.to(const Home());
       FirebaseUtils.main();
-      _dataController.getCallHistories();
+      _dataController.fetchCallHistories();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         // ignore: use_build_context_synchronously

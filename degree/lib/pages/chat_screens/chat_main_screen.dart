@@ -1,16 +1,14 @@
-import 'package:degree/pages/chat_room.dart';
-import 'package:degree/service/controller.dart';
-import 'package:degree/util/utils.dart';
+import 'package:degree/pages/chat_screens/chat_room.dart';
+import 'package:degree/service/Controllers/dataController.dart';
+import 'package:degree/service/Controllers/listenController.dart';
+import 'package:degree/service/Controllers/helpChatMainController.dart';
+import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/data_api.dart';
-import 'package:degree/models/customer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'chatpage.dart';
-import '../service/database.dart';
 
 class ChatMainScreen extends StatefulWidget {
   const ChatMainScreen({Key? key}) : super(key: key);
@@ -21,9 +19,10 @@ class ChatMainScreen extends StatefulWidget {
 
 class _ChatMainScreen extends State<ChatMainScreen> {
   final DataController _dataController = Get.find();
-  final Helper _helperController = Get.find();
+  final ListenerController _listenerController = Get.find();
+  final HelperChatMainController _helperController = Get.find();
   bool search = false;
-  // String? myName, myProfilePic, myUserName, myEmail, myId;
+
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
   PageController controller = PageController();
   StreamSubscription<Map<String, dynamic>>? lastMessageStream;
@@ -31,7 +30,9 @@ class _ChatMainScreen extends State<ChatMainScreen> {
   final FocusNode _focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
   RxBool menu = true.obs;
-
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+  var queryResultSet = [];
+  var tempSearchStore = [];
   @override
   void initState() {
     ontheload();
@@ -39,6 +40,15 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     _dataController.chatroomsLength();
 
     super.initState();
+  }
+
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      search = true;
+    } else {
+      search = false;
+    }
+    setState(() {});
   }
 
   initiateSearch(value) {
@@ -58,7 +68,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     if (queryResultSet.isEmpty && value.length == 1) {
       //print('search in DataStore');
       DatabaseMethods().search(value).then((QuerySnapshot docs) {
-        for (int i = 0; i < docs.docs.length; ++i) {
+        for (int i = 0; i < docs.docs.length; i++) {
           queryResultSet.add(docs.docs[i].data());
         }
       });
@@ -87,7 +97,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
           chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
-          return e['to_msg_${_dataController.myusername}'];
+          return e['to_msg_${_dataController.myUserName}'];
         }).toList();
         if (list.isNotEmpty) {
           _dataController.unreadChats.value =
@@ -99,20 +109,10 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     [Permission.microphone, Permission.camera, Permission.photos].request();
   }
 
-  getChatRoomIdbyUsername(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "${b}_$a";
-    } else {
-      return "${a}_$b";
-    }
-  }
-
-  var queryResultSet = [];
-  var tempSearchStore = [];
-
   listenRoom(String channel) async {
+    List<String> userNativeLans = [];
     String username =
-        channel.replaceAll("_", "").replaceAll(_dataController.myusername, "");
+        channel.replaceAll("_", "").replaceAll(_dataController.myUserName, "");
     username = username.replaceAll("_", "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
@@ -121,8 +121,8 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     if (!_dataController.activeChatroomListeners.contains(channel)) {
       //  print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
-      _dataController.listenForNewMessages(
-          channel, username, userNativeLans, context);
+      _listenerController.listenForNewMessages(
+          channel, username, userNativeLans);
     }
   }
 
@@ -150,27 +150,28 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                       DocumentSnapshot ds = snapshot.data.docs[index];
                       String username = ds.id
                           .replaceAll("_", "")
-                          .replaceAll(_dataController.myusername, "");
+                          .replaceAll(_dataController.myUserName, "");
                       _dataController.checkToLastMessage(
                           ds.id,
-                          _dataController.myusername,
+                          _dataController.myUserName,
                           username,
                           ds["read"],
                           ds["lastMessageSendBy"],
                           ds.data() as Map<String, dynamic>);
-                      listenRoom(ds.id);
 
-                      log('room id ${ds.id}');
+                      // listenRoom(ds.id);
+                      // _listenerController.listenToUserData(
+                      //     _dataController.fetchThisUserId(username));
 
                       return ChatRoomListTile(
                         chatRoomId: ds.id,
                         lastMessage: ds["lastMessage"],
-                        myUsername: _dataController.myusername,
+                        myUsername: _dataController.myUserName,
                         sendBy: ds["lastMessageSendBy"],
                         time: ds["lastMessageSendTs"],
                         read: ds["read"],
-                        toMsgNum: ds['to_msg_${_dataController.myusername}'],
-                        name: ds['sendByNameFrom'] == _dataController.myname
+                        toMsgNum: ds['to_msg_${_dataController.myUserName}'],
+                        name: ds['sendByNameFrom'] == _dataController.myName
                             ? ds['sendByNameTo']
                             : ds['sendByNameFrom'],
                       );
@@ -179,26 +180,16 @@ class _ChatMainScreen extends State<ChatMainScreen> {
         });
   }
 
-  void _handleFocusChange() {
-    if (_focusNode.hasFocus) {
-      search = true;
-    } else {
-      search = false;
-    }
-    setState(() {});
-  }
-
-  final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
-
   PreferredSizeWidget homeAppbar() {
     return AppBar(
       elevation: 0.5,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       toolbarHeight: 52,
       backgroundColor: Colors.white,
+      leading: Container(),
       flexibleSpace: SafeArea(
         child: Container(
-//          decoration: BoxDecoration(border: Border.all()),
+          decoration: BoxDecoration(border: Border.all()),
           padding: const EdgeInsets.only(
               left: 20.0, right: 20.0, top: 18.0, bottom: 0.0),
           child: Column(
@@ -207,18 +198,6 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                      padding: const EdgeInsets.all(2),
-                      child: GestureDetector(
-                        onTap: () {
-                          _globalKey.currentState!.openDrawer();
-                        },
-                        child: Image.asset(
-                          'assets/images/img_menu.png',
-                          width: 30,
-                          height: 20,
-                        ),
-                      )),
                   InkWell(
                     onTap: () {},
                     child: const Text(
@@ -233,6 +212,18 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  Container(
+                      padding: const EdgeInsets.all(2),
+                      child: GestureDetector(
+                        onTap: () {
+                          _globalKey.currentState!.openDrawer();
+                        },
+                        child: Image.asset(
+                          'assets/images/img_menu.png',
+                          width: 30,
+                          height: 20,
+                        ),
+                      )),
                 ],
               ),
             ],
@@ -253,8 +244,9 @@ class _ChatMainScreen extends State<ChatMainScreen> {
         backgroundColor: Colors.white,
         key: _globalKey,
         appBar: homeAppbar(),
-        drawer:
-            _helperController.drawerBuilder(_dataController.myname, context),
+        endDrawer:
+            _helperController.drawerBuilder(_dataController.myName, context),
+        onEndDrawerChanged: (isOpened) {},
         body: CustomScrollView(slivers: [
           SliverAppBar(
             elevation: 0,
@@ -262,8 +254,8 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             titleSpacing: 0,
             automaticallyImplyLeading: false,
             title: Container(
-              height: 37,
-              decoration: const BoxDecoration(
+              height: 40,
+              decoration: BoxDecoration(border: Border.all()
                   //color: Colors.white,
                   // borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
@@ -355,7 +347,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             ),
           ),
           Obx(() {
-            if (_dataController.roomsLen == 0 && search == false) {
+            if (_dataController.roomsNum.value == 0 && search == false) {
               return SliverToBoxAdapter(
                 child: SizedBox(
                     height: MediaQuery.sizeOf(context).height * 2 / 3,
@@ -381,7 +373,8 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                               primary: false,
                               shrinkWrap: true,
                               children: [...tempSearchStore].map((element) {
-                                return buildResultCard(element);
+                                return _helperController.buildResultCard(
+                                    element, search);
                               }).toList())
                           : chatRoomList();
                     },
@@ -392,122 +385,5 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             }
           }),
         ]));
-  }
-
-  List<String> userNativeLans = [];
-  getthisUserInfo(String username, String usrId, String chatroomId) async {
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
-
-    userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
-    String key = chatroomId + _dataController.myusername;
-
-    // if (usersBox.get(key) != null)
-    // print(
-    //     'user  selected lans $usrId: ${usersBox.get(key)!.trans_from_voice}');
-    if (usersBox.get(key) == null) {
-      //   print('user: $usrId is null');
-      usersBox.put(
-          chatroomId,
-          Customer(
-            id: usrId,
-            transFromVoice: 'Halh Mongolian',
-            transToVoice: userNativeLans[0],
-            transFromMsg: 'Halh Mongolian',
-            transToMsg: userNativeLans[0],
-          ));
-    }
-  }
-
-  Widget buildResultCard(data) {
-    var chatRoomId =
-        getChatRoomIdbyUsername(_dataController.myusername, data["username"]);
-    return FutureBuilder(
-        future: getthisUserInfo(data["username"], data['Id'], chatRoomId),
-        builder: (context, snapshot) {
-          return GestureDetector(
-            onTap: () async {
-              search = false;
-
-              Map<String, dynamic> chatRoomInfoMap = {
-                "users": [_dataController.myusername, data["username"]],
-              };
-
-              // print('created channel: $chatRoomId');
-              await DatabaseMethods()
-                  .createChatRoom(chatRoomId, chatRoomInfoMap);
-
-              if (!_dataController.activeChatroomListeners
-                  .contains(chatRoomId)) {
-                _dataController.listenForNewMessages(
-                    chatRoomId, data["username"], userNativeLans, context);
-              }
-
-              await Get.to(
-                  ChatPage(
-                    userId: data['Id'],
-                    name: data["Name"],
-                    profileurl: data["Photo"],
-                    username: data["username"],
-                    channel: chatRoomId,
-                  ),
-                  arguments: userNativeLans);
-              setState(() {});
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: Material(
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Image.network(
-                            data["Photo"],
-                            height: 60,
-                            width: 60,
-                            fit: BoxFit.cover,
-                          )),
-                      const SizedBox(
-                        width: 20.0,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data["Name"],
-                            style: const TextStyle(
-                                color: Color(0xff434347),
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Nunito',
-                                fontSize: 18.0),
-                          ),
-                          const SizedBox(
-                            height: 5.0,
-                          ),
-                          Text(
-                            data["username"],
-                            style: const TextStyle(
-                                color: Color(0xff434347),
-                                fontSize: 15.0,
-                                fontFamily: 'Nunito',
-                                fontWeight: FontWeight.w400),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
   }
 }

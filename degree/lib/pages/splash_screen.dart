@@ -1,4 +1,4 @@
-import 'package:degree/pages/onboard_screen.dart';
+import 'package:degree/pages/login_screens/onboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

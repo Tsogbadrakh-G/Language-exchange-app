@@ -1,6 +1,6 @@
 import 'dart:developer';
-import 'package:degree/pages/history_list_screen.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/pages/video_call_screens/history_list_screen.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,8 +18,8 @@ class _CallHistoryScreen extends State<CallHistoryScreen> {
 
   @override
   void initState() {
-    myUserName = _dataController.myusername;
-    _dataController.getCallHistories();
+    myUserName = _dataController.myUserName;
+    _dataController.fetchCallHistories();
     log('init call history page');
     super.initState();
   }

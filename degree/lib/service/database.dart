@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:get/get.dart';
 
 class DatabaseMethods {
@@ -82,7 +82,7 @@ class DatabaseMethods {
     return FirebaseFirestore.instance
         .collection("chatrooms")
         .orderBy("time", descending: true)
-        .where("users", arrayContains: _dataController.myusername)
+        .where("users", arrayContains: _dataController.myUserName)
         .snapshots();
   }
 

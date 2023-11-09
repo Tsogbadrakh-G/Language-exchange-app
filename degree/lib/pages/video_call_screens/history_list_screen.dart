@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,7 +27,7 @@ class _HistoryListScreen extends State<HistoryListScreen> {
           onRefresh: () async {
             _dataController.audioMessages.clear();
             _dataController.missedMessages.clear();
-            _dataController.getCallHistories();
+            _dataController.fetchCallHistories();
           },
           child: widget.calls.length != 0
               ? Container(

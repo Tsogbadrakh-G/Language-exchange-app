@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/data_api.dart';
-import 'package:degree/service/controller.dart';
 import 'package:degree/service/database.dart';
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -36,13 +36,12 @@ class _VideoCallScreen extends State<VideoCallScreen> {
   final audioPlayer = AudioPlayer();
   final dio = Dio();
   bool isRecording = false;
-
-  final DataController _dataController = Get.find();
+  ListenerController _listenerController = Get.find();
 
   @override
   void initState() {
     //print('init video call screen');
-    _dataController.exitedForEachChannel_Voice[widget.username] = false;
+    _listenerController.exitedForEachChannel_Voice[widget.username] = false;
     initAgora();
     //_dataController.sendJoinRequest(widget.channel);
 
@@ -176,8 +175,8 @@ class _VideoCallScreen extends State<VideoCallScreen> {
                 foregroundColor: Colors.white,
                 child: const Icon(Icons.call_end),
                 onPressed: () async {
-                  _dataController.exitedForEachChannel_Voice[widget.username] =
-                      true;
+                  _listenerController
+                      .exitedForEachChannel_Voice[widget.username] = true;
                   Get.back();
                 },
               ),
@@ -196,13 +195,13 @@ class _VideoCallScreen extends State<VideoCallScreen> {
                   print('click $mute ${widget.from} ${widget.to}');
                   if (mute % 2 == 0) {
                     await _engine.muteLocalAudioStream(true);
-                    print('here');
+
                     if (widget.from != widget.to) {
                       await _engine.stopAudioRecording();
-                      print('here1');
+
                       Directory tempDir = await getTemporaryDirectory();
                       String record = '${tempDir.absolute.path}/record.wav';
-                      print('here2');
+
                       // print('recorded file: $record');
                       print('from ${widget.from}, to: ${widget.to}');
                       setState(() {});
@@ -323,7 +322,7 @@ class _VideoCallScreen extends State<VideoCallScreen> {
     await _engine.leaveChannel();
     _engine.release();
 
-    _dataController.exitedForEachChannel_Voice[widget.username] = true;
+    _listenerController.exitedForEachChannel_Voice[widget.username] = true;
     super.dispose();
   }
 }

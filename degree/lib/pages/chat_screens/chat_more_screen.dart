@@ -1,5 +1,5 @@
 import 'package:degree/service/data_api.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -105,7 +105,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
   String key = '';
   @override
   void initState() {
-    key = widget.channel + _dataController.myusername;
+    key = widget.channel + _dataController.myUserName;
     // print('init key: $key');
     if (usersBox.get(key) != null) {
       // print('users box is not null');

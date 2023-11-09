@@ -1,5 +1,5 @@
-import 'package:degree/pages/login.dart';
-import 'package:degree/pages/select_languages.dart';
+import 'package:degree/pages/login_screens/login.dart';
+import 'package:degree/pages/login_screens/select_languages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

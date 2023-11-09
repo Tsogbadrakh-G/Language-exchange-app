@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

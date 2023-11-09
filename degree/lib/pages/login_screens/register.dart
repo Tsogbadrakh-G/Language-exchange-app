@@ -1,11 +1,11 @@
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/somni_alert.dart';
 import 'package:degree/util/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'home.dart';
-import '../service/database.dart';
+import '../home.dart';
+import '../../service/database.dart';
 import 'package:random_string/random_string.dart';
 import 'package:email_validator/email_validator.dart';
 

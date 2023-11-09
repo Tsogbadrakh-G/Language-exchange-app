@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/pages/call_history_screen.dart';
-import 'package:degree/pages/chat_main_screen.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/pages/video_call_screens/call_history_screen.dart';
+import 'package:degree/pages/chat_screens/chat_main_screen.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,7 +50,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
-          return e['to_msg_${_dataController.myusername}'];
+          return e['to_msg_${_dataController.myUserName}'];
         }).toList();
         if (list.isNotEmpty) {
           _dataController.unreadChats.value =

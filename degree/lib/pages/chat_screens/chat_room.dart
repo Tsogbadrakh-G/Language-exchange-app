@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/pages/chat_screens/chatpage.dart';
 import 'package:degree/service/data_api.dart';
-import 'package:degree/pages/chatpage.dart';
-import 'package:degree/service/controller.dart';
+import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/database.dart';
 import 'package:degree/models/customer.dart';
 import 'package:flutter/cupertino.dart';
@@ -84,8 +84,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 children: [
                   SlidableAction(
                     onPressed: (context) {
-                      if (_dataController.roomsLen > 0) {
-                        _dataController.roomsLen--;
+                      if (_dataController.roomsNum > 0) {
+                        _dataController.roomsNum--;
                       }
                       DatabaseMethods().deleteChatroom(widget.chatRoomId);
                     },

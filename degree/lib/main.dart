@@ -1,8 +1,9 @@
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/util/firebase_options.dart';
-import 'package:degree/pages/onboard_screen.dart';
+import 'package:degree/pages/login_screens/onboard_screen.dart';
 import 'package:degree/models/customer.dart';
-import 'package:degree/service/controller.dart';
-import 'package:degree/util/utils.dart';
+import 'package:degree/service/Controllers/dataController.dart';
+import 'package:degree/service/Controllers/helpChatMainController.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,7 +26,8 @@ void main() async {
   runApp(const MyApp());
 
   Get.put(DataController());
-  Get.put(Helper());
+  Get.put(ListenerController());
+  Get.put(HelperChatMainController());
   //FirebaseUtils.main();
   await FirebaseMessaging.instance.requestPermission();
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
