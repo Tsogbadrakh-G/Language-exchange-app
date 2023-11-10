@@ -244,6 +244,7 @@ class DataController extends GetxController {
       "ts": "$hour , $formattedDate",
       "rejected": false,
       "accept": false,
+      "missed": false
     };
 
     DatabaseMethods().addMessage(channel, messageId, messageInfoMap);
