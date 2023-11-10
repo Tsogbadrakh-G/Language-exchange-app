@@ -14,13 +14,31 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 class ListenerController extends GetxController {
-  DataController _dataController = Get.find();
+  final DataController _dataController = Get.find();
   RxList<bool> usrsOnlineStats = <bool>[].obs;
   Map<String, StreamSubscription> newMessages = {};
+  // ignore: non_constant_identifier_names
   Map<String, bool> exitedForEachChannel_Voice = {};
+  RxMap<String, bool> channelUsrIsActive = RxMap();
   final dio = Dio();
+  Set<String> processedUsernames = <String>{};
+  Set<String> processedMessageIds = <String>{};
 
-  final Set<String> processedMessageIds = Set<String>();
+  late StreamSubscription<DocumentSnapshot> userDataSubscription;
+  late StreamSubscription<DocumentSnapshot> userRequestChatSubscription;
+
+  Set<String> get processedUsr => processedUsernames;
+  StreamSubscription<DocumentSnapshot> get usrDataSubscription =>
+      userDataSubscription;
+  StreamSubscription<DocumentSnapshot> get usrRequestChatSubscription =>
+      userRequestChatSubscription;
+  Map<String, StreamSubscription> get chatRoomsSubscription => newMessages;
+
+  void setInitProccessedValues() {
+    processedUsernames = <String>{};
+    processedMessageIds = <String>{};
+  }
+
   void listenForNewMessages(
       String channel, String username, List<String> userNativeLans) {
     final CollectionReference messagesCollection =
@@ -163,8 +181,8 @@ class ListenerController extends GetxController {
     }
   }
 
-  void listenToUserData(String userId) {
-    FirebaseFirestore.instance
+  void listenToUserData(String userId, String channel) {
+    userDataSubscription = FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .snapshots()
@@ -173,29 +191,48 @@ class ListenerController extends GetxController {
         // User data has changed
         // Access the data using snapshot.data()
         Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-        print("User data: $userData");
+        print('user status : ${userData['status']}');
+        if (userData['status'] == 'online') {
+          //    channelUsrIsActive.putIfAbsent(channel, () => true);
+
+          channelUsrIsActive[channel] = true;
+        } else {
+          // channelUsrIsActive.putIfAbsent(channel, () => false);
+          channelUsrIsActive[channel] = false;
+        }
+        print('usr: ${channelUsrIsActive[channel]}');
+        print("Listening user data: $userData");
       } else {
         // User document doesn't exist
-        print("User document does not exist");
+        print("Listening user document does not exist");
       }
     });
   }
 
   void listenToChat(String chatId) {
-    FirebaseFirestore.instance
-        .collection('chats') // Replace with the name of your chats collection
-        .doc(chatId) // Provide the specific chat document ID
-        .snapshots()
-        .listen((DocumentSnapshot snapshot) {
-      if (snapshot.exists) {
-        // Chat data has changed
-        // Access the data using snapshot.data()
-        Map<String, dynamic> chatData = snapshot.data() as Map<String, dynamic>;
-        print("Chat data: $chatData");
-      } else {
-        // Chat document doesn't exist
-        print("Chat document does not exist");
-      }
-    });
+    if (!processedMessageIds.contains(chatId)) {
+      userRequestChatSubscription = FirebaseFirestore.instance
+          .collection('chats') // Replace with the name of your chats collection
+          .doc(chatId) // Provide the specific chat document ID
+          .snapshots()
+          .listen((DocumentSnapshot snapshot) {
+        if (snapshot.exists) {
+          Map<String, dynamic> chatData =
+              snapshot.data() as Map<String, dynamic>;
+          print("Chat data: $chatData");
+        } else {
+          // Chat document doesn't exist
+          print("Chat document does not exist");
+        }
+      });
+      processedMessageIds.add(chatId);
+    }
+  }
+
+  @override
+  void dispose() {
+    print('listen controller is disposed');
+    // TODO: implement dispose
+    super.dispose();
   }
 }

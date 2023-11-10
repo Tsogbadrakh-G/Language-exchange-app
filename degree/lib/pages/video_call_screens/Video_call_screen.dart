@@ -36,7 +36,7 @@ class _VideoCallScreen extends State<VideoCallScreen> {
   final audioPlayer = AudioPlayer();
   final dio = Dio();
   bool isRecording = false;
-  ListenerController _listenerController = Get.find();
+  final ListenerController _listenerController = Get.find();
 
   @override
   void initState() {

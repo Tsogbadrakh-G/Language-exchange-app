@@ -126,6 +126,14 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     }
   }
 
+  listenUserData(String username, String channel) async {
+    if (!_listenerController.processedUsr.contains(username)) {
+      String id = await _dataController.fetchThisUserId(username);
+      _listenerController.listenToUserData(id, channel);
+      _listenerController.processedUsernames.add(username);
+    }
+  }
+
   Widget chatRoomList() {
     return StreamBuilder(
         stream: chatRoomsStream,
@@ -159,7 +167,8 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                           ds["lastMessageSendBy"],
                           ds.data() as Map<String, dynamic>);
 
-                      // listenRoom(ds.id);
+                      listenRoom(ds.id);
+                      listenUserData(username, ds.id);
                       // _listenerController.listenToUserData(
                       //     _dataController.fetchThisUserId(username));
 
@@ -186,10 +195,11 @@ class _ChatMainScreen extends State<ChatMainScreen> {
       automaticallyImplyLeading: true,
       toolbarHeight: 52,
       backgroundColor: Colors.white,
+      foregroundColor: Colors.white,
       leading: Container(),
       flexibleSpace: SafeArea(
         child: Container(
-          decoration: BoxDecoration(border: Border.all()),
+          //   decoration: BoxDecoration(border: Border.all()),
           padding: const EdgeInsets.only(
               left: 20.0, right: 20.0, top: 18.0, bottom: 0.0),
           child: Column(
@@ -198,6 +208,19 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    child: GestureDetector(
+                      onTap: () {
+                        _globalKey.currentState!.openDrawer();
+                      },
+                      child: Image.asset(
+                        'assets/images/img_menu.png',
+                        width: 30,
+                        height: 20,
+                      ),
+                    ),
+                  ),
                   InkWell(
                     onTap: () {},
                     child: const Text(
@@ -212,18 +235,6 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Container(
-                      padding: const EdgeInsets.all(2),
-                      child: GestureDetector(
-                        onTap: () {
-                          _globalKey.currentState!.openDrawer();
-                        },
-                        child: Image.asset(
-                          'assets/images/img_menu.png',
-                          width: 30,
-                          height: 20,
-                        ),
-                      )),
                 ],
               ),
             ],
@@ -244,7 +255,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
         backgroundColor: Colors.white,
         key: _globalKey,
         appBar: homeAppbar(),
-        endDrawer:
+        drawer:
             _helperController.drawerBuilder(_dataController.myName, context),
         onEndDrawerChanged: (isOpened) {},
         body: CustomScrollView(slivers: [
@@ -253,9 +264,11 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             floating: true,
             titleSpacing: 0,
             automaticallyImplyLeading: false,
+            backgroundColor: Colors.white,
             title: Container(
               height: 40,
-              decoration: BoxDecoration(border: Border.all()
+              decoration: const BoxDecoration(
+                  //border: Border.all()
                   //color: Colors.white,
                   // borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),

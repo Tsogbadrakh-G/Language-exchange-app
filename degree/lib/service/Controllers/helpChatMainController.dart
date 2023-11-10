@@ -115,8 +115,8 @@ class HelperChatMainController extends GetxController {
                                   child: Obx(() {
                                     return CachedNetworkImage(
                                       imageUrl: _dataController.picUrl.value,
-                                      width: 100,
-                                      height: 100,
+                                      width: 70,
+                                      height: 70,
                                     );
                                     // return Image.network(
                                     //   _dataController.picUrl.value,

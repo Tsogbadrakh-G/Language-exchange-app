@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/models/chat.dart';
 import 'package:degree/service/database.dart';
@@ -8,6 +9,7 @@ import 'package:random_string/random_string.dart';
 import 'package:dio/dio.dart';
 
 class DataController extends GetxController {
+  final ListenerController _listenerController = Get.find();
   final dio = Dio();
   String id = '', myName = '', myUserName = '', key = '', email = '';
   Rx<String> picUrl = ''.obs;
@@ -231,13 +233,15 @@ class DataController extends GetxController {
     String formattedDate = DateFormat.yMd().format(now);
     String hour = DateFormat.Hm().format(now);
 
+    _listenerController.listenToChat(messageId);
+
     Map<String, dynamic> messageInfoMap = {
       "id": messageId,
       "type": "request",
       "message": "video call invitation",
       "sendBy": myUserName,
       "time": FieldValue.serverTimestamp(),
-      "ts": hour + " , " + formattedDate,
+      "ts": "$hour , $formattedDate",
       "rejected": false,
       "accept": false,
     };

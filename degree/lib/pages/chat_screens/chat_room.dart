@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/chat_screens/chatpage.dart';
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/database.dart';
@@ -35,6 +34,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String picUrl = "", name = "", username = "", id = "";
   List<String> userNativeLans = [];
   final DataController _dataController = Get.find();
+  final ListenerController _listenerController = Get.find();
   getthisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
@@ -45,7 +45,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     picUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
 
-    log('user name: $username, URL: $picUrl');
+    //log('user name: $username, URL: $picUrl');
 
     String key = widget.chatRoomId + widget.myUsername;
 
@@ -74,7 +74,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
-          log('room build');
+          // log('room build');
           return Slidable(
             key: Key(widget.chatRoomId),
             useTextDirection: false,
@@ -145,20 +145,32 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                    padding: EdgeInsets.all(2),
-                                    child: Image.asset(
-                                      'assets/images/img_online.png',
-                                      scale: 1.7,
-                                    )),
-                              ),
+                              Obx(() {
+                                print('herer');
+                                if (!_listenerController.channelUsrIsActive
+                                    .containsKey(widget.chatRoomId)) {
+                                  return const Offstage();
+                                } else {
+                                  return _listenerController.channelUsrIsActive[
+                                          widget.chatRoomId]!
+                                      ? Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(20))),
+                                              padding: EdgeInsets.all(2),
+                                              child: Image.asset(
+                                                'assets/images/img_online.png',
+                                                scale: 1.7,
+                                              )),
+                                        )
+                                      : const Offstage();
+                                }
+                              })
                             ],
                           ),
                     const SizedBox(

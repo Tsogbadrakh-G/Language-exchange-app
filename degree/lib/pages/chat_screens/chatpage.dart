@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/pages/video_call_screens/Video_call_screen.dart';
 import 'package:degree/pages/chat_screens/chat_more_screen.dart';
@@ -25,6 +26,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final DataController _dataController = Get.find();
+  final ListenerController _listenerController = Get.find();
   TextEditingController messagecontroller = TextEditingController();
   String? myUserName, myProfilePic, myName, myEmail, messageId, chatRoomId;
   Stream? messageStream;
@@ -336,6 +338,28 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
+                  Obx(
+                    () => Visibility(
+                      visible: _listenerController.channelUsrIsActive
+                              .containsKey(widget.channel)
+                          ? _listenerController
+                                  .channelUsrIsActive[widget.channel] ??
+                              false
+                          : false,
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: Image.asset(
+                          'assets/images/img_online.png',
+                          scale: 1.7,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  )
                 ],
               ),
             ),

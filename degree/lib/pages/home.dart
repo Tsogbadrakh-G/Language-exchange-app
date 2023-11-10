@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/video_call_screens/call_history_screen.dart';
 import 'package:degree/pages/chat_screens/chat_main_screen.dart';
 import 'package:degree/service/Controllers/dataController.dart';
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   final DataController _dataController = Get.find();
+  final ListenerController _listenerController = Get.find();
 
   StreamSubscription? chatRoomListSubscription;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
@@ -25,6 +27,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    print('init home screen');
+    _listenerController.setInitProccessedValues();
     load();
     setStatus('online');
     WidgetsBinding.instance.addObserver(this);
@@ -198,6 +202,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void dispose() {
     print('disposing home screen');
+    _listenerController.usrDataSubscription.cancel();
+    _listenerController.usrDataSubscription.cancel();
+    Iterable<String> roomKeys = _listenerController.chatRoomsSubscription.keys;
+    for (var element in roomKeys) {
+      _listenerController.chatRoomsSubscription[element]?.cancel();
+    }
     super.dispose();
   }
 }

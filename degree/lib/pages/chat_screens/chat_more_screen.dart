@@ -1,3 +1,4 @@
+import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/Controllers/dataController.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -98,6 +99,7 @@ class ChatMoreScreen extends StatefulWidget {
 
 class _ChatMoreScreen extends State<ChatMoreScreen> {
   final DataController _dataController = Get.find();
+  final ListenerController _listenerController = Get.find();
   String? selectedValueFrom1;
   String? selectedValueTo1;
   String? selectedValueFrom2;
@@ -129,7 +131,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: selectLanguage(),
-      body: Container(
+      body: SizedBox(
         //padding: const EdgeInsets.symmetric(vertical: 10),
         width: double.infinity,
         height: double.infinity,
@@ -268,26 +270,83 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                       )
                                     ],
                                   )),
-                              const Expanded(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    "Ready",
-                                    style: TextStyle(
-                                      fontFamily: "Inter",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff000000),
-                                      height: 22 / 14,
-                                    ),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                ],
-                              ))
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Obx(() {
+                                print('more sc');
+                                //if (
+                                return !_listenerController.channelUsrIsActive
+                                        .containsKey(widget.channel)
+                                    ?
+                                    //) {
+                                    const Text('Undefined')
+                                    : _listenerController
+                                            .channelUsrIsActive[widget.channel]!
+                                        ?
+                                        // } else {
+                                        //   return
+
+                                        //     ?
+                                        Expanded(
+                                            child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/img_online.png',
+                                                scale: 1.7,
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              const Text(
+                                                "Ready",
+                                                style: TextStyle(
+                                                  fontFamily: "Inter",
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(0xff000000),
+                                                  height: 22 / 14,
+                                                ),
+                                                textAlign: TextAlign.left,
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                            ],
+                                          ))
+                                        : Expanded(
+                                            flex: 2,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/images/img_online.png',
+                                                  scale: 1.7,
+                                                  color: Colors.red,
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                const Text(
+                                                  "Unavailable",
+                                                  style: TextStyle(
+                                                    fontFamily: "Inter",
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff000000),
+                                                    height: 22 / 14,
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                              ],
+                                            ));
+                              })
                             ],
                           ),
                         ],
