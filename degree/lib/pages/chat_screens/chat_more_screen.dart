@@ -5,86 +5,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-List<String> voiceInLans = [
-  'Halh Mongolian',
-  'Bengali',
-  'Catalan',
-  'Czech',
-  'Danish',
-  'Dutch',
-  'English',
-  'Estonian',
-  'Finnish',
-  'French',
-  'German',
-  'Hindi',
-  'Indonesian',
-  'Italian',
-  'Japanese',
-  'Korean',
-  'Maltese',
-  'Mandarin Chinese',
-  'Modern Standard Arabic',
-  'Northern Uzbek',
-  'Polish',
-  'Portuguese',
-  'Romanian',
-  'Russian',
-  'Slovak',
-  'Spanish',
-  'Swahili',
-  'Swedish',
-  'Tagalog',
-  'Telugu',
-  'Thai',
-  'Turkish',
-  'Ukrainian',
-  'Urdu',
-  'Vietnamese',
-  'Welsh',
-  'Western Persian'
-];
-
-final List<String> inputLans = [
-  'Halh Mongolian',
-  'Bengali',
-  'Catalan',
-  'Czech',
-  'Danish',
-  'Dutch',
-  'English',
-  'Estonian',
-  'Finnish',
-  'French',
-  'German',
-  'Hindi',
-  'Indonesian',
-  'Italian',
-  'Japanese',
-  'Korean',
-  'Maltese',
-  'Mandarin Chinese',
-  'Modern Standard Arabic',
-  'Northern Uzbek',
-  'Polish',
-  'Portuguese',
-  'Romanian',
-  'Russian',
-  'Slovak',
-  'Spanish',
-  'Swahili',
-  'Swedish',
-  'Tagalog',
-  'Telugu',
-  'Thai',
-  'Turkish',
-  'Ukrainian',
-  'Urdu',
-  'Vietnamese',
-  'Welsh',
-  'Western Persian'
-];
-
 class ChatMoreScreen extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables, non_constant_identifier_names
   final usrId, name, profileUrl, native_lans, channel;
@@ -413,20 +333,21 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(inputLans)
-                                  .map(
-                                      (String item) => DropdownMenuItem<String>(
-                                          value: item,
-                                          child: Text(
-                                            item,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          )))
-                                  .toList(),
+                              items:
+                                  List<String>.from(_dataController.inputLans)
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              )))
+                                      .toList(),
                               //   value: selectedValueFrom2,
                               onChanged: (String? value) {
                                 setState(() {
@@ -630,20 +551,21 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(inputLans)
-                                  .map(
-                                      (String item) => DropdownMenuItem<String>(
-                                          value: item,
-                                          child: Text(
-                                            item,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          )))
-                                  .toList(),
+                              items:
+                                  List<String>.from(_dataController.inputLans)
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              )))
+                                      .toList(),
                               //  value: selectedValueFrom1,
                               onChanged: (String? value) {
                                 setState(() {

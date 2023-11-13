@@ -20,6 +20,46 @@ class DataController extends GetxController {
   List<String> activeChatroomListeners = [];
   RxInt roomsNum = 0.obs;
 
+  final List<String> inputLans = [
+    'Halh Mongolian',
+    'Bengali',
+    'Catalan',
+    'Czech',
+    'Danish',
+    'Dutch',
+    'English',
+    'Estonian',
+    'Finnish',
+    'French',
+    'German',
+    'Hindi',
+    'Indonesian',
+    'Italian',
+    'Japanese',
+    'Korean',
+    'Maltese',
+    'Mandarin Chinese',
+    'Modern Standard Arabic',
+    'Northern Uzbek',
+    'Polish',
+    'Portuguese',
+    'Romanian',
+    'Russian',
+    'Slovak',
+    'Spanish',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
+    'Telugu',
+    'Thai',
+    'Turkish',
+    'Ukrainian',
+    'Urdu',
+    'Vietnamese',
+    'Welsh',
+    'Western Persian'
+  ];
+
   String fcmToken = '';
   Map<String, bool> exitedForEachChannel = {};
   // ignore: non_constant_identifier_names
