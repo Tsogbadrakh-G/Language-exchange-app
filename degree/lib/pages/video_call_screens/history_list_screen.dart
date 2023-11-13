@@ -110,6 +110,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
 
   @override
   Widget build(BuildContext context) {
+    String min = widget.time.minute < 10
+        ? '0${widget.time.minute}'
+        : '${widget.time.minute}';
     return FutureBuilder(
         future: getthisUserInfo(),
         builder: (context, snapshot) {
@@ -217,7 +220,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           "\n"
                           '${widget.time.hour}'
                           ':'
-                          '${widget.time.minute}',
+                          '$min',
                           style: const TextStyle(
                               fontFamily: "Nunito",
                               color: Colors.black45,

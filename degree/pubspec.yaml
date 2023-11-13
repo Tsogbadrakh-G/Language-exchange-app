@@ -65,7 +65,7 @@ dependencies:
   email_validator: ^2.1.17
   flutter_custom_clippers: ^2.1.0
   flutter_slidable: ^3.0.0
-  table_calendar: ^3.0.9
+
 
 dev_dependencies:
   flutter_test:

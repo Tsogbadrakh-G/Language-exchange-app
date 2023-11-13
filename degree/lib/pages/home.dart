@@ -29,6 +29,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     print('init home screen');
     _listenerController.setInitProccessedValues();
+    _dataController.activeChatroomListeners = [];
     load();
     setStatus('online');
     WidgetsBinding.instance.addObserver(this);

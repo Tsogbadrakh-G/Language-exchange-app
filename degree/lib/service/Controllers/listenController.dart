@@ -11,7 +11,9 @@ import 'package:degree/service/database.dart';
 import 'package:degree/service/somni_alert.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:random_string/random_string.dart';
 
 class ListenerController extends GetxController {
   final DataController _dataController = Get.find();
@@ -43,7 +45,7 @@ class ListenerController extends GetxController {
       String channel, String username, List<String> userNativeLans) {
     final CollectionReference messagesCollection =
         FirebaseFirestore.instance.collection('chatrooms/$channel/chats');
-
+    print('listening $channel');
     newMessages[channel] =
         messagesCollection.snapshots().listen((QuerySnapshot snapshot) {
       // ignore: avoid_function_literals_in_foreach_calls
@@ -54,17 +56,27 @@ class ListenerController extends GetxController {
           bool exited = exitedForEachChannel_Voice[username] ?? true;
           print(
               'new message: $messageData, widget username: $username, exited: $exited');
-          QuerySnapshot querySnapshot =
-              await DatabaseMethods().getUserInfo(username.toUpperCase());
-          print('queried');
+          QuerySnapshot querySnapshot = await DatabaseMethods()
+              .getUserInfo(_dataController.myUserName.toUpperCase());
+
           final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
           String status = user['status'];
           print('status $status');
-
-          if (messageData["type"] == 'request' &&
+          if (messageData['type'] == 'endCall' && !messageData['read']) {
+            Get.back();
+            final chatPairRef = FirebaseFirestore.instance
+                .collection('chatrooms')
+                .doc(channel)
+                .collection('chats')
+                .doc(messageData["id"]);
+            await chatPairRef.update({
+              'read': true,
+            });
+          } else if (messageData["type"] == 'request' &&
               messageData["sendBy"] == username &&
               messageData["rejected"] as bool == false &&
-              messageData["accept"] as bool == false) {
+              messageData["accept"] as bool == false &&
+              messageData['missed'] as bool == false) {
             if (status == 'offline') {
               final chatPairRef = FirebaseFirestore.instance
                   .collection('chatrooms')
@@ -72,7 +84,7 @@ class ListenerController extends GetxController {
                   .collection('chats')
                   .doc(messageData["id"]);
               await chatPairRef.update({
-                'rejected': true,
+                'missed': true,
               });
             } else if (exited) {
               await SomniAlerts.alertVideoCall(
@@ -132,9 +144,11 @@ class ListenerController extends GetxController {
                 },
               );
             }
-          } else if (messageData["type"] == "audio" && exited) {
-            updateChatReadState(messageData["id"], false, true, channel);
-          } else if (messageData["type"] == "audio" &&
+          }
+          // else if (messageData["type"] == "audio" && exited) {
+          //   updateChatReadState(messageData["id"], false, true, channel);
+          // }
+          else if (messageData["type"] == "audio" &&
               messageData["sendBy"] == username &&
               messageData["missed"] == false &&
               messageData["read"] == false) {
@@ -145,6 +159,77 @@ class ListenerController extends GetxController {
         }
       });
     });
+  }
+
+  void listenToChat(String chatId, String channel) {
+    if (!processedMessageIds.contains(chatId)) {
+      userRequestChatSubscription = FirebaseFirestore.instance
+          .collection(
+              'chatrooms/$channel/chats') // Replace with the name of your chats collection
+          .doc(chatId) // Provide the specific chat document ID
+          .snapshots()
+          .listen((DocumentSnapshot snapshot) {
+        if (snapshot.exists) {
+          Map<String, dynamic> chatData =
+              snapshot.data() as Map<String, dynamic>;
+          String sendBy = chatData['sendBy'];
+          if (sendBy == _dataController.myUserName &&
+              chatData['missed'] as bool) {
+            Get.back();
+          } else if (sendBy == _dataController.myUserName &&
+              chatData['rejected'] as bool) {
+            Get.back();
+          }
+          print("Chat data: $chatData");
+        } else {
+          // Chat document doesn't exist
+          print("Chat document does not exist");
+        }
+      });
+      processedMessageIds.add(chatId);
+    }
+  }
+
+  void sendJoinRequest(String channel) {
+    String messageId = randomAlphaNumeric(10);
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat.yMd().format(now);
+    String hour = DateFormat.Hm().format(now);
+
+    listenToChat(messageId, channel);
+
+    Map<String, dynamic> messageInfoMap = {
+      "id": messageId,
+      "type": "request",
+      "message": "video call invitation",
+      "sendBy": _dataController.myUserName,
+      "time": FieldValue.serverTimestamp(),
+      "ts": "$hour , $formattedDate",
+      "rejected": false,
+      "accept": false,
+      "missed": false
+    };
+
+    DatabaseMethods().addMessage(channel, messageId, messageInfoMap);
+  }
+
+  void sendEndCall(String channel) {
+    String messageId = randomAlphaNumeric(10);
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat.yMd().format(now);
+    String hour = DateFormat.Hm().format(now);
+
+    Map<String, dynamic> messageInfoMap = {
+      "id": messageId,
+      "type": "endCall",
+      "message": "video call invitation",
+      "sendBy": _dataController.myUserName,
+      "time": FieldValue.serverTimestamp(),
+      "ts": "$hour , $formattedDate",
+      "read": false
+    };
+
+    DatabaseMethods().addMessage(channel, messageId, messageInfoMap);
   }
 
   downloadAndPlayAudio(String url, String chatId, String channel) async {
@@ -207,26 +292,6 @@ class ListenerController extends GetxController {
         print("Listening user document does not exist");
       }
     });
-  }
-
-  void listenToChat(String chatId) {
-    if (!processedMessageIds.contains(chatId)) {
-      userRequestChatSubscription = FirebaseFirestore.instance
-          .collection('chats') // Replace with the name of your chats collection
-          .doc(chatId) // Provide the specific chat document ID
-          .snapshots()
-          .listen((DocumentSnapshot snapshot) {
-        if (snapshot.exists) {
-          Map<String, dynamic> chatData =
-              snapshot.data() as Map<String, dynamic>;
-          print("Chat data: $chatData");
-        } else {
-          // Chat document doesn't exist
-          print("Chat document does not exist");
-        }
-      });
-      processedMessageIds.add(chatId);
-    }
   }
 
   @override

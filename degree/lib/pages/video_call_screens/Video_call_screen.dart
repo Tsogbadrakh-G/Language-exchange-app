@@ -171,13 +171,14 @@ class _VideoCallScreen extends State<VideoCallScreen> {
             child: Transform.scale(
               scale: 1.2,
               child: FloatingActionButton(
+                heroTag: 'end  call',
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 child: const Icon(Icons.call_end),
                 onPressed: () async {
                   _listenerController
                       .exitedForEachChannel_Voice[widget.username] = true;
-                  Get.back();
+                  _listenerController.sendEndCall(widget.channel);
                 },
               ),
             ),
@@ -188,6 +189,7 @@ class _VideoCallScreen extends State<VideoCallScreen> {
             child: Transform.scale(
               scale: 1.2,
               child: FloatingActionButton(
+                heroTag: 'enable voice',
                 backgroundColor: Colors.white70,
                 foregroundColor: mute % 2 == 1 ? Colors.red : Colors.black,
                 onPressed: () async {
@@ -319,10 +321,13 @@ class _VideoCallScreen extends State<VideoCallScreen> {
 
   @override
   Future<void> dispose() async {
+    leaveChannel();
+    super.dispose();
+  }
+
+  Future<void> leaveChannel() async {
     await _engine.leaveChannel();
     _engine.release();
-
     _listenerController.exitedForEachChannel_Voice[widget.username] = true;
-    super.dispose();
   }
 }

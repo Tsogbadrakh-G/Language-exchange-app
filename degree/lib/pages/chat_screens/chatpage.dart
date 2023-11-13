@@ -305,7 +305,7 @@ class _ChatPageState extends State<ChatPage> {
                               selectedValueToVoice ?? outLans[0],
                               token,
                               intValue));
-                          _dataController.sendJoinRequest(widget.channel);
+                          _listenerController.sendJoinRequest(widget.channel);
                         },
                         shape: const CircleBorder(),
                         child: Image.asset("assets/images/ic_chat_video.png",
