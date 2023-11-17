@@ -1,4 +1,3 @@
-import 'package:degree/pages/chat_screens/selection_btn.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/Controllers/dataController.dart';
@@ -60,8 +59,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                   children: [
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 30),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         color: Color(0xffF9F9F9),
@@ -71,6 +69,9 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                         children: [
                           Row(
                             children: [
+                              const SizedBox(
+                                width: 20,
+                              ),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -106,7 +107,6 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                         color: Color(0xff000000),
-                                        height: 25 / 16,
                                       ),
                                       textAlign: TextAlign.left,
                                     ),
@@ -127,65 +127,61 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                  decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(30))),
+                              ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
                                   child: Image.asset(
                                     'assets/images/flags/${widget.userNativeLan}.png',
                                     width: 45,
-                                    height: 40,
+                                    height: 30,
+                                    fit: BoxFit.fill,
                                   )),
+                              const SizedBox(
+                                width: 20,
+                              ),
                             ],
                           ),
                           const Divider(),
+                          const SizedBox(
+                            height: 10,
+                          ),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(
-                                width: 15,
+                                width: 20,
                               ),
                               Expanded(
                                   flex: 2,
-                                  child: Wrap(
-                                    direction: Axis.horizontal,
-                                    children: [
-                                      const Text(
-                                        "Speaks: ",
-                                        style: TextStyle(
-                                          fontFamily: 'Manrope',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff000000),
-                                          height: 22 / 14,
-                                        ),
-                                        textAlign: TextAlign.left,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: 'Speaks: ',
+                                      style: const TextStyle(
+                                        fontFamily: 'Manrope',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xff000000),
                                       ),
-                                      for (var i = 0;
-                                          i < (widget.native_lans).length - 1;
-                                          i++)
-                                        Text(
-                                          "${widget.native_lans[i]}, ",
-                                          style: const TextStyle(
-                                            fontFamily: 'Nunito',
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xff000000),
-                                            height: 17 / 14,
-                                          ),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      Text(
-                                        "${widget.native_lans[(widget.native_lans).length - 1]}",
-                                        style: const TextStyle(
-                                          fontFamily: 'Nunito',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff000000),
-                                          height: 17 / 14,
-                                        ),
-                                        textAlign: TextAlign.left,
-                                      )
-                                    ],
+                                      children: <TextSpan>[
+                                        for (var i = 0;
+                                            i < (widget.native_lans).length - 1;
+                                            i++)
+                                          TextSpan(
+                                              text:
+                                                  '${widget.native_lans[i]}, ',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xff000000),
+                                              )),
+                                        TextSpan(
+                                            text:
+                                                '${widget.native_lans[(widget.native_lans).length - 1]}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xff000000),
+                                            )),
+                                      ],
+                                    ),
                                   )),
                               const SizedBox(
                                 width: 20,
@@ -211,10 +207,10 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                             children: [
                                               Image.asset(
                                                 'assets/images/img_online.png',
-                                                scale: 1.7,
+                                                scale: 1.9,
                                               ),
                                               const SizedBox(
-                                                width: 10,
+                                                width: 7,
                                               ),
                                               const Text(
                                                 "active",
@@ -226,9 +222,6 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                   height: 22 / 14,
                                                 ),
                                                 textAlign: TextAlign.left,
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
                                               ),
                                             ],
                                           ))
@@ -257,12 +250,12 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                   ),
                                                   textAlign: TextAlign.left,
                                                 ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
                                               ],
                                             ));
-                              })
+                              }),
+                              const SizedBox(
+                                width: 20,
+                              ),
                             ],
                           ),
                         ],
@@ -283,13 +276,18 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.chat_bubble),
-                              Spacer(
+                              // Icon(Icons.chat_bubble),
+                              Image.asset(
+                                  "assets/images/ic_chat_translation.png",
+                                  color: Get.theme.colorScheme.secondary,
+                                  width: 20,
+                                  height: 20),
+                              const Spacer(
                                 flex: 2,
                               ),
-                              Text(
+                              const Text(
                                 "Your language ",
                                 style: TextStyle(
                                   fontFamily: "Inter",
@@ -300,7 +298,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              Spacer(
+                              const Spacer(
                                 flex: 3,
                               )
                             ],
@@ -308,85 +306,84 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          SelectionButton(selectedValue: selectedValueFrom2),
-                          // DropdownButtonHideUnderline(
-                          //   child: DropdownButton2<String>(
-                          //     isExpanded: true,
-                          //     hint: Row(
-                          //       children: [
-                          //         const SizedBox(
-                          //           width: 4,
-                          //         ),
-                          //         Expanded(
-                          //           child: Text(
-                          //             selectedValueFrom2 ??
-                          //                 _dataController.myNativeLan,
-                          //             style: const TextStyle(
-                          //               fontSize: 14,
-                          //               fontWeight: FontWeight.bold,
-                          //               color: Colors.black,
-                          //             ),
-                          //             overflow: TextOverflow.ellipsis,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //     items:
-                          //         List<String>.from(_dataController.inputLans)
-                          //             .map((String item) =>
-                          //                 DropdownMenuItem<String>(
-                          //                     value: item,
-                          //                     child: Text(
-                          //                       item,
-                          //                       style: const TextStyle(
-                          //                         fontSize: 14,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.black,
-                          //                       ),
-                          //                       overflow: TextOverflow.ellipsis,
-                          //                     )))
-                          //             .toList(),
-                          //     //   value: selectedValueFrom2,
-                          //     onChanged: (String? value) {
-                          //       setState(() {
-                          //         selectedValueFrom2 = value;
-                          //       });
-                          //     },
-                          //     buttonStyleData: ButtonStyleData(
-                          //       height: 50,
-                          //       width: double.infinity,
-                          //       padding:
-                          //           const EdgeInsets.only(left: 14, right: 14),
-                          //       decoration: BoxDecoration(
-                          //           borderRadius: BorderRadius.circular(20),
-                          //           border: Border.all(
-                          //             color: Colors.black26,
-                          //           ),
-                          //           color: Colors.white),
-                          //       elevation: 2,
-                          //     ),
-                          //     dropdownStyleData: DropdownStyleData(
-                          //       maxHeight: 200,
-                          //       width: 200,
-                          //       decoration: BoxDecoration(
-                          //         borderRadius: BorderRadius.circular(14),
-                          //         color: Colors.white,
-                          //       ),
-                          //       offset: const Offset(0, 0),
-                          //       scrollbarTheme: ScrollbarThemeData(
-                          //         radius: const Radius.circular(40),
-                          //         thickness:
-                          //             MaterialStateProperty.all<double>(6),
-                          //         thumbVisibility:
-                          //             MaterialStateProperty.all<bool>(true),
-                          //       ),
-                          //     ),
-                          //     menuItemStyleData: const MenuItemStyleData(
-                          //       height: 40,
-                          //       padding: EdgeInsets.only(left: 14, right: 14),
-                          //     ),
-                          //   ),
-                          // ),
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton2<String>(
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      selectedValueFrom2 ??
+                                          _dataController.myNativeLan,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              items:
+                                  List<String>.from(_dataController.inputLans)
+                                      .map((String item) =>
+                                          DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              )))
+                                      .toList(),
+                              //   value: selectedValueFrom2,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedValueFrom2 = value;
+                                });
+                              },
+                              buttonStyleData: ButtonStyleData(
+                                height: 50,
+                                width: double.infinity,
+                                padding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                    ),
+                                    color: Colors.white),
+                                elevation: 2,
+                              ),
+                              dropdownStyleData: DropdownStyleData(
+                                maxHeight: 200,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white,
+                                ),
+                                offset: const Offset(0, 0),
+                                scrollbarTheme: ScrollbarThemeData(
+                                  radius: const Radius.circular(40),
+                                  thickness:
+                                      MaterialStateProperty.all<double>(6),
+                                  thumbVisibility:
+                                      MaterialStateProperty.all<bool>(true),
+                                ),
+                              ),
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
+                                padding: EdgeInsets.only(left: 14, right: 14),
+                              ),
+                            ),
+                          ),
                           const SizedBox(
                             height: 30,
                           ),
@@ -499,17 +496,18 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.keyboard_voice),
-                              // Image.asset("assets/images/ic_chat_translation.png",
-                              //     color: Get.theme.colorScheme.secondary,
-                              //     width: 20,
-                              //     height: 20),
-                              Spacer(
+                              // Icon(Icons.keyboard_voice),
+                              Image.asset(
+                                  "assets/images/ic_video_translation.png",
+                                  color: Get.theme.colorScheme.secondary,
+                                  width: 20,
+                                  height: 20),
+                              const Spacer(
                                 flex: 2,
                               ),
-                              Text(
+                              const Text(
                                 "Your language ",
                                 style: TextStyle(
                                   fontFamily: "Inter",
@@ -520,7 +518,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              Spacer(
+                              const Spacer(
                                 flex: 3,
                               )
                             ],

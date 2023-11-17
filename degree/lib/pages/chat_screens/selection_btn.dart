@@ -53,6 +53,7 @@ class _SelectionButton extends State<SelectionButton> {
             .toList(),
         onChanged: (String? value) {
           setState(() {
+            print('selected val: $value');
             selectedValue = value;
           });
         },

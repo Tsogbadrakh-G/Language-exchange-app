@@ -1,3 +1,4 @@
+import 'package:degree/pages/splash_screen.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/util/firebase_options.dart';
 import 'package:degree/pages/login_screens/onboard_screen.dart';
@@ -61,8 +62,8 @@ class MyApp extends StatelessWidget {
       //       }
       //     }),
       //home: Select_languages(),
-      //home: SplashScreen(),
-      home: const OnboardScreen(),
+      home: SplashScreen(),
+      // home: const OnboardScreen(),
       // home: LogIn(),
     );
   }

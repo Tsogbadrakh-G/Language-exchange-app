@@ -319,6 +319,9 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
+                  // const SizedBox(
+                  //   width: 5,
+                  // ),
                   Visibility(
                     visible: true,
                     child: Container(
@@ -343,6 +346,9 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
+                  // const SizedBox(
+                  //   width: 5,
+                  // ),
                   Obx(
                     () => Visibility(
                       visible: _listenerController.channelUsrIsActive
@@ -352,8 +358,8 @@ class _ChatPageState extends State<ChatPage> {
                               false
                           : false,
                       child: SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: 15,
+                        height: 15,
                         child: Image.asset(
                           'assets/images/img_online.png',
                           scale: 1.7,
