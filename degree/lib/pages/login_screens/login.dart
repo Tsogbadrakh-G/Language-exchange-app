@@ -21,7 +21,13 @@ class LogIn extends StatefulWidget {
 }
 
 class _LogInState extends State<LogIn> {
-  String email = "", password = "", name = "", pic = "", username = "", id = "";
+  String email = "",
+      password = "",
+      name = "",
+      pic = "",
+      username = "",
+      id = "",
+      userNativeLan = '';
   TextEditingController usermailcontroller = TextEditingController();
   TextEditingController userpasswordcontroller = TextEditingController();
   FocusNode focusNode1 = FocusNode();
@@ -49,13 +55,11 @@ class _LogInState extends State<LogIn> {
 
     if (_isEmptyMail && _isEmptyPass) {
       SomniAlerts.showMyDialog(context, 'Та майл болон нууц үгээ оруулна уу!');
-    } else if (_isEmptyMail)
-      // ignore: curly_braces_in_flow_control_structures
+    } else if (_isEmptyMail) {
       SomniAlerts.showMyDialog(context, 'Та майл-ээ оруулна уу!');
-    else if (_isEmptyPass)
-      // ignore: curly_braces_in_flow_control_structures
+    } else if (_isEmptyPass) {
       SomniAlerts.showMyDialog(context, 'Та нууц үгээ оруулна уу!');
-
+    }
     //print('validation mail: $_isEmptyMail, pass: $_isEmptyPass');
   }
 
@@ -76,9 +80,10 @@ class _LogInState extends State<LogIn> {
       username = "${querySnapshot.docs[0]["username"]}";
       pic = "${querySnapshot.docs[0]["Photo"]}";
       id = querySnapshot.docs[0].id;
+      userNativeLan = '${querySnapshot.docs[0]["myNativeLanguage"]}';
 
       _dataController.saveUser(id, name, username, pic,
-          "${querySnapshot.docs[0]["SearchKey"]}", email);
+          "${querySnapshot.docs[0]["SearchKey"]}", email, userNativeLan);
 
       //print('object: ${FirebaseAuth.instance.currentUser}');
       //print('name $name, usrname: $username, pic: $pic, id: $id');

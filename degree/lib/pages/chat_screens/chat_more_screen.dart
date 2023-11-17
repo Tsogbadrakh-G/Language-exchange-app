@@ -1,3 +1,4 @@
+import 'package:degree/pages/chat_screens/selection_btn.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/Controllers/dataController.dart';
@@ -7,9 +8,9 @@ import 'package:get/get.dart';
 
 class ChatMoreScreen extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables, non_constant_identifier_names
-  final usrId, name, profileUrl, native_lans, channel;
-  const ChatMoreScreen(
-      this.usrId, this.name, this.profileUrl, this.native_lans, this.channel,
+  final usrId, name, profileUrl, native_lans, channel, userNativeLan;
+  const ChatMoreScreen(this.usrId, this.name, this.profileUrl, this.native_lans,
+      this.channel, this.userNativeLan,
       {Key? key})
       : super(key: key);
 
@@ -25,34 +26,30 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
   String? selectedValueFrom2;
   String? selectedValueTo2;
   String key = '';
+  late List<String> userLans;
+
   @override
   void initState() {
+    userLans = List.from(widget.native_lans);
+    userLans.add(widget.userNativeLan);
     key = widget.channel + _dataController.myUserName;
-    // print('init key: $key');
+
     if (usersBox.get(key) != null) {
-      // print('users box is not null');
       selectedValueFrom1 = usersBox.get(key)!.transFromVoice;
       selectedValueTo1 = usersBox.get(key)!.transToVoice;
       selectedValueFrom2 = usersBox.get(key)!.transFromMsg;
       selectedValueTo2 = usersBox.get(key)!.transToMsg;
-      // print(
-      //     'selected vals: from1: $selectedValueFrom1 to1:$selectedValueTo1 from2: $selectedValueFrom2 to2: $selectedValueTo2');
     }
-    // else
-    //   print('users box is null');
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // print(
-    //     'name: ${widget.name}, profile url:  ${widget.profileUrl}, native lans: ${widget.native_lans}, input lans: ${input_lans}');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: selectLanguage(),
       body: SizedBox(
-        //padding: const EdgeInsets.symmetric(vertical: 10),
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -117,7 +114,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                       height: 5,
                                     ),
                                     Text(
-                                      widget.native_lans[0],
+                                      widget.userNativeLan,
                                       style: const TextStyle(
                                         fontFamily: "Nunito",
                                         fontSize: 14,
@@ -131,11 +128,11 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                 ),
                               ),
                               Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(30))),
                                   child: Image.asset(
-                                    'assets/images/flags/Halh Mongolian.png',
+                                    'assets/images/flags/${widget.userNativeLan}.png',
                                     width: 45,
                                     height: 40,
                                   )),
@@ -194,7 +191,6 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                 width: 20,
                               ),
                               Obx(() {
-                                print('more sc');
                                 //if (
                                 return !_listenerController.channelUsrIsActive
                                         .containsKey(widget.channel)
@@ -221,7 +217,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                 width: 10,
                                               ),
                                               const Text(
-                                                "Ready",
+                                                "active",
                                                 style: TextStyle(
                                                   fontFamily: "Inter",
                                                   fontSize: 14,
@@ -251,7 +247,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                   width: 10,
                                                 ),
                                                 const Text(
-                                                  "Unavailable",
+                                                  "inactive",
                                                   style: TextStyle(
                                                     fontFamily: "Inter",
                                                     fontSize: 14,
@@ -261,7 +257,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                   ),
                                                   textAlign: TextAlign.left,
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   width: 10,
                                                 ),
                                               ],
@@ -312,83 +308,85 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
-                              hint: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      selectedValueFrom2 ?? 'Halh Mongolian',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              items:
-                                  List<String>.from(_dataController.inputLans)
-                                      .map((String item) =>
-                                          DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Text(
-                                                item,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              )))
-                                      .toList(),
-                              //   value: selectedValueFrom2,
-                              onChanged: (String? value) {
-                                setState(() {
-                                  selectedValueFrom2 = value;
-                                });
-                              },
-                              buttonStyleData: ButtonStyleData(
-                                height: 50,
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.only(left: 14, right: 14),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.black26,
-                                    ),
-                                    color: Colors.white),
-                                elevation: 2,
-                              ),
-                              dropdownStyleData: DropdownStyleData(
-                                maxHeight: 200,
-                                width: 200,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  color: Colors.white,
-                                ),
-                                offset: const Offset(0, 0),
-                                scrollbarTheme: ScrollbarThemeData(
-                                  radius: const Radius.circular(40),
-                                  thickness:
-                                      MaterialStateProperty.all<double>(6),
-                                  thumbVisibility:
-                                      MaterialStateProperty.all<bool>(true),
-                                ),
-                              ),
-                              menuItemStyleData: const MenuItemStyleData(
-                                height: 40,
-                                padding: EdgeInsets.only(left: 14, right: 14),
-                              ),
-                            ),
-                          ),
+                          SelectionButton(selectedValue: selectedValueFrom2),
+                          // DropdownButtonHideUnderline(
+                          //   child: DropdownButton2<String>(
+                          //     isExpanded: true,
+                          //     hint: Row(
+                          //       children: [
+                          //         const SizedBox(
+                          //           width: 4,
+                          //         ),
+                          //         Expanded(
+                          //           child: Text(
+                          //             selectedValueFrom2 ??
+                          //                 _dataController.myNativeLan,
+                          //             style: const TextStyle(
+                          //               fontSize: 14,
+                          //               fontWeight: FontWeight.bold,
+                          //               color: Colors.black,
+                          //             ),
+                          //             overflow: TextOverflow.ellipsis,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     items:
+                          //         List<String>.from(_dataController.inputLans)
+                          //             .map((String item) =>
+                          //                 DropdownMenuItem<String>(
+                          //                     value: item,
+                          //                     child: Text(
+                          //                       item,
+                          //                       style: const TextStyle(
+                          //                         fontSize: 14,
+                          //                         fontWeight: FontWeight.bold,
+                          //                         color: Colors.black,
+                          //                       ),
+                          //                       overflow: TextOverflow.ellipsis,
+                          //                     )))
+                          //             .toList(),
+                          //     //   value: selectedValueFrom2,
+                          //     onChanged: (String? value) {
+                          //       setState(() {
+                          //         selectedValueFrom2 = value;
+                          //       });
+                          //     },
+                          //     buttonStyleData: ButtonStyleData(
+                          //       height: 50,
+                          //       width: double.infinity,
+                          //       padding:
+                          //           const EdgeInsets.only(left: 14, right: 14),
+                          //       decoration: BoxDecoration(
+                          //           borderRadius: BorderRadius.circular(20),
+                          //           border: Border.all(
+                          //             color: Colors.black26,
+                          //           ),
+                          //           color: Colors.white),
+                          //       elevation: 2,
+                          //     ),
+                          //     dropdownStyleData: DropdownStyleData(
+                          //       maxHeight: 200,
+                          //       width: 200,
+                          //       decoration: BoxDecoration(
+                          //         borderRadius: BorderRadius.circular(14),
+                          //         color: Colors.white,
+                          //       ),
+                          //       offset: const Offset(0, 0),
+                          //       scrollbarTheme: ScrollbarThemeData(
+                          //         radius: const Radius.circular(40),
+                          //         thickness:
+                          //             MaterialStateProperty.all<double>(6),
+                          //         thumbVisibility:
+                          //             MaterialStateProperty.all<bool>(true),
+                          //       ),
+                          //     ),
+                          //     menuItemStyleData: const MenuItemStyleData(
+                          //       height: 40,
+                          //       padding: EdgeInsets.only(left: 14, right: 14),
+                          //     ),
+                          //   ),
+                          // ),
                           const SizedBox(
                             height: 30,
                           ),
@@ -416,7 +414,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      selectedValueTo2 ?? widget.native_lans[0],
+                                      selectedValueTo2 ?? widget.userNativeLan,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -427,7 +425,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(widget.native_lans)
+                              items: List<String>.from(userLans)
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
@@ -468,7 +466,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   borderRadius: BorderRadius.circular(14),
                                   color: Colors.white,
                                 ),
-                                offset: const Offset(-20, 0),
+                                offset: const Offset(0, 0),
                                 scrollbarTheme: ScrollbarThemeData(
                                   radius: const Radius.circular(40),
                                   thickness:
@@ -540,7 +538,8 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      selectedValueFrom1 ?? 'Halh Mongolian',
+                                      selectedValueFrom1 ??
+                                          _dataController.myNativeLan,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -635,7 +634,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      selectedValueTo1 ?? widget.native_lans[0],
+                                      selectedValueTo1 ?? widget.userNativeLan,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -646,7 +645,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                   ),
                                 ],
                               ),
-                              items: List<String>.from(widget.native_lans)
+                              items: List<String>.from(userLans)
                                   .map(
                                       (String item) => DropdownMenuItem<String>(
                                           value: item,
@@ -750,12 +749,10 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
             //print('key: $key');
             Data.addUser(
                 key,
-                selectedValueFrom1 ?? 'Halh Mongolian', //voice from
-                selectedValueTo1 ??
-                    List<String>.from(widget.native_lans)[0], //voice to
-                selectedValueFrom2 ?? 'Halh Mongolian', // msg from
-                selectedValueTo2 ??
-                    List<String>.from(widget.native_lans)[0]); //msg to
+                selectedValueFrom1 ?? _dataController.myNativeLan, //voice from
+                selectedValueTo1 ?? widget.userNativeLan, //voice to
+                selectedValueFrom2 ?? _dataController.myNativeLan, // msg from
+                selectedValueTo2 ?? widget.userNativeLan); //msg to
 
             Get.back();
           },

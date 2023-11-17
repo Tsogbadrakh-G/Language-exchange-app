@@ -1,48 +1,9 @@
 import 'package:degree/pages/login_screens/register.dart';
 import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/somni_alert.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-List<String> outLans = [
-  'Halh Mongolian',
-  'Bengali',
-  'Catalan',
-  'Czech',
-  'Danish',
-  'Dutch',
-  'English',
-  'Estonian',
-  'Finnish',
-  'French',
-  'German',
-  'Hindi',
-  'Indonesian',
-  'Italian',
-  'Japanese',
-  'Korean',
-  'Maltese',
-  'Mandarin Chinese',
-  'Modern Standard Arabic',
-  'Northern Uzbek',
-  'Polish',
-  'Portuguese',
-  'Romanian',
-  'Russian',
-  'Slovak',
-  'Spanish',
-  'Swahili',
-  'Swedish',
-  'Tagalog',
-  //'Telugu',
-  'Thai',
-  'Turkish',
-  'Ukrainian',
-  // 'Urdu',
-  // 'Vietnamese',
-  // 'Welsh',
-  // 'Western Persian'
-];
 
 class SelectLanguages extends StatefulWidget {
   const SelectLanguages({Key? key}) : super(key: key);
@@ -53,13 +14,19 @@ class SelectLanguages extends StatefulWidget {
 
 class _OnboardScreen extends State<SelectLanguages> {
   final DataController _dataController = Get.find();
-  List<RxBool> isSelected =
-      List.generate(outLans.length, (index) => false.obs, growable: false);
+  late List<RxBool> isSelected;
   List<String> retval = [];
+
+  String? selectedValue;
 
   @override
   void initState() {
+    selectedValue = 'English';
+    _dataController.inputLans.remove(selectedValue);
     // print('init select languages page $retval');
+    isSelected = List.generate(
+        _dataController.inputLansLength, (index) => false.obs,
+        growable: false);
     super.initState();
   }
 
@@ -76,6 +43,133 @@ class _OnboardScreen extends State<SelectLanguages> {
           height: double.infinity,
           child: Column(
             children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                width: double.infinity,
+                child: const Text(
+                  'Өөрийн төрөлх хэлээ сонгоно уу:',
+                  style: TextStyle(
+                    color: Color(0xff434347),
+                    fontFamily: 'Nunito',
+                    fontSize: 17,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton2<String>(
+                    isExpanded: true,
+                    hint: Row(
+                      children: [
+                        selectedValue == null
+                            ? Container(
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Image.asset(
+                                  'assets/images/flags/English.png',
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              )
+                            : Container(
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Image.asset(
+                                  'assets/images/flags/$selectedValue.png',
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: Text(
+                            selectedValue ?? 'English',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    items: List<String>.from(_dataController.inputLans)
+                        .map((String item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                    child: Image.asset(
+                                      'assets/images/flags/$item.png',
+                                      width: 30,
+                                      height: 30,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    item,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  )
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedValue = value;
+                        _dataController.inputLans.remove(selectedValue);
+                      });
+                    },
+                    buttonStyleData: ButtonStyleData(
+                      height: 50,
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(left: 14, right: 14),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.black26,
+                          ),
+                          color: Colors.white),
+                      elevation: 2,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 250,
+                      width: 280,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white,
+                      ),
+                      offset: const Offset(0, 0),
+                      scrollbarTheme: ScrollbarThemeData(
+                        radius: const Radius.circular(40),
+                        thickness: MaterialStateProperty.all<double>(6),
+                        thumbVisibility: MaterialStateProperty.all<bool>(true),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      height: 40,
+                      padding: EdgeInsets.only(left: 14, right: 14),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -94,7 +188,7 @@ class _OnboardScreen extends State<SelectLanguages> {
               ),
               Expanded(
                   child: ListView.builder(
-                      itemCount: outLans.length,
+                      itemCount: _dataController.inputLansLength,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
@@ -126,7 +220,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(5),
                                       child: Image.asset(
-                                        'assets/images/flags/${outLans[index]}.png',
+                                        'assets/images/flags/${_dataController.inputLans[index]}.png',
                                         width: 30,
                                         height: 25,
                                       ),
@@ -135,7 +229,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                                       width: 14,
                                     ),
                                     Text(
-                                      outLans[index],
+                                      _dataController.inputLans[index],
                                       style: const TextStyle(
                                           color: Color(0xff434347),
                                           fontSize: 15,
@@ -164,11 +258,15 @@ class _OnboardScreen extends State<SelectLanguages> {
                   decoration: const BoxDecoration(),
                   child: ElevatedButton(
                     onPressed: () {
-                      for (var i = 0; i < outLans.length; i++) {
+                      for (var i = 0;
+                          i < _dataController.inputLansLength;
+                          i++) {
                         if (isSelected[i].value) {
-                          _dataController.nativeLans.add(outLans[i]);
+                          _dataController.nativeLans
+                              .add(_dataController.inputLans[i]);
                         }
                       }
+                      _dataController.myNativeLan = selectedValue ?? 'English';
 
                       if (_dataController.nativeLans.isEmpty) {
                         SomniAlerts.showMyDialog(context,

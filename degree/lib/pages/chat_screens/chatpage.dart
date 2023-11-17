@@ -11,14 +11,15 @@ import 'package:get/get.dart';
 import '../../service/database.dart';
 
 class ChatPage extends StatefulWidget {
-  final String name, profileurl, username, channel, userId;
+  final String name, profileurl, username, channel, userId, userNativeLan;
   const ChatPage(
       {super.key,
       required this.name,
       required this.profileurl,
       required this.username,
       required this.channel,
-      required this.userId});
+      required this.userId,
+      required this.userNativeLan});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -37,6 +38,7 @@ class _ChatPageState extends State<ChatPage> {
   String? selectedValueToMsg;
   String? selectedValueFromVoice;
   String? selectedValueToVoice;
+  List<String> outLans = List.empty(growable: true);
 
   getthesharedpref() async {
     myUserName = _dataController.myUserName;
@@ -75,6 +77,9 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void languageSelection() {
+    outLans = List.from(args as List<String>);
+    outLans.add(widget.userNativeLan);
+
     key = widget.channel + _dataController.myUserName;
     if (usersBox.get(key) != null) {
       //  print('users box is not null in chatpage');
@@ -155,16 +160,13 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
-  List<String> chatOutLans = [];
-  List<String> outLans = [];
-
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments;
     languageSelection();
 
     outLans = args as List<String>;
-    //print('args- $args');
+    print('native lan- ${widget.userNativeLan}');
     return Scaffold(
       appBar: buildAppBar(),
       backgroundColor: Colors.white,
@@ -200,8 +202,9 @@ class _ChatPageState extends State<ChatPage> {
                             _dataController.addMessage(
                                 widget.channel,
                                 messagecontroller.text,
-                                selectedValueFromMsg ?? "Halh Mongolian",
-                                selectedValueToMsg ?? outLans[0],
+                                selectedValueFromMsg ??
+                                    _dataController.myNativeLan,
+                                selectedValueToMsg ?? widget.userNativeLan,
                                 widget.username,
                                 widget.name);
 
@@ -301,8 +304,9 @@ class _ChatPageState extends State<ChatPage> {
                               widget.channel,
                               myUserName!,
                               widget.username,
-                              selectedValueFromVoice ?? 'Halh Mongolian',
-                              selectedValueToVoice ?? outLans[0],
+                              selectedValueFromVoice ??
+                                  _dataController.myNativeLan,
+                              selectedValueToVoice ?? widget.userNativeLan,
                               token,
                               intValue));
                           _listenerController.sendJoinRequest(widget.channel);
@@ -327,7 +331,8 @@ class _ChatPageState extends State<ChatPage> {
                               widget.name,
                               widget.profileurl,
                               outLans,
-                              chatRoomId));
+                              chatRoomId,
+                              widget.userNativeLan));
                           setState(() {});
                         },
                         shape: const CircleBorder(),

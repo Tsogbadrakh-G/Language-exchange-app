@@ -42,7 +42,7 @@ class ListenerController extends GetxController {
   }
 
   void listenForNewMessages(
-      String channel, String username, List<String> userNativeLans) {
+      String channel, String username, String userNativeLan) {
     final CollectionReference messagesCollection =
         FirebaseFirestore.instance.collection('chatrooms/$channel/chats');
     print('listening $channel');
@@ -103,13 +103,13 @@ class ListenerController extends GetxController {
                         channel,
                         Customer(
                           id: '1',
-                          transFromVoice: 'Halh Mongolian',
-                          transToVoice: userNativeLans[0],
-                          transFromMsg: 'Halh Mongolian',
-                          transToMsg: userNativeLans[0],
+                          transFromVoice: _dataController.myNativeLan,
+                          transToVoice: userNativeLan,
+                          transFromMsg: _dataController.myNativeLan,
+                          transToMsg: userNativeLan,
                         ));
                     from = 'Halh Mongolian';
-                    to = userNativeLans[0];
+                    to = userNativeLan;
                   }
                   Get.back();
                   Get.to(VideoCallScreen(channel, _dataController.myUserName,

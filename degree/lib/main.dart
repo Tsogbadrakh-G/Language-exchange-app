@@ -21,6 +21,7 @@ void main() async {
   var appDir = await getApplicationSupportDirectory();
   Hive.init(appDir.path);
   Hive.registerAdapter(CustomerAdapter());
+
   usersBox = await Hive.openBox('testBox');
 
   runApp(const MyApp());

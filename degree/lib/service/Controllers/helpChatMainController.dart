@@ -19,6 +19,7 @@ class HelperChatMainController extends GetxController {
   final DataController _dataController = Get.find();
   final ListenerController _listenerController = Get.find();
   List<String> userNativeLans = [];
+  String userNativeLan = '';
 
   void selectedImage() async {
     final ImagePicker imagePicker = ImagePicker();
@@ -153,22 +154,22 @@ class HelperChatMainController extends GetxController {
                     height: 20,
                   ),
                   DrawerItem(
-                    title: 'Хэрэглэгчийн булан',
+                    title: 'User',
                     icon: Icons.supervised_user_circle_outlined,
                     myFunction: () {},
                   ),
                   DrawerItem(
-                    title: 'Тусламж',
+                    title: 'Help',
                     icon: Icons.help_outline,
                     myFunction: () {},
                   ),
                   DrawerItem(
-                    title: 'Найзаа урих',
+                    title: 'Invite friend',
                     icon: Icons.people_outline,
                     myFunction: () {},
                   ),
                   DrawerItem(
-                    title: 'Утасны жагсаалт',
+                    title: 'Contact list',
                     icon: Icons.contact_mail_outlined,
                     myFunction: () {},
                   ),
@@ -241,19 +242,17 @@ class HelperChatMainController extends GetxController {
     userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
     String key = chatroomId + _dataController.myUserName;
 
-    // if (usersBox.get(key) != null)
-    // print(
-    //     'user  selected lans $usrId: ${usersBox.get(key)!.trans_from_voice}');
+    userNativeLan = querySnapshot.docs[0]['myNativeLanguage'];
+
     if (usersBox.get(key) == null) {
-      //   print('user: $usrId is null');
       usersBox.put(
           chatroomId,
           Customer(
             id: usrId,
-            transFromVoice: 'Halh Mongolian',
-            transToVoice: userNativeLans[0],
-            transFromMsg: 'Halh Mongolian',
-            transToMsg: userNativeLans[0],
+            transFromVoice: _dataController.myNativeLan,
+            transToVoice: userNativeLan,
+            transFromMsg: _dataController.myNativeLan,
+            transToMsg: userNativeLan,
           ));
     }
   }
@@ -279,17 +278,17 @@ class HelperChatMainController extends GetxController {
               if (!_dataController.activeChatroomListeners
                   .contains(chatRoomId)) {
                 _listenerController.listenForNewMessages(
-                    chatRoomId, data["username"], userNativeLans);
+                    chatRoomId, data["username"], userNativeLan);
               }
 
               await Get.to(
                   ChatPage(
-                    userId: data['Id'],
-                    name: data["Name"],
-                    profileurl: data["Photo"],
-                    username: data["username"],
-                    channel: chatRoomId,
-                  ),
+                      userId: data['Id'],
+                      name: data["Name"],
+                      profileurl: data["Photo"],
+                      username: data["username"],
+                      channel: chatRoomId,
+                      userNativeLan: userNativeLan),
                   arguments: userNativeLans);
               //  setState(() {});
             },
@@ -366,7 +365,7 @@ class DrawerItem extends StatelessWidget {
     return InkWell(
       onTap: myFunction,
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         padding: const EdgeInsets.only(bottom: 13, left: 10, top: 12),

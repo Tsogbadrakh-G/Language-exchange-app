@@ -89,7 +89,8 @@ class _Register extends State<Register> {
           "Photo":
               "https://firebasestorage.googleapis.com/v0/b/language-exchange-app-cf264.appspot.com/o/images%2Fimg_profile.png?alt=media&token=82d48d53-f2d7-4c3c-8daa-930ce1253b72&_gl=1*1c3e9ai*_ga*MTAwMzU1OTkzMi4xNjc4OTc2OTE3*_ga_CW55HF8NVT*MTY5ODQ1ODE1OS41MC4xLjE2OTg0NjM0MTEuMjAuMC4w",
           "Id": id,
-          "native_lans": _dataController.nativeLans
+          "native_lans": _dataController.nativeLans,
+          'myNativeLanguage': _dataController.myNativeLan
         };
 
         await DatabaseMethods().addUserDetails(userInfoMap, id);
@@ -100,7 +101,8 @@ class _Register extends State<Register> {
             updateusername.toUpperCase(),
             userInfoMap["Photo"],
             firstletter,
-            email);
+            email,
+            _dataController.myNativeLan);
 
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -147,6 +149,7 @@ class _Register extends State<Register> {
         leading: IconButton(
             onPressed: () {
               _dataController.nativeLans = [];
+              _dataController.myNativeLan = '';
               Get.back();
             },
             icon: const Icon(Icons.arrow_back)),

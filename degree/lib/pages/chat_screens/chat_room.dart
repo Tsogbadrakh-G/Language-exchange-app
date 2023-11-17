@@ -33,8 +33,16 @@ class ChatRoomListTile extends StatefulWidget {
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String picUrl = "", name = "", username = "", id = "";
   List<String> userNativeLans = [];
+  String userNativeLan = '';
   final DataController _dataController = Get.find();
   final ListenerController _listenerController = Get.find();
+
+  @override
+  void initState() {
+    getthisUserInfo();
+    super.initState();
+  }
+
   getthisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
@@ -44,6 +52,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     name = "${querySnapshot.docs[0]["Name"]}";
     picUrl = "${querySnapshot.docs[0]["Photo"]}";
     id = "${querySnapshot.docs[0]["Id"]}";
+    userNativeLan = "${querySnapshot.docs[0]["myNativeLanguage"]}";
 
     //log('user name: $username, URL: $picUrl');
 
@@ -55,18 +64,12 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           key,
           Customer(
             id: widget.chatRoomId,
-            transFromVoice: 'Halh Mongolian',
-            transToVoice: userNativeLans[0],
-            transFromMsg: 'Halh Mongolian',
-            transToMsg: userNativeLans[0],
+            transFromVoice: _dataController.myNativeLan,
+            transToVoice: userNativeLan,
+            transFromMsg: _dataController.myNativeLan,
+            transToMsg: userNativeLan,
           ));
     }
-  }
-
-  @override
-  void initState() {
-    getthisUserInfo();
-    super.initState();
   }
 
   @override
@@ -109,6 +112,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                       profileurl: picUrl,
                       username: username,
                       channel: widget.chatRoomId,
+                      userNativeLan: userNativeLan,
                     ),
                     arguments: userNativeLans);
 
@@ -146,7 +150,6 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 ),
                               ),
                               Obx(() {
-                                print('herer');
                                 if (!_listenerController.channelUsrIsActive
                                     .containsKey(widget.chatRoomId)) {
                                   return const Offstage();

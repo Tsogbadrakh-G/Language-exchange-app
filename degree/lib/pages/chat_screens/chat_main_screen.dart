@@ -110,19 +110,21 @@ class _ChatMainScreen extends State<ChatMainScreen> {
   }
 
   listenRoom(String channel) async {
-    List<String> userNativeLans = [];
+    // List<String> userNativeLans = [];
     String username =
         channel.replaceAll("_", "").replaceAll(_dataController.myUserName, "");
     username = username.replaceAll("_", "");
     QuerySnapshot querySnapshot =
         await DatabaseMethods().getUserInfo(username.toUpperCase());
-    userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
+
+    String userNativeLan = querySnapshot.docs[0]['myNativeLanguage'];
+    //userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
 
     if (!_dataController.activeChatroomListeners.contains(channel)) {
       //  print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
       _listenerController.listenForNewMessages(
-          channel, username, userNativeLans);
+          channel, username, userNativeLan);
     }
   }
 

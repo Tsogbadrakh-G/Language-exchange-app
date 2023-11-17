@@ -35,8 +35,8 @@ class _CallHistoryScreen extends State<CallHistoryScreen> {
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: Container(
-                width: 200,
-                height: 45,
+                width: 180,
+                height: 40,
                 padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                 decoration: BoxDecoration(
                     color: const Color(0xff767680).withOpacity(0.12),
@@ -44,10 +44,10 @@ class _CallHistoryScreen extends State<CallHistoryScreen> {
                 child: const TabBar(
                   tabs: [
                     Tab(
-                      text: "Бүгд",
+                      text: "All",
                     ),
                     Tab(
-                      text: "Алдсан",
+                      text: "Missed",
                     ),
                   ],
                   unselectedLabelStyle: TextStyle(

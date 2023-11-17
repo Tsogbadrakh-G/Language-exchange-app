@@ -19,6 +19,7 @@ class DataController extends GetxController {
   RxList<Chat> missedMessages = RxList.empty(growable: true);
   List<String> activeChatroomListeners = [];
   RxInt roomsNum = 0.obs;
+  String myNativeLan = '';
 
   final List<String> inputLans = [
     'Halh Mongolian',
@@ -50,20 +51,24 @@ class DataController extends GetxController {
     'Swahili',
     'Swedish',
     'Tagalog',
-    'Telugu',
+    // 'Telugu',
     'Thai',
     'Turkish',
     'Ukrainian',
-    'Urdu',
-    'Vietnamese',
-    'Welsh',
-    'Western Persian'
+    //'Urdu',
+    //'Vietnamese',
+    //'Welsh',
+    //'Western Persian'
   ];
 
   String fcmToken = '';
   Map<String, bool> exitedForEachChannel = {};
-  // ignore: non_constant_identifier_names
 
+  int get inputLansLength {
+    return inputLans.length;
+  }
+
+  // ignore: non_constant_identifier_names
   Future<void> chatroomsLength() async {
     int len = 0;
     QuerySnapshot querySnapshot =
@@ -102,16 +107,13 @@ class DataController extends GetxController {
             String callStatus = '';
             if (val['sendBy'] == myUserName) {
               callStatus = 'outbound';
-            } else if (val['rejected'] as bool == true)
-              // ignore: curly_braces_in_flow_control_structures
+            } else if (val['rejected'] as bool == true) {
               callStatus = 'missed';
-            else if (val['accept'] as bool == true)
-              // ignore: curly_braces_in_flow_control_structures
+            } else if (val['accept'] as bool == true) {
               callStatus = 'inbound';
-            else
-              // ignore: curly_braces_in_flow_control_structures
+            } else {
               callStatus = 'missed';
-
+            }
             List<String> parts = val['ts'].toString().split(',');
 
             List<String> times = parts[0].split(':');
@@ -144,13 +146,14 @@ class DataController extends GetxController {
   }
 
   void saveUser(String id, String name, String username, String url,
-      String searchKey, String email) {
+      String searchKey, String email, String nativeLan) {
     this.id = id;
     myName = name;
     myUserName = username;
     picUrl.value = url;
     key = searchKey;
     this.email = email;
+    myNativeLan = nativeLan;
   }
 
   void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap,
