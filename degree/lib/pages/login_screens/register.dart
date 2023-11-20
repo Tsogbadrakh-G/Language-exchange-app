@@ -108,7 +108,7 @@ class _Register extends State<Register> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
           "Registered Successfully",
-          style: TextStyle(fontSize: 20.0),
+          style: TextStyle(fontSize: 15.0),
         )));
 
         Get.to(const Home());
@@ -135,7 +135,7 @@ class _Register extends State<Register> {
       }
     } else {
       SomniAlerts.showMyDialog(context,
-          'Таны оруулсан нууц үг болон баталгаажуулсан нууц үг ижилхэн эсэхийг шалгана уу!');
+          'Make sure the password you entered and the password you confirmed are the same !');
     }
   }
 
@@ -240,7 +240,7 @@ class _Register extends State<Register> {
                                   color: Colors.black87,
                                 ),
                               ),
-                              hintText: "Нэр",
+                              hintText: "Name",
                               hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
@@ -255,12 +255,12 @@ class _Register extends State<Register> {
                             padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
                             child: const Text(
-                              'Нэрээ оруулна уу.',
+                              'Enter your name',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
                         const SizedBox(
-                          height: 25,
+                          height: 15,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -281,7 +281,7 @@ class _Register extends State<Register> {
                                   color: Colors.black87,
                                 ),
                               ),
-                              hintText: "Имэйл",
+                              hintText: "Email",
                               hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
@@ -296,12 +296,12 @@ class _Register extends State<Register> {
                             padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
                             child: const Text(
-                              'Имэйлээ оруулна уу.',
+                              'Enter your email',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
                         const SizedBox(
-                          height: 25.0,
+                          height: 15.0,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -328,7 +328,7 @@ class _Register extends State<Register> {
                                   color: Colors.black87,
                                 ),
                               ),
-                              hintText: "Нууц үг",
+                              hintText: "Password",
                               hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
@@ -344,12 +344,12 @@ class _Register extends State<Register> {
                             padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
                             child: const Text(
-                              'Нууц үгээ оруулна уу.',
+                              'Enter your password',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
                         const SizedBox(
-                          height: 25.0,
+                          height: 15.0,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -370,7 +370,7 @@ class _Register extends State<Register> {
                                   color: Colors.black87,
                                 ),
                               ),
-                              hintText: "Нууц үг баталгаажуулах",
+                              hintText: "Confirm password",
                               hintStyle: const TextStyle(
                                   color: Color(0xff434347),
                                   fontFamily: 'Nunito',
@@ -386,7 +386,7 @@ class _Register extends State<Register> {
                             padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                             width: double.infinity,
                             child: const Text(
-                              'Баталгаажуулах нууц үгээ оруулна уу.',
+                              'Enter your confirmation password',
                               style: TextStyle(color: Colors.red, fontSize: 10),
                             ),
                           ),
@@ -435,7 +435,7 @@ class _Register extends State<Register> {
                         backgroundColor: const Color(0xff0057ff),
                       ),
                       child: const Text(
-                        'Бүртгүүлэх',
+                        'Sign up',
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'Nunito',
