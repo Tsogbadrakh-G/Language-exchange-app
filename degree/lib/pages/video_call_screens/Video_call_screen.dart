@@ -256,7 +256,7 @@ class _VideoCallScreen extends State<VideoCallScreen> {
                     setState(() {});
                   }
                 },
-                child: const Icon(Icons.music_note),
+                child: const Icon(Icons.keyboard_voice_outlined),
               ),
             ),
           )

@@ -110,8 +110,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               InkWell(
                 child: Image.asset(
                   'assets/images/ic_video.png',
-                  width: 30,
-                  height: 30,
+                  width: 27,
+                  height: 26,
                   color: bottomSelectedIndex != 1
                       ? const Color(0xff7c7c82a6).withOpacity(0.65)
                       : const Color(0xff2675EC),
@@ -204,13 +204,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void dispose() {
     print('disposing home screen');
     _listenerController.usrDataSubscription.cancel();
-    _listenerController.userRequestChatSubscription.cancel();
 
     //_listenerController.usrDataSubscription.cancel();
     Iterable<String> roomKeys = _listenerController.chatRoomsSubscription.keys;
     for (var element in roomKeys) {
       _listenerController.chatRoomsSubscription[element]?.cancel();
     }
+    _listenerController.userRequestChatSubscription.cancel();
     super.dispose();
   }
 }

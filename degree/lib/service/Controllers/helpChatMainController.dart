@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ffi';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:degree/models/customer.dart';
@@ -244,17 +243,21 @@ class HelperChatMainController extends GetxController {
                 stat.value = stat.value;
                 print('rebuild table calendar');
                 return TableCalendar(
-                  selectedDayPredicate: (day) => focusedDay == day,
+                  selectedDayPredicate: (day) => isSameDay(focusedDay, day),
                   onDaySelected: (selectedDay, focusedDay) {
                     print('selected day: $selectedDay');
                     print('focused day: $focusedDay');
                     focusedDay = selectedDay;
-                    stat.value = !stat.value;
+
                     showCupertinoModalPopup<void>(
                         context: context,
                         builder: (BuildContext context) {
                           return _buildContainer(timerPicker());
                         });
+                  },
+                  //  calendarFormat: ,
+                  onFormatChanged: (format) {
+                    stat.value = !stat.value;
                   },
                   headerVisible: true,
                   headerStyle: const HeaderStyle(
@@ -270,6 +273,12 @@ class HelperChatMainController extends GetxController {
                   lastDay: DateTime.utc(2030, 3, 14),
                   focusedDay: focusedDay,
                   calendarStyle: const CalendarStyle(
+                      selectedDecoration: BoxDecoration(
+                        color: Colors
+                            .blue, // Set the background color of the selected date
+                        shape: BoxShape
+                            .rectangle, // You can also use other shapes like CircleBorder()
+                      ),
                       weekendTextStyle: TextStyle(
                           color: Color(0xff2675ec),
                           fontFamily: 'Nunito',

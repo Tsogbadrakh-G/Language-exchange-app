@@ -198,6 +198,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
       toolbarHeight: 52,
       backgroundColor: Colors.white,
       foregroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
       leading: Container(),
       flexibleSpace: SafeArea(
         child: Container(
@@ -343,7 +344,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                           206), // Set the border color when focused
                     ),
                   ),
-                  hintText: 'Хайх',
+                  hintText: 'Search',
                   hintStyle: TextStyle(
                     fontFamily: "Manrope",
                     fontSize: 18,

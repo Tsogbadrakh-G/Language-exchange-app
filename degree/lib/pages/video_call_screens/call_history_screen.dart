@@ -27,11 +27,18 @@ class _CallHistoryScreen extends State<CallHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      color: Colors.white,
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: true,
+            // toolbarHeight: 52,
             backgroundColor: Colors.white,
+            foregroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            shadowColor: Colors.white,
+
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: Container(

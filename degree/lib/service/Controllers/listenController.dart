@@ -207,7 +207,8 @@ class ListenerController extends GetxController {
       "ts": "$hour , $formattedDate",
       "rejected": false,
       "accept": false,
-      "missed": false
+      "missed": false,
+      "read": false
     };
 
     DatabaseMethods().addMessage(channel, messageId, messageInfoMap);

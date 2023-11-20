@@ -240,7 +240,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
                                                   width: 10,
                                                 ),
                                                 const Text(
-                                                  "inactive",
+                                                  "Inactive",
                                                   style: TextStyle(
                                                     fontFamily: "Inter",
                                                     fontSize: 14,
@@ -756,7 +756,7 @@ class _ChatMoreScreen extends State<ChatMoreScreen> {
           },
           icon: const Icon(Icons.arrow_back_ios)),
       title: const Text(
-        "МЭДЭЭЛЭЛ",
+        "INFORMATION",
         style: TextStyle(
             fontFamily: 'Nunito',
             color: Color(0Xff2675EC),
