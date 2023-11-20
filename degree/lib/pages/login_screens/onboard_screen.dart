@@ -29,7 +29,7 @@ class _OnboardScreen extends State<OnboardScreen> {
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 80),
               width: double.infinity,
               child: const Text(
-                'Санаа амар харилц!',
+                'Communicate with ease!',
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 25,
@@ -52,7 +52,7 @@ class _OnboardScreen extends State<OnboardScreen> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
-                'Сомни',
+                'Somni',
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 25,
@@ -83,7 +83,7 @@ class _OnboardScreen extends State<OnboardScreen> {
                   backgroundColor: const Color(0xff0057ff),
                 ),
                 child: const Text(
-                  'ЭХЛҮҮЛЭХ',
+                  'START',
                   style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w500,
@@ -110,7 +110,7 @@ class _OnboardScreen extends State<OnboardScreen> {
                   backgroundColor: const Color(0xfff1eff6),
                 ),
                 child: const Text(
-                  'ШУУД НЭВТРЭХ',
+                  'SIGN IN',
                   style: TextStyle(
                       decoration: TextDecoration.none,
                       fontFamily: 'Nunito',
