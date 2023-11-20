@@ -54,11 +54,12 @@ class _LogInState extends State<LogIn> {
     }
 
     if (_isEmptyMail && _isEmptyPass) {
-      SomniAlerts.showMyDialog(context, 'Та майл болон нууц үгээ оруулна уу!');
+      SomniAlerts.showMyDialog(
+          context, 'Please enter your email and password!');
     } else if (_isEmptyMail) {
-      SomniAlerts.showMyDialog(context, 'Та майл-ээ оруулна уу!');
+      SomniAlerts.showMyDialog(context, 'Please enter your email!');
     } else if (_isEmptyPass) {
-      SomniAlerts.showMyDialog(context, 'Та нууц үгээ оруулна уу!');
+      SomniAlerts.showMyDialog(context, 'Please enter your password!');
     }
     //print('validation mail: $_isEmptyMail, pass: $_isEmptyPass');
   }
@@ -95,22 +96,23 @@ class _LogInState extends State<LogIn> {
       if (e.code == 'user-not-found') {
         // ignore: use_build_context_synchronously
         SomniAlerts.showMyDialog(
-            context, 'Таны оруулсан бүтгэлтэй хэрэглэгч байхгүй байна!');
+            context, 'There are no registered users you have entered!');
       } else if (e.code == 'wrong-password') {
         // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(context, 'Таны оруулсан нууц үг буруу байна!');
+        SomniAlerts.showMyDialog(
+            context, 'The password you entered is incorrect!');
       } else if (e.code == 'invalid-email') {
         // ignore: use_build_context_synchronously
         SomniAlerts.showMyDialog(
-            context, 'Таны оруулсан имэйл хаяг буруу байна!');
+            context, 'The email address you entered is incorrect!');
       } else if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
         // ignore: use_build_context_synchronously
         SomniAlerts.showMyDialog(context,
-            'Та өөрийн оруулсан нууц үг болон мэйлээ зөв эсэхийг шалгана уу!');
+            'Please check that the password and email you entered are correct!');
       } else if (e.code == 'network-request-failed') {
         // ignore: use_build_context_synchronously
         SomniAlerts.showMyDialog(
-            context, 'Та интернетэд холбогдсон эсэхээ шалгана уу!');
+            context, 'Make sure you are connected to the Internet!');
       }
 
       log('sign in exception: ${e.toString()}, code: ${e.code}');
@@ -199,7 +201,7 @@ class _LogInState extends State<LogIn> {
                                 color: Color(0xff434347),
                               ),
                             ),
-                            hintText: 'Имэйл',
+                            hintText: 'Email',
                             hintStyle: const TextStyle(
                                 color: Color(0xff434347),
                                 fontFamily: 'Nunito',
@@ -232,7 +234,7 @@ class _LogInState extends State<LogIn> {
                               ),
                             ),
                             border: InputBorder.none,
-                            hintText: 'Нууц үг',
+                            hintText: 'Password',
                             hintStyle: TextStyle(
                                 color: Color(0xff434347),
                                 fontFamily: 'Nunito',
@@ -257,7 +259,6 @@ class _LogInState extends State<LogIn> {
                                 setState(() {
                                   email = usermailcontroller.text;
                                   password = userpasswordcontroller.text;
-                                  //log('email: $email, pass: $password');
                                 });
                               }
                               userLogin();
@@ -270,7 +271,7 @@ class _LogInState extends State<LogIn> {
                             backgroundColor: const Color(0xff0057ff),
                           ),
                           child: const Text(
-                            'Нэвтрэх',
+                            'Sign in',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontFamily: 'Nunito',
