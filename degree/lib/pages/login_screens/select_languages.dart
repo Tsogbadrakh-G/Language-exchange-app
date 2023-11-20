@@ -27,6 +27,8 @@ class _OnboardScreen extends State<SelectLanguages> {
     isSelected = List.generate(
         _dataController.inputLansLength, (index) => false.obs,
         growable: false);
+    _dataController.inputLans
+        .sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     super.initState();
   }
 
@@ -48,7 +50,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 width: double.infinity,
                 child: const Text(
-                  'Өөрийн төрөлх хэлээ сонгоно уу:',
+                  'Select your native language:',
                   style: TextStyle(
                     color: Color(0xff434347),
                     fontFamily: 'Nunito',
@@ -133,8 +135,12 @@ class _OnboardScreen extends State<SelectLanguages> {
                         .toList(),
                     onChanged: (String? value) {
                       setState(() {
+                        _dataController.inputLans
+                            .add(selectedValue ?? 'English');
                         selectedValue = value;
                         _dataController.inputLans.remove(selectedValue);
+                        _dataController.inputLans.sort((a, b) =>
+                            a.toLowerCase().compareTo(b.toLowerCase()));
                       });
                     },
                     buttonStyleData: ButtonStyleData(
@@ -178,7 +184,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 width: double.infinity,
                 child: const Text(
-                  'Өөрийн ярьдаг хэлээ сонгоно уу:',
+                  'Select the language you speak:',
                   style: TextStyle(
                     color: Color(0xff434347),
                     fontFamily: 'Nunito',
@@ -270,7 +276,7 @@ class _OnboardScreen extends State<SelectLanguages> {
 
                       if (_dataController.nativeLans.isEmpty) {
                         SomniAlerts.showMyDialog(context,
-                            'Та өөрийн ярьж чаддаг хэлээ сонгоогүй байна.');
+                            'You have not selected the language you can speak');
                       } else {
                         Get.to(const Register());
                       }
@@ -282,7 +288,7 @@ class _OnboardScreen extends State<SelectLanguages> {
                       backgroundColor: const Color(0xff0057ff),
                     ),
                     child: const Text(
-                      'Үргэлжлүүлэх',
+                      'Continue',
                       style: TextStyle(
                           decoration: TextDecoration.none,
                           fontFamily: 'Nunito',
@@ -308,12 +314,12 @@ class _OnboardScreen extends State<SelectLanguages> {
           },
           icon: const Icon(Icons.arrow_back_ios)),
       title: const Text(
-        "Ярих хэлээ сонгох",
+        "Select your language",
         style: TextStyle(
             fontFamily: 'Nunito',
             color: Color(0xff0057ff),
             fontSize: 25.0,
-            fontWeight: FontWeight.w600),
+            fontWeight: FontWeight.w500),
       ),
       centerTitle: true,
     );
