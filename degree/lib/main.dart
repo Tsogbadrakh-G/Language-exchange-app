@@ -62,8 +62,8 @@ class MyApp extends StatelessWidget {
       //       }
       //     }),
       //home: Select_languages(),
-      home: SplashScreen(),
-      // home: const OnboardScreen(),
+      //home: SplashScreen(),
+      home: const OnboardScreen(),
       // home: LogIn(),
     );
   }

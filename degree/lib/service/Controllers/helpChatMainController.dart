@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:degree/models/customer.dart';
@@ -9,12 +10,14 @@ import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/service/Controllers/dataController.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HelperChatMainController extends GetxController {
   final DataController _dataController = Get.find();
@@ -50,9 +53,67 @@ class HelperChatMainController extends GetxController {
         .update({"Photo": _dataController.picUrl.value});
   }
 
+  Duration initialTimer = const Duration();
+  var time;
+  Widget _buildContainer(Widget picker) {
+    return Container(
+      height: 200,
+      padding: const EdgeInsets.only(top: 6.0),
+      color: CupertinoColors.white,
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: CupertinoColors.black,
+          fontSize: 22.0,
+        ),
+        child: GestureDetector(
+          onTap: () {},
+          child: SafeArea(
+            top: false,
+            child: picker,
+          ),
+        ),
+      ),
+    );
+  }
+
+  DateTime focusedDay = DateTime.now();
+  RxBool stat = RxBool(false);
+
+  Widget timerPicker() {
+    // return CupertinoTimerPicker(
+    //   mode: CupertinoTimerPickerMode.hm,
+    //   // minuteInterval: 1,
+    //   // secondInterval: 1,
+    //   initialTimerDuration: initialTimer,
+    //   onTimerDurationChanged: (Duration changeTimer) {
+    //     //setState(() {
+    //     initialTimer = changeTimer;
+    //     time =
+    //         '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs';
+    //     // });
+    //   },
+    // );
+    return MaterialApp(
+      locale: const Locale('en'),
+      debugShowCheckedModeBanner: false,
+      // theme: LimeStyles.limeTheme,
+      home: CupertinoDatePicker(
+        mode: CupertinoDatePickerMode.time,
+        initialDateTime: DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        ),
+        onDateTimeChanged: (DateTime newDateTime) {
+          print('$newDateTime');
+        },
+      ),
+    );
+  }
+
   Widget drawerBuilder(String name, BuildContext context) {
     return Drawer(
-      width: 250,
+      width: 330,
       elevation: 30,
       backgroundColor: const Color(0xFfFFFFFF),
       shadowColor: Colors.white,
@@ -179,30 +240,46 @@ class HelperChatMainController extends GetxController {
                   // ),
                 ],
               ),
-              // TableCalendar(
-              //   headerVisible: true,
-              //   headerStyle: HeaderStyle(
-              //     formatButtonVisible: false,
-              //     titleTextStyle: TextStyle(
-              //         fontSize: 18,
-              //         color: Color(0xff2675ec),
-              //         fontFamily: 'Manrope',
-              //         fontWeight: FontWeight.w500),
-              //   ),
-              //   daysOfWeekHeight: 20,
-              //   firstDay: DateTime.utc(2010, 10, 16),
-              //   lastDay: DateTime.utc(2030, 3, 14),
-              //   focusedDay: DateTime.now(),
-              //   calendarStyle: CalendarStyle(
-              //       weekendTextStyle: TextStyle(
-              //           color: Color(0xff2675ec),
-              //           fontFamily: 'Nunito',
-              //           fontWeight: FontWeight.w400),
-              //       defaultTextStyle: TextStyle(
-              //           color: Color(0xff2675ec),
-              //           fontFamily: 'Nunito',
-              //           fontWeight: FontWeight.w400)),
-              // ),
+              Obx(() {
+                stat.value = stat.value;
+                print('rebuild table calendar');
+                return TableCalendar(
+                  selectedDayPredicate: (day) => focusedDay == day,
+                  onDaySelected: (selectedDay, focusedDay) {
+                    print('selected day: $selectedDay');
+                    print('focused day: $focusedDay');
+                    focusedDay = selectedDay;
+                    stat.value = !stat.value;
+                    showCupertinoModalPopup<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return _buildContainer(timerPicker());
+                        });
+                  },
+                  headerVisible: true,
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    titleTextStyle: TextStyle(
+                        fontSize: 18,
+                        color: Color(0xff2675ec),
+                        fontFamily: 'Manrope',
+                        fontWeight: FontWeight.w500),
+                  ),
+                  daysOfWeekHeight: 20,
+                  firstDay: DateTime.utc(2010, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: focusedDay,
+                  calendarStyle: const CalendarStyle(
+                      weekendTextStyle: TextStyle(
+                          color: Color(0xff2675ec),
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w400),
+                      defaultTextStyle: TextStyle(
+                          color: Color(0xff2675ec),
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w400)),
+                );
+              }),
               const Divider(),
               const SizedBox(
                 height: 10,
