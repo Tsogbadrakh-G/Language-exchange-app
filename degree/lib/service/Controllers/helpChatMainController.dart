@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:degree/models/customer.dart';
 import 'package:degree/pages/chat_screens/chatpage.dart';
 import 'package:degree/pages/login_screens/login.dart';
+import 'package:degree/pages/user_screen.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/database.dart';
@@ -51,13 +52,13 @@ class HelperChatMainController extends GetxController {
 
   Widget drawerBuilder(String name, BuildContext context) {
     return Drawer(
-      width: 300,
+      width: 250,
       elevation: 30,
       backgroundColor: const Color(0xFfFFFFFF),
       shadowColor: Colors.white,
       surfaceTintColor: Colors.white,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(0))),
+          borderRadius: BorderRadius.horizontal(right: Radius.circular(20))),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
         child: SingleChildScrollView(
@@ -155,24 +156,27 @@ class HelperChatMainController extends GetxController {
                   ),
                   DrawerItem(
                     title: 'User',
-                    icon: Icons.supervised_user_circle_outlined,
+                    img: 'assets/images/ic_user.png',
+                    myFunction: () {
+                      Get.to(const UserScreen());
+                    },
+                  ),
+
+                  DrawerItem(
+                    title: 'Invite friend',
+                    img: 'assets/images/ic_invite.png',
                     myFunction: () {},
                   ),
                   DrawerItem(
                     title: 'Help',
-                    icon: Icons.help_outline,
+                    img: 'assets/images/ic_help.png',
                     myFunction: () {},
                   ),
-                  DrawerItem(
-                    title: 'Invite friend',
-                    icon: Icons.people_outline,
-                    myFunction: () {},
-                  ),
-                  DrawerItem(
-                    title: 'Contact list',
-                    icon: Icons.contact_mail_outlined,
-                    myFunction: () {},
-                  ),
+                  // DrawerItem(
+                  //   title: 'Contact list',
+                  //   img: '',
+                  //   myFunction: () {},
+                  // ),
                 ],
               ),
               // TableCalendar(
@@ -205,12 +209,12 @@ class HelperChatMainController extends GetxController {
               ),
               DrawerItem(
                 title: 'Log out',
-                icon: Icons.logout,
+                img: 'assets/images/ic_logout.png',
                 myFunction: () async {
                   await FirebaseAuth.instance.signOut();
                   final CollectionReference usersCollection =
                       FirebaseFirestore.instance.collection('users');
-                  await usersCollection
+                  usersCollection
                       .doc(_dataController.id)
                       .update({'status': 'offline'});
 
@@ -351,13 +355,13 @@ class HelperChatMainController extends GetxController {
 }
 
 class DrawerItem extends StatelessWidget {
-  final String title;
-  final IconData icon;
+  final String title, img;
+  // final IconData icon;
   final void Function() myFunction;
   const DrawerItem(
       {super.key,
       required this.title,
-      required this.icon,
+      required this.img,
       required this.myFunction});
 
   @override
@@ -365,31 +369,40 @@ class DrawerItem extends StatelessWidget {
     return InkWell(
       onTap: myFunction,
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 7),
+        width: double.infinity,
         decoration: const BoxDecoration(
+          //border: Border.all(),
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
-        padding: const EdgeInsets.only(bottom: 13, left: 10, top: 12),
+        padding: const EdgeInsets.only(bottom: 10, left: 10, top: 10),
         child: Row(
+          //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              icon,
-              color: const Color(0xff2675ec),
-              size: 30,
+            Image.asset(
+              img,
+              width: 30,
+              height: 30,
+              color: const Color(0xff2675EC),
             ),
+            // Icon(
+            //   icon,
+            //   color: const Color(0xff2675ec),
+            //   size: 30,
+            // ),
             const SizedBox(
               width: 20,
             ),
-            Expanded(
-              child: Text(title,
-                  style: const TextStyle(
-                    fontFamily: "Manrope",
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff2675ec),
-                    height: 23 / 19,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
+
+            Text(title,
+                style: const TextStyle(
+                  fontFamily: "Manrope",
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff2675ec),
+                  height: 23 / 19,
+                ),
+                textAlign: TextAlign.left),
           ],
         ),
       ),
