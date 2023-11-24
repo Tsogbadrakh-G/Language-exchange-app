@@ -101,8 +101,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                   ),
                 ]),
             child: InkWell(
-              highlightColor: Colors.amberAccent,
-              splashColor: Colors.red.shade100,
+              // highlightColor: Colors.amberAccent,
+              // splashColor: Colors.red.shade100,
               onTap: () async {
                 //   print('click to ${widget.chatRoomId}');
                 await Get.to(
