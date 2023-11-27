@@ -151,7 +151,8 @@ class ListenerController extends GetxController {
           else if (messageData["type"] == "audio" &&
               messageData["sendBy"] == username &&
               messageData["missed"] == false &&
-              messageData["read"] == false) {
+              messageData["read"] == false &&
+              !exited) {
             downloadAndPlayAudio(
                 messageData["url"], messageData["id"], channel);
           }
