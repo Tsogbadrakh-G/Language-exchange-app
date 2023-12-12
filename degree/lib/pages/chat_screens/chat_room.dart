@@ -31,19 +31,21 @@ class ChatRoomListTile extends StatefulWidget {
 }
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
+  //Уг чат өрөөний нөгөө хэрэглэгчийн мэдээллүүдийг хадгадах хувьсагчууд
   String picUrl = "", name = "", username = "", id = "";
   List<String> userNativeLans = [];
   String userNativeLan = '';
+
   final DataController _dataController = Get.find();
   final ListenerController _listenerController = Get.find();
 
   @override
   void initState() {
-    getthisUserInfo();
+    getThisUserInfo();
     super.initState();
   }
 
-  getthisUserInfo() async {
+  getThisUserInfo() async {
     username =
         widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
     QuerySnapshot querySnapshot =
@@ -75,7 +77,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getthisUserInfo(),
+        future: getThisUserInfo(),
         builder: (context, snapshot) {
           // log('room build');
           return Slidable(
