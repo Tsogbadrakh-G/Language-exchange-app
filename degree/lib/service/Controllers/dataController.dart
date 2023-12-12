@@ -8,17 +8,28 @@ import 'package:random_string/random_string.dart';
 import 'package:dio/dio.dart';
 
 class DataController extends GetxController {
-  //final ListenerController _listenerController = Get.find();
   final dio = Dio();
+
+  //Тухайн аппын нэвтэрсний дараа хэрэглэгчийн мэдээллийг хадгалах хувьсагчууд
   String id = '', myName = '', myUserName = '', key = '', email = '';
   Rx<String> picUrl = ''.obs;
   List<String> nativeLans = List.empty(growable: true);
+
+  // Тухайн хэрэглэгчийн нийт уншаагүй чатын тоог хадгалах хувьсагч
   RxInt unreadChats = 0.obs;
   final firestoreInstance = FirebaseFirestore.instance;
+
+  // хэрэглэгчийн хийсэн видео дуудлага болон алдсан видео дуудлагуудыг илэрхийлэх хувьсагч
   RxList<Chat> audioMessages = RxList.empty(growable: true);
   RxList<Chat> missedMessages = RxList.empty(growable: true);
+
+  //Listener-д бүртгэгдсэн чат өрөөнүүдийн утгыг хадгалах хувьсагч
   List<String> activeChatroomListeners = [];
+
+  //хэрэглэгчийн үүсгэсэн өрөөнүүдийн тоо
   RxInt roomsNum = 0.obs;
+
+  // хэрэглэгчийн төрөлх хэлийг хадгалах хувьсагч
   String myNativeLan = '';
 
   final List<String> inputLans = [
