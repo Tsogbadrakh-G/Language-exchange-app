@@ -29,29 +29,37 @@ class VideoCallScreen extends StatefulWidget {
 }
 
 class _VideoCallScreen extends State<VideoCallScreen> {
+// Видео дуудлага хийж буй нөгөө хэрэглэгчийн [ID]
   int? _remoteUid;
+
+  // Тухайн дуудлага хийж буй хэрэглэгч чаннелд холбогдсон эсэхийг илэрхийлэх хувьсагч
   bool _localUserJoined = false;
+
+  // Видео дуудлагыг үүсгэх RTC engine
   late RtcEngine _engine;
+
+  // Тухайн хэрэглэгчийн rtc audio-г mute хийх эсэхийг тогтоох хувьсагч
   int mute = 0;
+
+  //audio файлыг тухайн device дээр тоглуулах player ref
   final audioPlayer = AudioPlayer();
+
+  //http req төстэй req ref
   final dio = Dio();
+
   bool isRecording = false;
+
+  //апп-д ашиглагдаж байгаа листенэрүүлийг агуулах Контроллёр
   final ListenerController _listenerController = Get.find();
 
   @override
   void initState() {
-    //print('init video call screen');
     _listenerController.exitedForEachChannel_Voice[widget.username] = false;
     initAgora();
-    //_dataController.sendJoinRequest(widget.channel);
-
     super.initState();
   }
 
   Future<void> initAgora() async {
-    // retrieve permissions
-
-    //create the engine
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
       const RtcEngineContext(
@@ -108,21 +116,9 @@ class _VideoCallScreen extends State<VideoCallScreen> {
     }
   }
 
-  // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    print('Video call screen');
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //       onPressed: () {
-      //         _dataController.exitedForEachChannel_Voice[widget.username] =
-      //             true;
-      //         Get.back();
-      //       },
-      //       icon: Icon(Icons.arrow_back_ios)),
-      //   title: const Text('Agora Video Call'),
-      // ),
       body: Stack(
         children: [
           Positioned.fill(
