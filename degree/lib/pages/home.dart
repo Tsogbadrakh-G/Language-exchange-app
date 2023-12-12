@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:degree/pages/video_call_screens/call_history_screen.dart';
 import 'package:degree/pages/chat_screens/chat_main_screen.dart';
@@ -16,25 +17,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
+  ///Хэрэглэгчийн мэдээлэл болон түүний бичсэн чатын, дуудлага зэргийн мэдээллийг илэрхийлэх контроллер класс
   final DataController _dataController = Get.find();
-  final ListenerController _listenerController = Get.find();
 
+  /// Хэрэглэгчийн бичсэн чат дуудлагын мэдэгдэл зэргийг чагнах мөн хариу үйлдлийг хийдэг класс
+  final ListenerController _listenerController = Get.find();
+  //Чат өрөөнүүдийг сонсохын тулд програм ажиллаж байх явцад тэдгээр өрөөнүүдийг  сонсох Stream
   StreamSubscription? chatRoomListSubscription;
   Stream<QuerySnapshot<Object?>>? chatRoomsStream;
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('users');
 
   @override
   void initState() {
     super.initState();
     print('init home screen');
+
+    /// Програм ажиллаж эхлэхэд чат өрөө бүрийн өгөгдлийг 1 л удаа сонсох ёстой тул анхдагч утгыг хоосолж байна
     _listenerController.setInitProccessedValues();
     _dataController.activeChatroomListeners = [];
+
+    /// Чат өрөөнүүдийн мэдээллийг серверээс авчираад тэдгээрийг чагнаж байна
     load();
+
+    /// Хэрэглэгчийн идэвхтэй статусын мэдээллийг програм ажиллаж эхэлж байгаа учир идэвхитэй болгож байна.
     setStatus('online');
     WidgetsBinding.instance.addObserver(this);
   }
 
+  /// Хэрэглэгчдийн collection
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
   Future<void> setStatus(String status) async {
     await usersCollection.doc(_dataController.id).update({'status': status});
   }
@@ -65,6 +76,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
+  /// Bottom tab bar-уудын илтгэх widget
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(
@@ -139,8 +151,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     ];
   }
 
+  /// Bottom tab индекс болон page солигдох үед харгалзах индексүүдийг олгож байна.
   int bottomSelectedIndex = 0;
-
   PageController pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -159,6 +171,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     });
   }
 
+  /// Page View -ийг харуулах хэсэг
   Widget buildPageView() {
     return PageView(
       controller: pageController,
@@ -172,6 +185,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     );
   }
 
+  /// Нүүр хуудсыг build хийх функц
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -200,9 +214,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             )));
   }
 
+  /// Нүүр хуудас dispose хийгдэх үед системд бүртгэгдсэн listener stream-үүдийг cancel хийнэ
   @override
   void dispose() {
-    print('disposing home screen');
+    log('disposing home screen');
     _listenerController.usrDataSubscription.cancel();
 
     //_listenerController.usrDataSubscription.cancel();
