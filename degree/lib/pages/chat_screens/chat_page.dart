@@ -319,9 +319,7 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  // const SizedBox(
-                  //   width: 5,
-                  // ),
+
                   Visibility(
                     visible: true,
                     child: Container(

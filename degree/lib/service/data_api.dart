@@ -7,15 +7,12 @@ import 'package:hive/hive.dart';
 late Box<Customer> usersBox;
 
 class Data {
-  //DataController _dataController
   List<String> inputLanguages = [];
 
   List<String> outputLanguages = [];
-  // String appId = 'd565b44b98164c39b2b1855292b22dd2';
-  // String appCertificate = 'caf2f127d2a64a5d92afaf7aee8b3609';
 
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  static const url = 'http://51.20.44.63:5000/todo';
+  static const url = 'http://13.125.68.71:5000/todo';
   //static final url = 'http://192.168.1.98:5000/todo';
 
   static Future<dynamic> sendAudio(String path, String from, String to,
@@ -59,8 +56,6 @@ class Data {
       'output': to,
     });
 
-    //print('pre response for text $text |$from| {$to}');
-
     final response = await dio.post(
       url,
       data: formData,
@@ -68,8 +63,6 @@ class Data {
     );
 
     if (response.statusCode == 200) {
-      // print('translated: ${response.data['message']}');
-
       return response.data['message'];
     } else {
       log('unsuccessfull req');
@@ -80,13 +73,11 @@ class Data {
   static Future<void> sendNotifcation(
       String toToken, String name, String content) async {
     final dio = Dio();
-    //String localUrl = 'http://192.168.1.98:5000/sendChat';
-    String localUrl = 'http://51.20.44.63:5000/sendChat';
+
+    String localUrl = 'http://13.125.68.71:5000/sendChat';
 
     FormData formData =
         FormData.fromMap({'fcm': toToken, 'name': name, 'content': content});
-
-    // print('pre response for notification $formData');
 
     dio.get(
       localUrl,
@@ -96,8 +87,7 @@ class Data {
   }
 
   static Future<String> generateToken(String roomid, int uid) async {
-    final localUrl = 'http://51.20.44.63:5000/generate_agora_token/' + roomid;
-    //final localUrl = 'http://192.168.1.98:5000/generate_agora_token/' + roomid;
+    final localUrl = 'http://13.125.68.71:5000/generate_agora_token/' + roomid;
 
     final dio = Dio();
 

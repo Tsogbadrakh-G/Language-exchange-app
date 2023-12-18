@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:degree/models/customer.dart';
-import 'package:degree/pages/chat_screens/chatpage.dart';
+import 'package:degree/pages/chat_screens/chat_page.dart';
 import 'package:degree/pages/login_screens/login.dart';
 import 'package:degree/pages/user_screen.dart';
 import 'package:degree/service/Controllers/listenController.dart';

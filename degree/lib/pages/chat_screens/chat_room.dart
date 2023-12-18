@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:degree/pages/chat_screens/chatpage.dart';
+import 'package:degree/pages/chat_screens/chat_page.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/service/data_api.dart';
 import 'package:degree/service/Controllers/dataController.dart';
