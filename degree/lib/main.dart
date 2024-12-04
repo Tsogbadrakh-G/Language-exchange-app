@@ -1,7 +1,6 @@
 import 'package:degree/pages/splash_screen.dart';
 import 'package:degree/service/Controllers/listenController.dart';
 import 'package:degree/util/firebase_options.dart';
-import 'package:degree/pages/login_screens/onboard_screen.dart';
 import 'package:degree/models/customer.dart';
 import 'package:degree/service/Controllers/dataController.dart';
 import 'package:degree/service/Controllers/helpChatMainController.dart';
@@ -16,8 +15,7 @@ import 'service/data_api.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-      name: 'App', options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(name: 'App', options: DefaultFirebaseOptions.currentPlatform);
 
   var appDir = await getApplicationSupportDirectory();
   Hive.init(appDir.path);
@@ -52,19 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      // home: FutureBuilder(
-      //     future: AuthMethods().getcurrentUser(),
-      //     builder: (context, AsyncSnapshot<dynamic> snapshot) {
-      //       if (snapshot.hasData) {
-      //         return Home();
-      //       } else {
-      //         return Register();
-      //       }
-      //     }),
-      //home: Select_languages(),
-      home: SplashScreen(),
-      //home: const OnboardScreen(),
-      // home: LogIn(),
+      home: const SplashScreen(),
     );
   }
 }
