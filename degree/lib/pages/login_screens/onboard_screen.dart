@@ -31,11 +31,7 @@ class _OnboardScreen extends State<OnboardScreen> {
               child: const Text(
                 'Communicate with ease!',
                 style: TextStyle(
-                    decoration: TextDecoration.none,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
-                    color: Color(0xff434347)),
+                    decoration: TextDecoration.none, fontSize: 25, fontWeight: FontWeight.w600, fontFamily: 'Nunito', color: Color(0xff434347)),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -77,19 +73,14 @@ class _OnboardScreen extends State<OnboardScreen> {
                   Get.to(const SelectLanguages());
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   backgroundColor: const Color(0xff0057ff),
                 ),
                 child: const Text(
                   'START',
                   style: TextStyle(
-                      fontFamily: 'Nunito',
-                      fontWeight: FontWeight.w500,
-                      decoration: TextDecoration.none,
-                      color: Colors.white,
-                      fontSize: 14),
+                      fontFamily: 'Nunito', fontWeight: FontWeight.w500, decoration: TextDecoration.none, color: Colors.white, fontSize: 14),
                 ),
               ),
             ),
@@ -104,19 +95,14 @@ class _OnboardScreen extends State<OnboardScreen> {
                   Get.to(const LogIn());
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   backgroundColor: const Color(0xfff1eff6),
                 ),
                 child: const Text(
                   'SIGN IN',
                   style: TextStyle(
-                      decoration: TextDecoration.none,
-                      fontFamily: 'Nunito',
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff0057ff),
-                      fontSize: 14),
+                      decoration: TextDecoration.none, fontFamily: 'Nunito', fontWeight: FontWeight.w500, color: Color(0xff0057ff), fontSize: 14),
                 ),
               ),
             ),

@@ -17,16 +17,7 @@ class SplashScreen extends StatelessWidget {
             Image.asset(
               'assets/images/ic_splash.png',
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            // Text(
-            //   "mono",
-            //   style: TextStyle(
-            //       decoration: TextDecoration.none,
-            //       fontSize: 32.0,
-            //       color: Colors.black54),
-            // ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -35,7 +26,6 @@ class SplashScreen extends StatelessWidget {
 
   Future callDelay(BuildContext context) async {
     await Future.delayed(const Duration(milliseconds: 3000), () {});
-
     Get.to(const OnboardScreen());
   }
 }

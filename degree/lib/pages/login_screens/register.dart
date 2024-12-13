@@ -72,13 +72,11 @@ class _Register extends State<Register> {
       try {
         email = email.toLowerCase().trim();
 
-        await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: email, password: password);
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
         String id = randomAlphaNumeric(10);
         String user = email.replaceAll("@gmail.com", "");
-        String updateusername =
-            user.replaceFirst(user[0], user[0].toUpperCase());
+        String updateusername = user.replaceFirst(user[0], user[0].toUpperCase());
         String firstletter = user.substring(0, 1).toUpperCase();
 
         Map<String, dynamic> userInfoMap = {
@@ -96,13 +94,7 @@ class _Register extends State<Register> {
         await DatabaseMethods().addUserDetails(userInfoMap, id);
 
         _dataController.saveUser(
-            id,
-            namecontroller.text,
-            updateusername.toUpperCase(),
-            userInfoMap["Photo"],
-            firstletter,
-            email,
-            _dataController.myNativeLan);
+            id, namecontroller.text, updateusername.toUpperCase(), userInfoMap["Photo"], firstletter, email, _dataController.myNativeLan);
 
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -134,8 +126,7 @@ class _Register extends State<Register> {
         // print('sign up exception: ${e.code}');
       }
     } else {
-      SomniAlerts.showMyDialog(context,
-          'Make sure the password you entered and the password you confirmed are the same !');
+      SomniAlerts.showMyDialog(context, 'Make sure the password you entered and the password you confirmed are the same !');
     }
   }
 
@@ -229,10 +220,7 @@ class _Register extends State<Register> {
                             controller: namecontroller,
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: const Color(0xff434347)
-                                        .withOpacity(0.5)),
+                                borderSide: BorderSide(width: 1, color: const Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -241,11 +229,7 @@ class _Register extends State<Register> {
                                 ),
                               ),
                               hintText: "Name",
-                              hintStyle: const TextStyle(
-                                  color: Color(0xff434347),
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
+                              hintStyle: const TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                               border: InputBorder.none,
                             ),
                           ),
@@ -270,10 +254,7 @@ class _Register extends State<Register> {
                             controller: mailcontroller,
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: const Color(0xff434347)
-                                        .withOpacity(0.5)),
+                                borderSide: BorderSide(width: 1, color: const Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -282,11 +263,7 @@ class _Register extends State<Register> {
                                 ),
                               ),
                               hintText: "Email",
-                              hintStyle: const TextStyle(
-                                  color: Color(0xff434347),
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
+                              hintStyle: const TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                               border: InputBorder.none,
                             ),
                           ),
@@ -317,10 +294,7 @@ class _Register extends State<Register> {
                             // },
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: const Color(0xff434347)
-                                        .withOpacity(0.5)),
+                                borderSide: BorderSide(width: 1, color: const Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -329,11 +303,7 @@ class _Register extends State<Register> {
                                 ),
                               ),
                               hintText: "Password",
-                              hintStyle: const TextStyle(
-                                  color: Color(0xff434347),
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
+                              hintStyle: const TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                               border: InputBorder.none,
                             ),
                             obscureText: true,
@@ -359,10 +329,7 @@ class _Register extends State<Register> {
                             controller: confirmPasswordcontroller,
                             decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: const Color(0xff434347)
-                                        .withOpacity(0.5)),
+                                borderSide: BorderSide(width: 1, color: const Color(0xff434347).withOpacity(0.5)),
                               ),
                               focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -371,11 +338,7 @@ class _Register extends State<Register> {
                                 ),
                               ),
                               hintText: "Confirm password",
-                              hintStyle: const TextStyle(
-                                  color: Color(0xff434347),
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
+                              hintStyle: const TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                               border: InputBorder.none,
                             ),
                             obscureText: true,
@@ -412,10 +375,7 @@ class _Register extends State<Register> {
                           validation();
                         });
 
-                        if (!_isEmptyName &&
-                            !_isEmptyPass &&
-                            !_isEmptyPassConfirm &&
-                            _isValidMail) {
+                        if (!_isEmptyName && !_isEmptyPass && !_isEmptyPassConfirm && _isValidMail) {
                           if (_formkey.currentState!.validate()) {
                             setState(() {
                               email = mailcontroller.text;
@@ -429,18 +389,13 @@ class _Register extends State<Register> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         backgroundColor: const Color(0xff0057ff),
                       ),
                       child: const Text(
                         'Sign up',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Nunito',
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14),
+                        style: TextStyle(color: Colors.white, fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                       ),
                     ),
                   ),

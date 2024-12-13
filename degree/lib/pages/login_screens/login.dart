@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:degree/pages/home.dart';
@@ -21,13 +23,7 @@ class LogIn extends StatefulWidget {
 }
 
 class _LogInState extends State<LogIn> {
-  String email = "",
-      password = "",
-      name = "",
-      pic = "",
-      username = "",
-      id = "",
-      userNativeLan = '';
+  String email = "", password = "", name = "", pic = "", username = "", id = "", userNativeLan = '';
   TextEditingController usermailcontroller = TextEditingController();
   TextEditingController userpasswordcontroller = TextEditingController();
   FocusNode focusNode1 = FocusNode();
@@ -54,8 +50,7 @@ class _LogInState extends State<LogIn> {
     }
 
     if (_isEmptyMail && _isEmptyPass) {
-      SomniAlerts.showMyDialog(
-          context, 'Please enter your email and password!');
+      SomniAlerts.showMyDialog(context, 'Please enter your email and password!');
     } else if (_isEmptyMail) {
       SomniAlerts.showMyDialog(context, 'Please enter your email!');
     } else if (_isEmptyPass) {
@@ -70,11 +65,9 @@ class _LogInState extends State<LogIn> {
 
       email = email.toLowerCase();
       //print('email $email, pass: $password');
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
 
-      QuerySnapshot querySnapshot =
-          await DatabaseMethods().getUserbyemail(email);
+      QuerySnapshot querySnapshot = await DatabaseMethods().getUserbyemail(email);
 
       name = "${querySnapshot.docs[0]["Name"]}";
 
@@ -83,8 +76,7 @@ class _LogInState extends State<LogIn> {
       id = querySnapshot.docs[0].id;
       userNativeLan = '${querySnapshot.docs[0]["myNativeLanguage"]}';
 
-      _dataController.saveUser(id, name, username, pic,
-          "${querySnapshot.docs[0]["SearchKey"]}", email, userNativeLan);
+      _dataController.saveUser(id, name, username, pic, "${querySnapshot.docs[0]["SearchKey"]}", email, userNativeLan);
 
       //print('object: ${FirebaseAuth.instance.currentUser}');
       //print('name $name, usrname: $username, pic: $pic, id: $id');
@@ -94,25 +86,15 @@ class _LogInState extends State<LogIn> {
       _dataController.fetchCallHistories();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(
-            context, 'There are no registered users you have entered!');
+        SomniAlerts.showMyDialog(context, 'There are no registered users you have entered!');
       } else if (e.code == 'wrong-password') {
-        // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(
-            context, 'The password you entered is incorrect!');
+        SomniAlerts.showMyDialog(context, 'The password you entered is incorrect!');
       } else if (e.code == 'invalid-email') {
-        // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(
-            context, 'The email address you entered is incorrect!');
+        SomniAlerts.showMyDialog(context, 'The email address you entered is incorrect!');
       } else if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
-        // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(context,
-            'Please check that the password and email you entered are correct!');
+        SomniAlerts.showMyDialog(context, 'Please check that the password and email you entered are correct!');
       } else if (e.code == 'network-request-failed') {
-        // ignore: use_build_context_synchronously
-        SomniAlerts.showMyDialog(
-            context, 'Make sure you are connected to the Internet!');
+        SomniAlerts.showMyDialog(context, 'Make sure you are connected to the Internet!');
       }
 
       log('sign in exception: ${e.toString()}, code: ${e.code}');
@@ -192,8 +174,7 @@ class _LogInState extends State<LogIn> {
                                     scale: 1.9,
                                   ),
                             enabledBorder: const UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(width: 1, color: Colors.black38),
+                              borderSide: BorderSide(width: 1, color: Colors.black38),
                             ),
                             focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(
@@ -202,11 +183,7 @@ class _LogInState extends State<LogIn> {
                               ),
                             ),
                             hintText: 'Email',
-                            hintStyle: const TextStyle(
-                                color: Color(0xff434347),
-                                fontFamily: 'Nunito',
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
+                            hintStyle: const TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                             border: InputBorder.none,
                           ),
                         ),
@@ -224,8 +201,7 @@ class _LogInState extends State<LogIn> {
                           controller: userpasswordcontroller,
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(width: 1, color: Colors.black38),
+                              borderSide: BorderSide(width: 1, color: Colors.black38),
                             ),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
@@ -235,11 +211,7 @@ class _LogInState extends State<LogIn> {
                             ),
                             border: InputBorder.none,
                             hintText: 'Password',
-                            hintStyle: TextStyle(
-                                color: Color(0xff434347),
-                                fontFamily: 'Nunito',
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
+                            hintStyle: TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                           ),
                           obscureText: true,
                         ),
@@ -265,18 +237,13 @@ class _LogInState extends State<LogIn> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             backgroundColor: const Color(0xff0057ff),
                           ),
                           child: const Text(
                             'Sign in',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Nunito',
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
+                            style: TextStyle(color: Colors.white, fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                           ),
                         ),
                       ),
@@ -295,11 +262,7 @@ class _LogInState extends State<LogIn> {
                               alignment: Alignment.bottomRight,
                               child: const Text(
                                 "Forgot Password?",
-                                style: TextStyle(
-                                    color: Color(0xff434347),
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14),
+                                style: TextStyle(color: Color(0xff434347), fontFamily: 'Nunito', fontWeight: FontWeight.normal, fontSize: 14),
                               ),
                             ),
                           ),

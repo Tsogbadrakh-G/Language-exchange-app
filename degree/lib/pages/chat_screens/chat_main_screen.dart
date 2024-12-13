@@ -93,15 +93,13 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     getChannels();
     //print('chat room ${chatRoomsStream}');
     if (chatRoomsStream != null) {
-      chatRoomListSubscription =
-          chatRoomsStream!.asBroadcastStream().listen((e) {
+      chatRoomListSubscription = chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
           return e['to_msg_${_dataController.myUserName}'];
         }).toList();
         if (list.isNotEmpty) {
-          _dataController.unreadChats.value =
-              list.reduce((value, element) => value + element);
+          _dataController.unreadChats.value = list.reduce((value, element) => value + element);
         }
       });
     }
@@ -111,11 +109,9 @@ class _ChatMainScreen extends State<ChatMainScreen> {
 
   listenRoom(String channel) async {
     // List<String> userNativeLans = [];
-    String username =
-        channel.replaceAll("_", "").replaceAll(_dataController.myUserName, "");
+    String username = channel.replaceAll("_", "").replaceAll(_dataController.myUserName, "");
     username = username.replaceAll("_", "");
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username.toUpperCase());
 
     String userNativeLan = querySnapshot.docs[0]['myNativeLanguage'];
     //userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
@@ -123,8 +119,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
     if (!_dataController.activeChatroomListeners.contains(channel)) {
       //  print('update last message with ${channel}');
       _dataController.activeChatroomListeners.add(channel);
-      _listenerController.listenForNewMessages(
-          channel, username, userNativeLan);
+      _listenerController.listenForNewMessages(channel, username, userNativeLan);
     }
   }
 
@@ -158,16 +153,9 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                     physics: const ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
                       DocumentSnapshot ds = snapshot.data.docs[index];
-                      String username = ds.id
-                          .replaceAll("_", "")
-                          .replaceAll(_dataController.myUserName, "");
+                      String username = ds.id.replaceAll("_", "").replaceAll(_dataController.myUserName, "");
                       _dataController.checkToLastMessage(
-                          ds.id,
-                          _dataController.myUserName,
-                          username,
-                          ds["read"],
-                          ds["lastMessageSendBy"],
-                          ds.data() as Map<String, dynamic>);
+                          ds.id, _dataController.myUserName, username, ds["read"], ds["lastMessageSendBy"], ds.data() as Map<String, dynamic>);
 
                       listenRoom(ds.id);
                       listenUserData(username, ds.id);
@@ -182,9 +170,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                         time: ds["lastMessageSendTs"],
                         read: ds["read"],
                         toMsgNum: ds['to_msg_${_dataController.myUserName}'],
-                        name: ds['sendByNameFrom'] == _dataController.myName
-                            ? ds['sendByNameTo']
-                            : ds['sendByNameFrom'],
+                        name: ds['sendByNameFrom'] == _dataController.myName ? ds['sendByNameTo'] : ds['sendByNameFrom'],
                       );
                     }));
           }
@@ -203,8 +189,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
       flexibleSpace: SafeArea(
         child: Container(
           //   decoration: BoxDecoration(border: Border.all()),
-          padding: const EdgeInsets.only(
-              left: 20.0, right: 20.0, top: 18.0, bottom: 0.0),
+          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 18.0, bottom: 0.0),
           child: Column(
             children: [
               Row(
@@ -251,15 +236,13 @@ class _ChatMainScreen extends State<ChatMainScreen> {
   Widget build(BuildContext context) {
     textEditingController.value = textEditingController.value.copyWith(
       // Set the cursor position at the end
-      selection:
-          TextSelection.collapsed(offset: textEditingController.text.length),
+      selection: TextSelection.collapsed(offset: textEditingController.text.length),
     );
     return Scaffold(
         backgroundColor: Colors.white,
         key: _globalKey,
         appBar: homeAppbar(),
-        drawer:
-            _helperController.drawerBuilder(_dataController.myName, context),
+        drawer: _helperController.drawerBuilder(_dataController.myName, context),
         onEndDrawerChanged: (isOpened) {},
         body: CustomScrollView(slivers: [
           SliverAppBar(
@@ -270,11 +253,6 @@ class _ChatMainScreen extends State<ChatMainScreen> {
             backgroundColor: Colors.white,
             title: Container(
               height: 40,
-              decoration: const BoxDecoration(
-                  //border: Border.all()
-                  //color: Colors.white,
-                  // borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
               margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: TextField(
                 cursorHeight: 25,
@@ -340,8 +318,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15.0),
                     borderSide: const BorderSide(
-                      color: Color.fromARGB(255, 205, 205,
-                          206), // Set the border color when focused
+                      color: Color.fromARGB(255, 205, 205, 206), // Set the border color when focused
                     ),
                   ),
                   hintText: 'Search',
@@ -354,11 +331,7 @@ class _ChatMainScreen extends State<ChatMainScreen> {
                   ),
                 ),
                 style: const TextStyle(
-                    decoration: TextDecoration.none,
-                    color: Colors.black,
-                    fontFamily: 'Nunito',
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.w400),
+                    decoration: TextDecoration.none, color: Colors.black, fontFamily: 'Nunito', fontSize: 15.0, fontWeight: FontWeight.w400),
               ),
             ),
           ),
@@ -384,13 +357,11 @@ class _ChatMainScreen extends State<ChatMainScreen> {
 
                       return search
                           ? ListView(
-                              padding:
-                                  const EdgeInsets.only(left: 5.0, right: 5.0),
+                              padding: const EdgeInsets.only(left: 5.0, right: 5.0),
                               primary: false,
                               shrinkWrap: true,
                               children: [...tempSearchStore].map((element) {
-                                return _helperController.buildResultCard(
-                                    element, search);
+                                return _helperController.buildResultCard(element, search);
                               }).toList())
                           : chatRoomList();
                     },

@@ -46,10 +46,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   }
 
   getThisUserInfo() async {
-    username =
-        widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
+    username = widget.chatRoomId.replaceAll("_", "").replaceAll(widget.myUsername, "");
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username.toUpperCase());
     userNativeLans = List<String>.from(querySnapshot.docs[0]["native_lans"]);
     name = "${querySnapshot.docs[0]["Name"]}";
     picUrl = "${querySnapshot.docs[0]["Photo"]}";
@@ -83,30 +81,23 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           return Slidable(
             key: Key(widget.chatRoomId),
             useTextDirection: false,
-            endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                extentRatio: 0.3,
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      if (_dataController.roomsNum > 0) {
-                        _dataController.roomsNum--;
-                      }
-                      DatabaseMethods().deleteChatroom(widget.chatRoomId);
-                    },
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                    backgroundColor: const Color(0xFFFE4A49),
-                    foregroundColor: Colors.white,
-                    icon: CupertinoIcons.delete,
-                    label: 'delete',
-                  ),
-                ]),
+            endActionPane: ActionPane(motion: const ScrollMotion(), extentRatio: 0.3, children: [
+              SlidableAction(
+                onPressed: (context) {
+                  if (_dataController.roomsNum > 0) {
+                    _dataController.roomsNum--;
+                  }
+                  DatabaseMethods().deleteChatroom(widget.chatRoomId);
+                },
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                backgroundColor: const Color(0xFFFE4A49),
+                foregroundColor: Colors.white,
+                icon: CupertinoIcons.delete,
+                label: 'delete',
+              ),
+            ]),
             child: InkWell(
-              // highlightColor: Colors.amberAccent,
-              // splashColor: Colors.red.shade100,
               onTap: () async {
-                //   print('click to ${widget.chatRoomId}');
                 await Get.to(
                     ChatPage(
                       userId: id,
@@ -123,10 +114,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
               child: Container(
                 margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                decoration: const BoxDecoration(
-                    //border: Border.all(),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
                 width: double.infinity,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,10 +127,8 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 height: 65,
                                 width: 65,
                                 decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.black.withOpacity(0.5)),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(30))),
+                                    border: Border.all(color: Colors.black.withOpacity(0.5)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(30))),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(30),
                                   child: CachedNetworkImage(
@@ -152,21 +138,16 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                                 ),
                               ),
                               Obx(() {
-                                if (!_listenerController.channelUsrIsActive
-                                    .containsKey(widget.chatRoomId)) {
+                                if (!_listenerController.channelUsrIsActive.containsKey(widget.chatRoomId)) {
                                   return const Offstage();
                                 } else {
-                                  return _listenerController.channelUsrIsActive[
-                                          widget.chatRoomId]!
+                                  return _listenerController.channelUsrIsActive[widget.chatRoomId]!
                                       ? Positioned(
                                           bottom: 0,
                                           right: 0,
                                           child: Container(
-                                              decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(20))),
+                                              decoration:
+                                                  const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
                                               padding: EdgeInsets.all(2),
                                               child: Image.asset(
                                                 'assets/images/img_online.png',
@@ -190,15 +171,10 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                           ),
                           Text(
                             widget.name,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 17.0,
-                                fontWeight: FontWeight.w500),
+                            style: const TextStyle(color: Colors.black, fontSize: 17.0, fontWeight: FontWeight.w500),
                           ),
                           Text(
-                            widget.sendBy == widget.myUsername
-                                ? "you: ${widget.lastMessage}"
-                                : widget.lastMessage,
+                            widget.sendBy == widget.myUsername ? "you: ${widget.lastMessage}" : widget.lastMessage,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 color: widget.sendBy == widget.myUsername
@@ -222,22 +198,15 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                       children: [
                         Text(
                           widget.time,
-                          style: const TextStyle(
-                              color: Colors.black45,
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w500),
+                          style: const TextStyle(color: Colors.black45, fontSize: 13.0, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
                         if (widget.toMsgNum != 0) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 5),
-                            decoration: const BoxDecoration(
-                                color: Color(0xff2675EC),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30))),
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                            decoration: const BoxDecoration(color: Color(0xff2675EC), borderRadius: BorderRadius.all(Radius.circular(30))),
                             child: Text(
                               '${widget.toMsgNum}',
                               style: const TextStyle(
@@ -250,8 +219,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                        ] else if (widget.read &&
-                            widget.sendBy == widget.myUsername)
+                        ] else if (widget.read && widget.sendBy == widget.myUsername)
                           Image.asset(
                             'assets/images/img_viewed.png',
                             scale: 2,
@@ -309,16 +277,13 @@ class Pages extends StatelessWidget {
     return Container(
       color: color,
       child: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                text,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
-              ),
-            ]),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          ),
+        ]),
       ),
     );
   }

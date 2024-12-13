@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   agora_rtc_engine: ^6.2.2
   permission_handler: ^10.2.0
-  native_screenshot: ^1.0.0
+  # native_screenshot: ^1.0.0
   get: ^4.6.6
   just_audio: ^0.9.35
 

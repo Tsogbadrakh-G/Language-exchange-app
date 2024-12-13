@@ -44,8 +44,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   /// Хэрэглэгчдийн collection
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('users');
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
   Future<void> setStatus(String status) async {
     await usersCollection.doc(_dataController.id).update({'status': status});
   }
@@ -62,15 +61,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   Future<void> load() async {
     chatRoomsStream = await DatabaseMethods().getChatRooms();
     if (chatRoomsStream != null) {
-      chatRoomListSubscription =
-          chatRoomsStream!.asBroadcastStream().listen((e) {
+      chatRoomListSubscription = chatRoomsStream!.asBroadcastStream().listen((e) {
         _dataController.chatroomsLength();
         var list = e.docs.map((e) {
           return e['to_msg_${_dataController.myUserName}'];
         }).toList();
         if (list.isNotEmpty) {
-          _dataController.unreadChats.value =
-              list.reduce((value, element) => value + element);
+          _dataController.unreadChats.value = list.reduce((value, element) => value + element);
         }
       });
     }
@@ -89,9 +86,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     'assets/images/ic_chat1.png',
                     width: 50,
                     height: 30,
-                    color: bottomSelectedIndex != 0
-                        ? const Color(0xff7c7c82a6).withOpacity(0.65)
-                        : const Color(0xff2675EC),
+                    color: bottomSelectedIndex != 0 ? const Color(0xff7c7c82a6).withOpacity(0.65) : const Color(0xff2675EC),
                   ),
                 ),
                 if (_dataController.unreadChats.value > 0) ...[
@@ -99,16 +94,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       top: 0,
                       right: 5,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 1),
-                        decoration: const BoxDecoration(
-                            color: Colors.red,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: const BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(10))),
                         child: Text(
                           '${_dataController.unreadChats.value}',
-                          style: const TextStyle(
-                              fontSize: 8, color: Color(0xffFEFFFE)),
+                          style: const TextStyle(fontSize: 8, color: Color(0xffFEFFFE)),
                         ),
                       )),
                 ],
@@ -124,9 +114,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   'assets/images/ic_video.png',
                   width: 27,
                   height: 26,
-                  color: bottomSelectedIndex != 1
-                      ? const Color(0xff7c7c82a6).withOpacity(0.65)
-                      : const Color(0xff2675EC),
+                  color: bottomSelectedIndex != 1 ? const Color(0xff7c7c82a6).withOpacity(0.65) : const Color(0xff2675EC),
                 ),
               ),
               if (0 > 0) ...[
@@ -134,11 +122,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     top: 0,
                     right: 5,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 1),
-                      decoration: const BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: const BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: const Text(
                         '',
                         style: TextStyle(fontSize: 8, color: Color(0xffFEFFFE)),
@@ -166,8 +151,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void bottomTapped(int index) {
     setState(() {
       bottomSelectedIndex = index;
-      pageController.animateToPage(index,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+      pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
 

@@ -82,8 +82,7 @@ class DataController extends GetxController {
   // ignore: non_constant_identifier_names
   Future<void> chatroomsLength() async {
     int len = 0;
-    QuerySnapshot querySnapshot =
-        await firestoreInstance.collection('chatrooms').get();
+    QuerySnapshot querySnapshot = await firestoreInstance.collection('chatrooms').get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       String username = doc.id.replaceAll(myUserName, "");
@@ -96,19 +95,14 @@ class DataController extends GetxController {
   void fetchCallHistories() async {
     audioMessages = <Chat>[].obs;
     missedMessages = <Chat>[].obs;
-    QuerySnapshot querySnapshot =
-        await firestoreInstance.collection('chatrooms').get();
+    QuerySnapshot querySnapshot = await firestoreInstance.collection('chatrooms').get();
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       //iteration of all chat rooms
       if (doc.id.contains(myUserName)) {
         String username = doc.id.replaceAll(myUserName, "");
         username = username.replaceAll("_", "");
 
-        QuerySnapshot chatSnapshot = await firestoreInstance
-            .collection('chatrooms')
-            .doc(doc.id)
-            .collection('chats')
-            .get();
+        QuerySnapshot chatSnapshot = await firestoreInstance.collection('chatrooms').doc(doc.id).collection('chats').get();
 
         for (var chatDoc in chatSnapshot.docs) {
           Map<String, dynamic> val = chatDoc.data() as Map<String, dynamic>;
@@ -156,8 +150,7 @@ class DataController extends GetxController {
     missedMessages.sort((a, b) => b.officialTime.compareTo(a.officialTime));
   }
 
-  void saveUser(String id, String name, String username, String url,
-      String searchKey, String email, String nativeLan) {
+  void saveUser(String id, String name, String username, String url, String searchKey, String email, String nativeLan) {
     this.id = id;
     myName = name;
     myUserName = username;
@@ -167,8 +160,7 @@ class DataController extends GetxController {
     myNativeLan = nativeLan;
   }
 
-  void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap,
-      bool read, String myUserName, String username) {
+  void setLastMessage(String chatroomId, Map<String, dynamic> lasMessageMap, bool read, String myUserName, String username) {
     Map<String, dynamic> lastMessageInfoMap = {
       "lastMessage": lasMessageMap['lastMessage'],
       "lastMessageSendTs": lasMessageMap['lastMessageSendTs'],
@@ -182,8 +174,7 @@ class DataController extends GetxController {
     DatabaseMethods().updateLastMessageSend(chatroomId, lastMessageInfoMap);
   }
 
-  void checkToLastMessage(String chatroomId, String myUserName,
-      String ousername, bool read, String sendBy, dynamic lastMessageData) {
+  void checkToLastMessage(String chatroomId, String myUserName, String ousername, bool read, String sendBy, dynamic lastMessageData) {
 //    print('check ${exitedForEachChannel[ousername]}');
 
     bool exited = exitedForEachChannel[ousername] ?? true;
@@ -193,15 +184,14 @@ class DataController extends GetxController {
     }
   }
 
-  addMessage(String chatRoomId, String text, String from, String transto,
-      String ousername, String oname) async {
+  addMessage(String chatRoomId, String text, String from, String transto, String ousername, String oname) async {
     if (text != "") {
       String message = text;
       text = "";
-      if (from != transto) {
-        String translationText = await Data.sendText(message, from, transto);
-        message = "$message\n$translationText";
-      }
+      // if (from != transto) {
+      //   String translationText = await Data.sendText(message, from, transto);
+      //   message = "$message\n$translationText";
+      // }
       String messageId = randomAlphaNumeric(10);
 
       DateTime now = DateTime.now();
@@ -215,13 +205,9 @@ class DataController extends GetxController {
         "ts": now,
         "time": FieldValue.serverTimestamp(),
         "imgUrl": picUrl.value,
-        //"missed": false
       };
 
-      DocumentSnapshot ds = await FirebaseFirestore.instance
-          .collection("chatrooms")
-          .doc(chatRoomId)
-          .get();
+      DocumentSnapshot ds = await FirebaseFirestore.instance.collection("chatrooms").doc(chatRoomId).get();
       Map<String, dynamic>? lastMessageData = ds.data() as Map<String, dynamic>;
 
       int to = 0;
@@ -232,9 +218,7 @@ class DataController extends GetxController {
         to = 1;
       }
 
-      DatabaseMethods()
-          .addMessage(chatRoomId, messageId, messageInfoMap)
-          .then((value) {
+      DatabaseMethods().addMessage(chatRoomId, messageId, messageInfoMap).then((value) {
         Map<String, dynamic> lastMessageInfoMap = {
           "lastMessage": message,
           "lastMessageSendTs": formattedDate,
@@ -255,16 +239,14 @@ class DataController extends GetxController {
   }
 
   Future<void> updateUserFCMtoken() async {
-    final CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('users');
+    final CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
 
     await usersCollection.doc(id).update({'fcm_$myUserName': fcmToken});
   }
 
   fetchthisUserFCM(String ousername, String chatroomID) async {
     ousername = chatroomID.replaceAll("_", "").replaceAll(myUserName, "");
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(ousername.toUpperCase());
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(ousername.toUpperCase());
     final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
     String fcm = "${user["fcm_$ousername"]}";
 
@@ -272,8 +254,7 @@ class DataController extends GetxController {
   }
 
   Future<String> fetchThisUserId(String username) async {
-    QuerySnapshot querySnapshot =
-        await DatabaseMethods().getUserInfo(username.toUpperCase());
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username.toUpperCase());
     final user = querySnapshot.docs[0].data() as Map<String, dynamic>;
     String fcm = "${user["Id"]}";
 
